@@ -159,6 +159,28 @@ export default function HomePage() {
   // Common
   const [bookingDate, setBookingDate] = useState("");
   const [bookingPax, setBookingPax] = useState(1);
+  const [bookingError, setBookingError] = useState("");
+
+  function validateBooking(): boolean {
+    if (!bookingDate) { setBookingError("Please select a date."); return false; }
+    if (bookingService === 0) {
+      if (!airportPickup) { setBookingError("Please enter a pickup location."); return false; }
+      if (!airportDropoff) { setBookingError("Please enter a drop-off location."); return false; }
+    } else if (bookingService === 1) {
+      if (!tourDest) { setBookingError("Please enter a tour destination."); return false; }
+      if (!tourMeet) { setBookingError("Please enter a meeting point."); return false; }
+    } else {
+      if (!intercityFrom) { setBookingError("Please enter the departure city."); return false; }
+      if (!intercityTo) { setBookingError("Please enter the destination city."); return false; }
+    }
+    setBookingError("");
+    return true;
+  }
+
+  function handleBookingSubmit() {
+    if (!validateBooking()) return;
+    window.open(buildBookingWaLink(), "_blank", "noopener,noreferrer");
+  }
 
   function buildBookingWaLink() {
     const services = [t.booking.service1, t.booking.service2, t.booking.service3];
@@ -478,15 +500,18 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <a
-                  href={buildBookingWaLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                {bookingError && (
+                  <p className="text-red-400 text-xs font-semibold text-center -mb-1">{bookingError}</p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleBookingSubmit}
                   className="w-full bg-[#F5C518] text-black py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-yellow-400 transition-colors"
                 >
                   <WhatsAppIcon />
                   {t.booking.sendBtn}
-                </a>
+                </button>
 
                 <p className="text-center text-xs text-white/40">
                   {t.booking.disclaimer}
