@@ -471,6 +471,7 @@ export default function HomePage() {
                       {t.booking.dateLabel}
                     </label>
                     <DatePicker
+                      dark
                       value={bookingDate}
                       onChange={setBookingDate}
                       placeholder={t.booking.dateLabel}
