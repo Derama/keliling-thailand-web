@@ -73,17 +73,13 @@ export default function Navbar() {
             <Image
               src="/Logo.png"
               alt="Keliling Thailand"
-              width={80}
-              height={80}
-              className="h-20 w-20 object-contain transition-all duration-300"
-              style={{
-                filter: transparent
-                  ? "brightness(0) invert(1)"
-                  : "invert(12%) sepia(36%) saturate(796%) hue-rotate(191deg) brightness(87%) contrast(96%)",
-              }}
+              width={64}
+              height={64}
+              className="h-16 w-16 object-contain transition-all duration-300"
+              style={transparent ? { filter: "brightness(0) invert(1)" } : {}}
               priority
             />
-            <div style={{ fontFamily: "Georgia, serif" }} className={`ml-4 pl-4 border-l-2 ${borderSubtle} flex flex-col leading-none gap-1`}>
+            <div style={{ fontFamily: "Georgia, serif" }} className={`ml-1 pl-3 border-l-2 ${borderSubtle} flex flex-col leading-none gap-1`}>
               <span className={`${textPrimary} font-bold text-sm tracking-[0.15em]`}>Keliling</span>
               <span className={`${textPrimary} font-bold text-xl tracking-[0.1em] uppercase`}>Thailand</span>
             </div>

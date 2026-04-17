@@ -14,7 +14,10 @@ export default function ServicesContent() {
   return (
     <>
       {/* Page Header */}
-      <section className="bg-black pt-28 pb-16">
+      <section
+        className="pt-28 pb-16 relative"
+        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+      >
         <div className="max-w-4xl mx-auto px-4 text-center">
           <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
             {s.header.eyebrow}
@@ -22,7 +25,7 @@ export default function ServicesContent() {
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mt-3 mb-4">
             {s.header.title}
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/70 text-lg max-w-2xl mx-auto">
             {s.header.subtitle}
           </p>
         </div>
@@ -35,44 +38,60 @@ export default function ServicesContent() {
             {s.services.map((svc) => (
               <div
                 key={svc.title}
-                className={`rounded-2xl overflow-hidden border-2 flex flex-col ${
+                className={`rounded-2xl overflow-hidden border-2 flex flex-col transition-all ${
                   svc.highlight
-                    ? "border-[#F5C518] shadow-2xl shadow-yellow-100"
-                    : "border-gray-100"
+                    ? "border-[#F5C518] shadow-2xl shadow-yellow-100 lg:col-span-1"
+                    : "border-gray-100 hover:border-[#F5C518] hover:shadow-md"
                 }`}
               >
+                {/* Tag bar */}
                 {svc.highlight ? (
                   <div className="bg-[#F5C518] text-black text-center text-xs font-bold py-2 uppercase tracking-widest">
-                    ⭐ {svc.tag}
+                    {svc.tag}
                   </div>
                 ) : (
-                  <div className="bg-gray-50 text-gray-500 text-center text-xs font-bold py-2 uppercase tracking-widest">
+                  <div className="bg-amber-50 text-[#1B2A4A]/50 text-center text-xs font-bold py-2 uppercase tracking-widest">
                     {svc.tag}
                   </div>
                 )}
 
                 <div className="p-8 flex flex-col flex-1">
-                  <div className="text-5xl mb-4">{svc.icon}</div>
                   <div className="text-xs text-gray-400 font-semibold uppercase tracking-widest mb-1">
                     {svc.subtitle}
                   </div>
-                  <h2 className="text-2xl font-extrabold text-black mb-4">{svc.title}</h2>
+                  <h2 className="text-2xl font-extrabold text-black mb-3">{svc.title}</h2>
                   <p className="text-gray-600 text-sm leading-relaxed mb-6">{svc.description}</p>
 
                   <ul className="space-y-2 mb-8 flex-1">
                     {svc.features.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
-                        <span className="text-[#F5C518] font-bold mt-0.5">✓</span>
+                        <span className="text-[#F5C518] font-bold mt-0.5 shrink-0">✓</span>
                         {f}
                       </li>
                     ))}
                   </ul>
 
                   <div className="border-t border-gray-100 pt-6">
-                    <div className="text-xs text-gray-400 uppercase tracking-widest mb-1">
-                      {s.priceTable.colPrice}
-                    </div>
-                    <div className="text-2xl font-extrabold text-black mb-4">{svc.price}</div>
+                    {svc.highlight ? (
+                      /* Dual-price display for Alphard */
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="bg-[#1B2A4A] rounded-xl py-5 px-3 text-center">
+                          <div className="text-white/50 text-[10px] font-bold uppercase tracking-widest mb-2">5 jam</div>
+                          <div className="text-[#F5C518] text-2xl font-extrabold leading-none mb-1">5.000</div>
+                          <div className="text-white/60 text-xs">THB</div>
+                        </div>
+                        <div className="bg-[#F5C518] rounded-xl py-5 px-3 text-center">
+                          <div className="text-black/50 text-[10px] font-bold uppercase tracking-widest mb-2">10 jam</div>
+                          <div className="text-black text-2xl font-extrabold leading-none mb-1">8.500</div>
+                          <div className="text-black/60 text-xs">THB</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-4">
+                        <div className="text-xs text-gray-400 uppercase tracking-widest mb-1">{s.priceTable.colPrice}</div>
+                        <div className="text-2xl font-extrabold text-black">{svc.price}</div>
+                      </div>
+                    )}
                     <a
                       href={WA_LINK}
                       target="_blank"
@@ -80,7 +99,7 @@ export default function ServicesContent() {
                       className={`w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-sm transition-colors ${
                         svc.highlight
                           ? "bg-[#F5C518] text-black hover:bg-yellow-400"
-                          : "bg-black text-white hover:bg-[#F5C518] hover:text-black"
+                          : "bg-[#1B2A4A] text-white hover:bg-[#253d6b]"
                       }`}
                     >
                       {svc.orderBtn}
@@ -96,7 +115,10 @@ export default function ServicesContent() {
       </section>
 
       {/* Popular Destinations */}
-      <section className="py-20 bg-black">
+      <section
+        className="py-20"
+        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
@@ -111,9 +133,11 @@ export default function ServicesContent() {
             {s.destinations.items.map((d) => (
               <div
                 key={d.name}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center hover:border-[#F5C518] transition-colors cursor-default"
+                className="bg-white/10 border border-white/20 rounded-xl p-4 text-center hover:border-[#F5C518] hover:bg-white/15 transition-all cursor-default"
               >
-                <div className="text-3xl mb-2">{d.emoji}</div>
+                <svg className="w-5 h-5 text-[#F5C518] mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
                 <div className="text-white text-sm font-semibold leading-tight">{d.name}</div>
               </div>
             ))}
@@ -130,14 +154,14 @@ export default function ServicesContent() {
             <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
               {s.priceTable.eyebrow}
             </span>
-            <h2 className="text-3xl font-extrabold text-black mt-2">{s.priceTable.title}</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">{s.priceTable.title}</h2>
             <p className="text-gray-500 mt-3 text-sm">{s.priceTable.subtitle}</p>
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
+                <tr className="bg-amber-50 border-b border-gray-100">
                   <th className="text-left px-6 py-4 text-gray-500 font-semibold">{s.priceTable.colService}</th>
                   <th className="text-center px-4 py-4 text-gray-500 font-semibold">{s.priceTable.colPrice}</th>
                   <th className="text-center px-4 py-4 text-gray-500 font-semibold">{s.priceTable.colDriver}</th>
@@ -149,12 +173,14 @@ export default function ServicesContent() {
                 {s.priceTable.rows.map((row) => (
                   <tr key={row.name} className={row.highlight ? "bg-[#F5C518]/5" : ""}>
                     <td className="px-6 py-4 font-extrabold text-black">
-                      {row.name}
-                      {row.highlight && row.badge && (
-                        <span className="ml-2 text-xs bg-[#F5C518] text-black px-2 py-0.5 rounded-full font-bold">
-                          {row.badge}
-                        </span>
-                      )}
+                      <div className="flex flex-col gap-1">
+                        <span>{row.name}</span>
+                        {row.highlight && row.badge && (
+                          <span className="text-xs bg-[#F5C518] text-black px-2 py-0.5 rounded-full font-bold w-fit">
+                            {row.badge}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className={`text-center px-4 py-4 font-bold ${row.highlight ? "text-black" : "text-gray-600"}`}>
                       {row.price}
@@ -179,19 +205,19 @@ export default function ServicesContent() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-amber-50">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-12">
             <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
               {s.faq.eyebrow}
             </span>
-            <h2 className="text-3xl font-extrabold text-black mt-2">{s.faq.title}</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">{s.faq.title}</h2>
           </div>
 
           <div className="space-y-4">
             {s.faq.items.map((faq) => (
               <div key={faq.q} className="bg-white rounded-xl border border-gray-100 p-6">
-                <h3 className="font-bold text-black mb-2">❓ {faq.q}</h3>
+                <h3 className="font-bold text-black mb-2">{faq.q}</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">{faq.a}</p>
               </div>
             ))}
@@ -200,10 +226,13 @@ export default function ServicesContent() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="py-16 bg-[#F5C518]">
+      <section
+        className="py-16"
+        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+      >
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-black mb-3">{s.cta.title}</h2>
-          <p className="text-black/70 mb-8">{s.cta.subtitle}</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">{s.cta.title}</h2>
+          <p className="text-white/70 mb-8">{s.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href={WA_LINK}
@@ -218,7 +247,7 @@ export default function ServicesContent() {
             </a>
             <Link
               href="/contact"
-              className="bg-black text-white px-6 py-3 rounded-full font-bold hover:bg-gray-800 transition-colors inline-flex items-center gap-2"
+              className="bg-white text-[#1B2A4A] px-6 py-3 rounded-full font-bold hover:bg-[#F5C518] hover:text-[#1B2A4A] transition-colors inline-flex items-center gap-2"
             >
               {s.cta.bookingBtn}
             </Link>

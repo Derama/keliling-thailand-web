@@ -11,13 +11,15 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Keliling Thailand — Transportasi Wisata untuk Turis Indonesia",
+  title: "Alphard Experience — Premium Private Transport in Thailand",
   description:
-    "Layanan transportasi premium di Thailand khusus untuk wisatawan Indonesia. SUV charter, airport transfer, dan day tour tersedia. Hubungi kami via WhatsApp!",
-  keywords: "keliling thailand, tour thailand, transportasi thailand, wisata thailand, turis indonesia thailand",
+    "Premium private transport in Thailand for Indonesian, Singaporean, Chinese, Middle Eastern, Western, and Thai travelers. Ideal for corporate trips, weddings, birthdays, influencer itineraries, and Bangkok stays.",
+  keywords:
+    "alphard experience, thailand private transport, bangkok premium chauffeur, thailand airport transfer, wedding transport bangkok, corporate travel thailand",
   openGraph: {
-    title: "Keliling Thailand",
-    description: "Transportasi wisata terpercaya untuk turis Indonesia di Thailand",
+    title: "Alphard Experience",
+    description:
+      "Premium private transport in Thailand for business, celebrations, and high-comfort travel.",
     type: "website",
   },
 };

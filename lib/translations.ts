@@ -14,12 +14,12 @@ export const translations = {
       location: "Lokasi",
     },
     hero: {
-      badge: "🇮🇩 Khusus Wisatawan Indonesia",
-      title1: "Liburan Thailand",
-      title2: "Tanpa Scam,",
-      title3: "Bebas Drama.",
+      badge: "Premium Private Transport in Thailand",
+      title1: "Alphard Experience",
+      title2: "Kemewahan di",
+      title3: "Setiap Perjalanan.",
       subtitle:
-        "Pengemudi berlisensi dan sangat profesional, harga all-in tanpa kejutan, garansi tepat waktu. Sudah 1.200+ trip kami selesaikan — nol penipuan, nol penjemputan gagal dalam 4 tahun.",
+        "Alphard Experience adalah layanan signature kami untuk perjalanan privat premium di Bangkok, sementara Fortuner, Sedan, Van, dan Bus tetap tersedia sebagai pilihan alternatif sesuai kebutuhan perjalanan Anda.",
       stat1Value: "1.200+",
       stat1Label: "Trip Berhasil",
       stat2Value: "4+",
@@ -38,11 +38,11 @@ export const translations = {
       service2: "City Tours & Day Trips",
       service3: "Rute Antar Kota",
       vehicleLabel: "Jenis Kendaraan",
-      vehicle1: "VAN",
-      vehicle2: "SUV (Fortuner)",
-      vehicle3: "Altis (Sedan)",
-      vehicle4: "Mini Bus",
-      vehicle5: "Bus",
+      vehicle1: "Alphard Experience — Signature Offer",
+      vehicle2: "Fortuner — Opsi Alternatif",
+      vehicle3: "Sedan (Altis) — Opsi Alternatif",
+      vehicle4: "Van / Mini Bus — Opsi Alternatif",
+      vehicle5: "Bus — Opsi Alternatif",
       airportPickupLabel: "Lokasi Penjemputan",
       airportPickupPlaceholder: "cth. Hotel Chatrium, Bangkok",
       airportDropoffLabel: "Lokasi Pengantaran",
@@ -72,27 +72,27 @@ export const translations = {
     fleet: {
       eyebrow: "Armada Kami",
       title: "Pilihan Kendaraan",
-      subtitle: "Tersedia berbagai pilihan kendaraan premium untuk setiap kebutuhan perjalanan Anda.",
+      subtitle: "Alphard Experience adalah penawaran signature premium kami. Fortuner, Sedan, Van, dan Bus tersedia sebagai opsi alternatif sesuai ukuran grup dan kebutuhan perjalanan Anda.",
     },
     fleetItems: [
-      { name: "VAN", capacity: "1–8 Orang", tag: "Keluarga & Grup", desc: "Kendaraan luas ideal untuk rombongan kecil dengan kenyamanan maksimal." },
-      { name: "SUV (Fortuner)", capacity: "1–6 Orang", tag: "SUV Premium", desc: "Toyota Fortuner premium, nyaman untuk perjalanan kota maupun jarak jauh." },
-      { name: "Altis (Sedan)", capacity: "1–4 Orang", tag: "Sedan Eksekutif", desc: "Toyota Altis elegan untuk perjalanan bisnis atau couple." },
-      { name: "Mini Bus", capacity: "9–14 Orang", tag: "Grup Sedang", desc: "Solusi tepat untuk rombongan menengah dengan kapasitas lebih besar." },
-      { name: "Bus", capacity: "15–45 Orang", tag: "Grup Besar", desc: "Armada bus untuk rombongan besar, wisata, atau acara korporat." },
+      { name: "Alphard Experience", capacity: "1–6 Orang", tag: "Penawaran Signature Premium", desc: "Pilihan utama kami untuk perjalanan premium, bisnis, airport transfer VIP, dan momen spesial di Bangkok." },
+      { name: "Fortuner", capacity: "1–6 Orang", tag: "Opsi Alternatif", desc: "Alternatif yang nyaman untuk perjalanan kota maupun jarak jauh saat Anda tidak membutuhkan Alphard." },
+      { name: "Sedan (Altis)", capacity: "1–4 Orang", tag: "Opsi Alternatif", desc: "Alternatif praktis dan elegan untuk perjalanan bisnis singkat atau perjalanan berdua." },
+      { name: "Van / Mini Bus", capacity: "7–14 Orang", tag: "Opsi Alternatif", desc: "Alternatif untuk grup kecil hingga menengah yang membutuhkan kapasitas lebih besar." },
+      { name: "Bus", capacity: "15–45 Orang", tag: "Opsi Alternatif", desc: "Alternatif terbaik untuk rombongan besar, acara perusahaan, atau perjalanan grup." },
     ],
     services: {
       eyebrow: "Apa yang Kami Tawarkan",
       title: "Layanan Unggulan Kami",
       subtitle:
-        "Kami hadir untuk memudahkan perjalanan Anda di Thailand dengan armada premium dan tim yang berpengalaman.",
+        "Kami menghadirkan Alphard Experience sebagai layanan utama, dengan alternatif kendaraan lain untuk kebutuhan grup dan rute yang berbeda.",
       moreBtn: "Selengkapnya",
       allBtn: "Lihat Semua Layanan",
     },
     serviceItems: [
       {
-        title: "SUV Charter",
-        desc: "Armada SUV premium dengan pengemudi berpengalaman siap menemani perjalanan Anda seharian penuh.",
+        title: "Alphard Experience",
+        desc: "Layanan signature kami untuk perjalanan premium seharian penuh dengan kenyamanan ekstra dan pengemudi berpengalaman.",
       },
       {
         title: "Airport Transfer",
@@ -107,7 +107,7 @@ export const translations = {
       eyebrow: "Kenapa Keliling Thailand?",
       title: "Kepercayaan Pelanggan Adalah Prioritas Kami",
       subtitle:
-        "Kami bukan sekadar layanan transportasi biasa. Kami adalah teman perjalanan Anda — driver berlisensi dan sangat profesional, memahami kebutuhan turis dari tanah air, dan selalu siap membantu.",
+        "Alphard Experience memimpin layanan transportasi premium kami, didukung pilihan kendaraan alternatif untuk setiap kebutuhan perjalanan di Thailand.",
       consultBtn: "Konsultasi Gratis",
     },
     reasonItems: [
@@ -138,21 +138,21 @@ export const translations = {
     ],
     valueStack: {
       eyebrow: "Grand Slam Offer",
-      title: "Semua Yang Anda Dapatkan",
+      title: "Rincian Paket Charter 10 Jam",
       subtitle:
-        "Kami tidak sekadar menjual transportasi — kami memberikan ketenangan pikiran penuh untuk liburan keluarga Anda di Thailand",
+        "Paket ini dirancang untuk charter privat 10 jam dengan Alphard, driver profesional, dan biaya perjalanan yang dibuat sesederhana mungkin.",
       items: [
-        { name: "Pengemudi bersertifikat dan sangat profesional", value: "2.000 THB" },
-        { name: "Pemantauan jadwal penerbangan real-time (Airport Transfer)", value: "500 THB" },
-        { name: "Konsultasi & perencanaan itinerary gratis", value: "300 THB" },
-        { name: "Rekomendasi & panduan restoran halal", value: "200 THB" },
-        { name: "Dukungan WhatsApp 24/7 selama perjalanan", value: "400 THB" },
+        { name: "Private charter Alphard 10 jam", value: "8.500 THB" },
+        { name: "Driver berlisensi dan sangat profesional", value: "1.500 THB" },
+        { name: "Perencanaan rute fleksibel untuk beberapa pemberhentian", value: "700 THB" },
+        { name: "Koordinasi bahan bakar, tol, dan parkir", value: "800 THB" },
+        { name: "Dukungan WhatsApp 24/7 selama perjalanan", value: "500 THB" },
         { name: "Harga all-in — tidak ada biaya tersembunyi, selamanya", value: "Tak ternilai" },
       ],
       totalLabel: "Total Nilai Paket",
-      totalValue: "3.400 THB",
-      payLabel: "Anda Hanya Bayar",
-      payValue: "mulai 1.200 THB",
+      totalValue: "12.000 THB",
+      payLabel: "Harga Charter 10 Jam",
+      payValue: "8.500 THB",
       ctaBtn: "Klaim Penawaran Ini",
     },
     guarantee: {
@@ -186,9 +186,9 @@ export const translations = {
     },
     testimonials: {
       eyebrow: "Kata Mereka",
-      title: "Bukti Nyata dari Keluarga Indonesia",
+      title: "Bukti Nyata dari Tamu Premium Kami",
       subtitle:
-        "1.200+ trip berhasil, dari ratusan keluarga Indonesia. Ini kata mereka yang sudah merasakan sendiri.",
+        "Dipercaya oleh tamu privat, keluarga, dan profesional yang mengutamakan kenyamanan dan ketepatan waktu.",
     },
     testimonialItems: [
       {
@@ -277,9 +277,9 @@ export const translations = {
     ],
     cta: {
       eyebrow: "Mulai Perjalanan Anda",
-      title: "Mulai Liburan Impian Anda Sekarang",
+      title: "Pesan Alphard Experience Sekarang",
       subtitle:
-        "Lebih dari 1.200 keluarga Indonesia sudah membuktikan. Dengan garansi tepat waktu dan harga all-in, tidak ada risiko sama sekali.",
+        "Jadikan Alphard sebagai pilihan utama Anda, dengan Fortuner, Sedan, Van, dan Bus tetap tersedia sebagai alternatif sesuai kebutuhan.",
       chatBtn: "Chat WhatsApp",
       bookingBtn: "Pesan Sekarang",
     },
@@ -309,7 +309,7 @@ export const translations = {
       services: ["SUV Charter (Full Day)", "SUV Charter (Half Day)", "Airport Transfer (Jemput)", "Airport Transfer (Antar)", "Day Tour Bangkok", "Day Tour Pattaya", "Day Tour Ayutthaya", "Lainnya"],
       vehicleLabel: "Jenis Kendaraan *",
       vehiclePlaceholder: "-- Pilih Kendaraan --",
-      vehicles: ["Van (Alphard/H1)", "SUV (Fortuner)", "Sedan (Altis)", "Mini Bus", "Bus"],
+      vehicles: ["Alphard Experience", "Fortuner — Opsi Alternatif", "Sedan (Altis) — Opsi Alternatif", "Van / Mini Bus — Opsi Alternatif", "Bus — Opsi Alternatif"],
       pickupLabel: "Lokasi Penjemputan",
       pickupPlaceholder: "cth. Hotel Chatrium, Bangkok",
       dropoffLabel: "Lokasi Pengantaran",
@@ -351,12 +351,12 @@ export const translations = {
       location: "Location",
     },
     hero: {
-      badge: "🌏 For All Tourists",
-      title1: "Travel Thailand",
-      title2: "No Scams,",
-      title3: "No Drama.",
+      badge: "Premium Private Transport in Thailand",
+      title1: "Alphard Experience",
+      title2: "Luxury in",
+      title3: "Every Ride.",
       subtitle:
-        "Licensed and highly professional drivers, all-in pricing with no surprises, on-time guarantee. 1,200+ trips completed — zero scams, zero missed pickups in 4 years.",
+        "Alphard Experience is our signature private transport offer in Bangkok, with Fortuner, Sedan, Van, and Bus available as clear alternatives for different trip needs.",
       stat1Value: "1,200+",
       stat1Label: "Trips Completed",
       stat2Value: "4+",
@@ -375,11 +375,11 @@ export const translations = {
       service2: "City Tours & Day Trips",
       service3: "Inter City Routes",
       vehicleLabel: "Vehicle Type",
-      vehicle1: "VAN",
-      vehicle2: "SUV (Fortuner)",
-      vehicle3: "Altis (Sedan)",
-      vehicle4: "Mini Bus",
-      vehicle5: "Bus",
+      vehicle1: "Alphard Experience — Signature Offer",
+      vehicle2: "Fortuner — Alternative Option",
+      vehicle3: "Sedan (Altis) — Alternative Option",
+      vehicle4: "Van / Mini Bus — Alternative Option",
+      vehicle5: "Bus — Alternative Option",
       airportPickupLabel: "Pickup Location",
       airportPickupPlaceholder: "e.g. Chatrium Hotel, Bangkok",
       airportDropoffLabel: "Drop-off Location",
@@ -409,27 +409,27 @@ export const translations = {
     fleet: {
       eyebrow: "Our Fleet",
       title: "Vehicle Options",
-      subtitle: "A range of premium vehicles available for every travel need.",
+      subtitle: "Alphard Experience is our signature premium offer. Fortuner, Sedan, Van, and Bus remain available as alternative options based on your group size and trip style.",
     },
     fleetItems: [
-      { name: "VAN", capacity: "1–8 People", tag: "Family & Groups", desc: "Spacious vehicle ideal for small groups with maximum comfort." },
-      { name: "SUV (Fortuner)", capacity: "1–6 People", tag: "Premium SUV", desc: "Premium Toyota Fortuner, comfortable for city trips and long distances." },
-      { name: "Altis (Sedan)", capacity: "1–4 People", tag: "Executive Sedan", desc: "Elegant Toyota Altis for business travel or couples seeking extra comfort." },
-      { name: "Mini Bus", capacity: "9–14 People", tag: "Medium Groups", desc: "The right solution for mid-size groups needing more capacity." },
-      { name: "Bus", capacity: "15–45 People", tag: "Large Groups", desc: "Full-size bus for large groups, tours, or corporate events." },
+      { name: "Alphard Experience", capacity: "1–6 People", tag: "Premium Signature Offer", desc: "Our lead choice for premium travel, executive transfers, VIP airport pickup, and special occasions in Bangkok." },
+      { name: "Fortuner", capacity: "1–6 People", tag: "Alternative Option", desc: "A comfortable alternative for city rides and longer-distance travel when Alphard is not required." },
+      { name: "Sedan (Altis)", capacity: "1–4 People", tag: "Alternative Option", desc: "A practical and elegant alternative for business travel or couples." },
+      { name: "Van / Mini Bus", capacity: "7–14 People", tag: "Alternative Option", desc: "A group-friendly alternative for small to mid-size parties." },
+      { name: "Bus", capacity: "15–45 People", tag: "Alternative Option", desc: "The best alternative for large groups, company movements, or events." },
     ],
     services: {
       eyebrow: "What We Offer",
       title: "Our Featured Services",
       subtitle:
-        "We make your journey in Thailand seamless with our premium fleet and experienced team.",
+        "We lead with Alphard Experience, while keeping the right alternative vehicles available for larger groups and different travel styles.",
       moreBtn: "Learn More",
       allBtn: "View All Services",
     },
     serviceItems: [
       {
-        title: "SUV Charter",
-        desc: "Premium SUV fleet with experienced drivers ready to accompany you for a full day of travel.",
+        title: "Alphard Experience",
+        desc: "Our signature premium charter with elevated comfort and experienced drivers for a full day of travel.",
       },
       {
         title: "Airport Transfer",
@@ -444,7 +444,7 @@ export const translations = {
       eyebrow: "Why Keliling Thailand?",
       title: "Customer Trust Is Our Priority",
       subtitle:
-        "We are more than just a transportation service. We are your travel companion — understanding tourist needs and always ready to help.",
+        "Alphard Experience leads our premium transport offering, supported by clear vehicle alternatives for every trip across Thailand.",
       consultBtn: "Free Consultation",
     },
     reasonItems: [
@@ -475,21 +475,21 @@ export const translations = {
     ],
     valueStack: {
       eyebrow: "Grand Slam Offer",
-      title: "Everything You Get",
+      title: "10-Hour Charter Breakdown",
       subtitle:
-        "We do not just sell transportation — we deliver complete peace of mind for your family vacation in Thailand",
+        "This package is built for a private 10-hour Alphard charter with a professional driver and simple all-in trip coordination.",
       items: [
-        { name: "Certified licensed and professional driver", value: "2,000 THB" },
-        { name: "Real-time flight monitoring (Airport Transfer)", value: "500 THB" },
-        { name: "Free itinerary consultation & planning", value: "300 THB" },
-        { name: "Halal restaurant recommendations & guidance", value: "200 THB" },
-        { name: "24/7 WhatsApp support throughout your trip", value: "400 THB" },
+        { name: "Private Alphard charter for 10 hours", value: "8,500 THB" },
+        { name: "Licensed and highly professional driver", value: "1,500 THB" },
+        { name: "Flexible route planning for multiple stops", value: "700 THB" },
+        { name: "Fuel, toll, and parking coordination", value: "800 THB" },
+        { name: "24/7 WhatsApp support throughout your trip", value: "500 THB" },
         { name: "All-in pricing — no hidden fees, ever", value: "Priceless" },
       ],
       totalLabel: "Total Package Value",
-      totalValue: "3,400 THB",
-      payLabel: "You Only Pay",
-      payValue: "from 1,200 THB",
+      totalValue: "12,000 THB",
+      payLabel: "10-Hour Charter Price",
+      payValue: "8,500 THB",
       ctaBtn: "Claim This Offer",
     },
     guarantee: {
@@ -523,9 +523,9 @@ export const translations = {
     },
     testimonials: {
       eyebrow: "What They Say",
-      title: "Real Proof From Real Families",
+      title: "Real Proof From Premium Guests",
       subtitle:
-        "1,200+ trips completed across hundreds of satisfied families. Here is what they have to say.",
+        "Trusted by private guests, families, and professionals who value comfort and punctuality.",
     },
     testimonialItems: [
       {
@@ -614,9 +614,9 @@ export const translations = {
     ],
     cta: {
       eyebrow: "Start Your Journey",
-      title: "Start Your Dream Vacation Today",
+      title: "Book Alphard Experience Today",
       subtitle:
-        "Over 1,200 families have already trusted us. With our on-time guarantee and all-in pricing, there is zero risk to you.",
+        "Choose Alphard as your first option, with Fortuner, Sedan, Van, and Bus available whenever a different setup fits better.",
       chatBtn: "Chat on WhatsApp",
       bookingBtn: "Book Now",
     },
@@ -646,7 +646,7 @@ export const translations = {
       services: ["SUV Charter (Full Day)", "SUV Charter (Half Day)", "Airport Transfer (Pick Up)", "Airport Transfer (Drop Off)", "Day Tour Bangkok", "Day Tour Pattaya", "Day Tour Ayutthaya", "Other"],
       vehicleLabel: "Vehicle Type *",
       vehiclePlaceholder: "-- Select Vehicle --",
-      vehicles: ["Van (Alphard/H1)", "SUV (Fortuner)", "Sedan (Altis)", "Mini Bus", "Bus"],
+      vehicles: ["Alphard Experience", "Fortuner — Alternative Option", "Sedan (Altis) — Alternative Option", "Van / Mini Bus — Alternative Option", "Bus — Alternative Option"],
       pickupLabel: "Pickup Location",
       pickupPlaceholder: "e.g. Chatrium Hotel, Bangkok",
       dropoffLabel: "Drop-off Location",
@@ -688,12 +688,12 @@ export const translations = {
       location: "สถานที่",
     },
     hero: {
-      badge: "🇹🇭 บริการท่องเที่ยวไทย",
-      title1: "เที่ยวไทย",
-      title2: "ไม่โดนโกง,",
-      title3: "ไม่มีปัญหา.",
+      badge: "บริการรถส่วนตัวพรีเมียมในประเทศไทย",
+      title1: "Alphard Experience",
+      title2: "Luxury in",
+      title3: "Every Ride.",
       subtitle:
-        "คนขับมีใบอนุญาตและมืออาชีพสูง ราคาครบไม่มีเซอร์ไพรส์ รับประกันตรงเวลา ทริปกว่า 1,200 ครั้งสำเร็จแล้ว — ไม่มีการโกง ไม่มีการรับไม่ได้ในรอบ 4 ปี",
+        "Alphard Experience คือบริการ signature ของเราสำหรับรถส่วนตัวระดับพรีเมียมในกรุงเทพฯ โดยมี Fortuner, Sedan, Van และ Bus เป็นตัวเลือกทางเลือกตามรูปแบบการเดินทางของคุณ",
       stat1Value: "1,200+",
       stat1Label: "ทริปสำเร็จ",
       stat2Value: "4+",
@@ -711,11 +711,11 @@ export const translations = {
       service2: "ทัวร์เมืองและทัวร์รายวัน",
       service3: "เส้นทางระหว่างเมือง",
       vehicleLabel: "ประเภทรถ",
-      vehicle1: "แวน (VAN)",
-      vehicle2: "SUV (Fortuner)",
-      vehicle3: "Altis (ซีดาน)",
-      vehicle4: "มินิบัส",
-      vehicle5: "บัส",
+      vehicle1: "Alphard Experience — Signature Offer",
+      vehicle2: "Fortuner — ตัวเลือกทางเลือก",
+      vehicle3: "Sedan (Altis) — ตัวเลือกทางเลือก",
+      vehicle4: "Van / Mini Bus — ตัวเลือกทางเลือก",
+      vehicle5: "Bus — ตัวเลือกทางเลือก",
       airportPickupLabel: "จุดรับ",
       airportPickupPlaceholder: "เช่น โรงแรม Chatrium กรุงเทพฯ",
       airportDropoffLabel: "จุดส่ง",
@@ -745,27 +745,27 @@ export const translations = {
     fleet: {
       eyebrow: "รถของเรา",
       title: "ตัวเลือกรถ",
-      subtitle: "มีรถพรีเมียมหลายประเภทให้เลือกตามความต้องการการเดินทางของคุณ",
+      subtitle: "Alphard Experience คือข้อเสนอพรีเมียม signature ของเรา ส่วน Fortuner, Sedan, Van และ Bus พร้อมให้บริการเป็นตัวเลือกทางเลือกตามขนาดกลุ่มและลักษณะทริป",
     },
     fleetItems: [
-      { name: "แวน (VAN)", capacity: "1–8 คน", tag: "ครอบครัวและกลุ่ม", desc: "รถขนาดใหญ่เหมาะสำหรับกลุ่มเล็กที่ต้องการความสะดวกสบายสูงสุด" },
-      { name: "SUV (Fortuner)", capacity: "1–6 คน", tag: "SUV พรีเมียม", desc: "Toyota Fortuner พรีเมียม สะดวกสบายทั้งในเมืองและทางไกล" },
-      { name: "Altis (ซีดาน)", capacity: "1–4 คน", tag: "ซีดานหรู", desc: "Toyota Altis หรูหราสำหรับการเดินทางธุรกิจหรือคู่รัก" },
-      { name: "มินิบัส", capacity: "9–14 คน", tag: "กลุ่มกลาง", desc: "เหมาะสำหรับกลุ่มขนาดกลางที่ต้องการพื้นที่มากขึ้น" },
-      { name: "บัส", capacity: "15–45 คน", tag: "กลุ่มใหญ่", desc: "บัสขนาดใหญ่สำหรับทัวร์กลุ่มใหญ่หรืองานองค์กร" },
+      { name: "Alphard Experience", capacity: "1–6 คน", tag: "ข้อเสนอ Signature ระดับพรีเมียม", desc: "ตัวเลือกหลักของเราสำหรับการเดินทางพรีเมียม ทริปธุรกิจ รับส่งสนามบินแบบ VIP และโอกาสพิเศษในกรุงเทพฯ" },
+      { name: "Fortuner", capacity: "1–6 คน", tag: "ตัวเลือกทางเลือก", desc: "ตัวเลือกทางเลือกที่นั่งสบายสำหรับการเดินทางในเมืองและทางไกลเมื่อไม่จำเป็นต้องใช้ Alphard" },
+      { name: "Sedan (Altis)", capacity: "1–4 คน", tag: "ตัวเลือกทางเลือก", desc: "ตัวเลือกทางเลือกที่คล่องตัวและดูดีสำหรับทริปธุรกิจหรือเดินทางแบบคู่" },
+      { name: "Van / Mini Bus", capacity: "7–14 คน", tag: "ตัวเลือกทางเลือก", desc: "ตัวเลือกทางเลือกสำหรับกลุ่มเล็กถึงกลางที่ต้องการพื้นที่มากขึ้น" },
+      { name: "Bus", capacity: "15–45 คน", tag: "ตัวเลือกทางเลือก", desc: "ตัวเลือกทางเลือกที่เหมาะที่สุดสำหรับคณะใหญ่ งานอีเวนต์ หรือการเดินทางหมู่คณะ" },
     ],
     services: {
       eyebrow: "สิ่งที่เรานำเสนอ",
       title: "บริการเด่นของเรา",
       subtitle:
-        "เราช่วยให้การเดินทางของคุณในประเทศไทยสะดวกสบายด้วยรถพรีเมียมและทีมงานที่มีประสบการณ์",
+        "เราให้ Alphard Experience เป็นบริการหลัก พร้อมรถทางเลือกสำหรับกลุ่มใหญ่ขึ้นและรูปแบบการเดินทางที่ต่างกัน",
       moreBtn: "อ่านเพิ่มเติม",
       allBtn: "ดูบริการทั้งหมด",
     },
     serviceItems: [
       {
-        title: "เช่า SUV",
-        desc: "รถ SUV พรีเมียมพร้อมคนขับที่มีประสบการณ์พาคุณเที่ยวได้ทั้งวัน",
+        title: "Alphard Experience",
+        desc: "บริการ signature ของเราสำหรับการเดินทางพรีเมียมตลอดวัน พร้อมความสบายระดับสูงและคนขับที่มีประสบการณ์",
       },
       {
         title: "รับส่งสนามบิน",
@@ -780,7 +780,7 @@ export const translations = {
       eyebrow: "ทำไมต้องเลือก Keliling Thailand?",
       title: "ความไว้วางใจของลูกค้าคือสิ่งสำคัญที่สุด",
       subtitle:
-        "เราไม่ใช่แค่บริการรถรับส่งธรรมดา เราคือเพื่อนร่วมเดินทางของคุณ เข้าใจความต้องการของนักท่องเที่ยว และพร้อมช่วยเหลือเสมอ",
+        "Alphard Experience คือหัวใจของบริการรถพรีเมียมของเรา พร้อมตัวเลือกรถทางเลือกที่ชัดเจนสำหรับทุกทริปทั่วประเทศไทย",
       consultBtn: "ปรึกษาฟรี",
     },
     reasonItems: [
@@ -811,21 +811,21 @@ export const translations = {
     ],
     valueStack: {
       eyebrow: "ข้อเสนอพิเศษ",
-      title: "ทุกสิ่งที่คุณได้รับ",
+      title: "รายละเอียดแพ็กเกจเช่าเหมารถ 10 ชั่วโมง",
       subtitle:
-        "เราไม่ได้แค่ขายบริการรถ — เราให้ความสงบใจสมบูรณ์แบบสำหรับวันหยุดของครอบครัวคุณในประเทศไทย",
+        "แพ็กเกจนี้ออกแบบมาสำหรับการเช่า Alphard แบบส่วนตัว 10 ชั่วโมง พร้อมคนขับมืออาชีพและการประสานงานการเดินทางแบบครบจบ.",
       items: [
-        { name: "คนขับที่ผ่านการรับรองและมีใบอนุญาตอย่างเป็นทางการ", value: "2,000 บาท" },
-        { name: "ติดตามตารางบินแบบเรียลไทม์ (รับส่งสนามบิน)", value: "500 บาท" },
-        { name: "ปรึกษาและวางแผนการเดินทางฟรี", value: "300 บาท" },
-        { name: "แนะนำร้านอาหารฮาลาลและคำแนะนำ", value: "200 บาท" },
-        { name: "สนับสนุน WhatsApp 24/7 ตลอดการเดินทาง", value: "400 บาท" },
+        { name: "เช่า Alphard แบบส่วนตัว 10 ชั่วโมง", value: "8,500 บาท" },
+        { name: "คนขับที่มีใบอนุญาตและเป็นมืออาชีพสูง", value: "1,500 บาท" },
+        { name: "วางแผนเส้นทางยืดหยุ่นสำหรับหลายจุดแวะ", value: "700 บาท" },
+        { name: "ประสานงานค่าน้ำมัน ค่าทางด่วน และค่าจอดรถ", value: "800 บาท" },
+        { name: "สนับสนุน WhatsApp 24/7 ตลอดการเดินทาง", value: "500 บาท" },
         { name: "ราคาครบ — ไม่มีค่าใช้จ่ายแอบแฝงตลอดไป", value: "ประเมินค่าไม่ได้" },
       ],
       totalLabel: "มูลค่ารวมทั้งหมด",
-      totalValue: "3,400 บาท",
-      payLabel: "คุณจ่ายเพียง",
-      payValue: "เริ่มต้น 1,200 บาท",
+      totalValue: "12,000 บาท",
+      payLabel: "ราคาเช่าเหมารถ 10 ชั่วโมง",
+      payValue: "8,500 บาท",
       ctaBtn: "รับข้อเสนอนี้",
     },
     guarantee: {
@@ -859,9 +859,9 @@ export const translations = {
     },
     testimonials: {
       eyebrow: "เสียงจากลูกค้า",
-      title: "หลักฐานจริงจากครอบครัวจริง",
+      title: "เสียงจริงจากลูกค้าพรีเมียมของเรา",
       subtitle:
-        "ทริปกว่า 1,200 ครั้งสำเร็จ จากครอบครัวอินโดนีเซียหลายร้อยครอบครัว นี่คือสิ่งที่พวกเขาพูด",
+        "ได้รับความไว้วางใจจากลูกค้าส่วนตัว ครอบครัว และมืออาชีพที่ให้ความสำคัญกับความสบายและความตรงเวลา",
     },
     testimonialItems: [
       {
@@ -950,9 +950,9 @@ export const translations = {
     ],
     cta: {
       eyebrow: "เริ่มต้นการเดินทาง",
-      title: "เริ่มต้นวันหยุดในฝันของคุณวันนี้",
+      title: "จอง Alphard Experience วันนี้",
       subtitle:
-        "ครอบครัวอินโดนีเซียกว่า 1,200 ครอบครัวไว้ใจเราแล้ว ด้วยการรับประกันตรงเวลาและราคาครบ ไม่มีความเสี่ยงสำหรับคุณเลย",
+        "เลือก Alphard เป็นตัวเลือกแรกของคุณ และยังมี Fortuner, Sedan, Van และ Bus พร้อมเป็นทางเลือกเมื่อเหมาะกับทริปมากกว่า",
       chatBtn: "แชท WhatsApp",
       bookingBtn: "จองเลย",
     },
@@ -982,7 +982,7 @@ export const translations = {
       services: ["เช่า SUV (เต็มวัน)", "เช่า SUV (ครึ่งวัน)", "รับสนามบิน", "ส่งสนามบิน", "ทัวร์รายวัน กรุงเทพฯ", "ทัวร์รายวัน พัทยา", "ทัวร์รายวัน อยุธยา", "อื่นๆ"],
       vehicleLabel: "ประเภทรถ *",
       vehiclePlaceholder: "-- เลือกรถ --",
-      vehicles: ["แวน (Alphard/H1)", "SUV (Fortuner)", "ซีดาน (Altis)", "มินิบัส", "บัส"],
+      vehicles: ["Alphard Experience", "Fortuner — ตัวเลือกทางเลือก", "Sedan (Altis) — ตัวเลือกทางเลือก", "Van / Mini Bus — ตัวเลือกทางเลือก", "Bus — ตัวเลือกทางเลือก"],
       pickupLabel: "จุดรับ",
       pickupPlaceholder: "เช่น โรงแรม Chatrium กรุงเทพฯ",
       dropoffLabel: "จุดส่ง",
@@ -1015,18 +1015,18 @@ export const translations = {
 export const extendedTranslations = {
   id: {
     alts: {
-      slide1: "Toyota Fortuner SUV hitam parkir di tepi hutan",
-      slide2: "Sedan putih di jalan beraspal",
-      slide3: "Bus coach putih di jalan dekat tebing",
-      fleet1: "Kendaraan van putih",
+      slide1: "Toyota Alphard hitam parkir di area resort mewah",
+      slide2: "Toyota Alphard premium untuk airport transfer privat",
+      slide3: "Rangkaian Toyota Alphard untuk perjalanan VIP keluarga",
+      fleet1: "Toyota Alphard premium berwarna hitam",
       fleet2: "SUV Toyota Fortuner",
       fleet3: "Sedan Toyota Altis",
       fleet4: "Mini bus di jalan",
       fleet5: "Bus ukuran penuh",
     },
     meta: {
-      defaultTitle: "Keliling Thailand — Transportasi Wisata untuk Turis Indonesia",
-      defaultDescription: "Layanan transportasi premium di Thailand khusus untuk wisatawan Indonesia. SUV charter, airport transfer, dan day tour tersedia.",
+      defaultTitle: "Alphard Experience — Transportasi Privat Premium di Thailand",
+      defaultDescription: "Transportasi privat premium di Thailand untuk tamu Indonesia, Singapura, China, Timur Tengah, Barat, dan Thailand. Cocok untuk corporate travel, wedding, birthday trip, influencer trip, dan airport transfer.",
       servicesTitle: "Layanan — Keliling Thailand",
       servicesDescription: "SUV Charter, Airport Transfer, dan Day Tour untuk wisatawan Indonesia di Thailand. Armada premium, pengemudi berpengalaman, harga transparan.",
       contactTitle: "Pesan Sekarang — Keliling Thailand",
@@ -1044,22 +1044,22 @@ export const extendedTranslations = {
       },
       services: [
         {
-          icon: "🚙", tag: "Paling Populer", title: "SUV Charter", subtitle: "Full Day / Half Day", highlight: true,
-          description: "Sewa SUV premium seharian penuh dengan pengemudi berpengalaman kami. Bebas tentukan itinerary, kami siap membawa Anda ke mana saja di Thailand.",
-          features: ["Armada Toyota Fortuner / Innova / setara","Driver berlisensi dan sangat profesional","Kapasitas hingga 7 penumpang","Bebas tentukan rute & destinasi","AC sejuk sepanjang perjalanan","Tersedia full day (12 jam) & half day (6 jam)","Termasuk BBM & parkir"],
-          price: "Mulai dari 1.200 THB", orderBtn: "Pesan via WhatsApp",
+          icon: "car", tag: "Pilihan Utama", title: "Alphard Experience", subtitle: "Charter Privat Premium", highlight: true,
+          description: "Standar baru perjalanan privat di Thailand. Kabin lega, kursi captain, privasi penuh — untuk 1–6 tamu yang menginginkan perjalanan terbaik.",
+          features: ["Kabin premium dengan captain seat & dual-zone AC","Driver berlisensi dan sangat profesional","Kapasitas 1–6 penumpang","USB & wireless charging tersedia","Termasuk BBM, tol & parkir","Konfirmasi cepat via WhatsApp"],
+          price: "5.000 THB (5 jam) / 8.500 THB (10 jam)", orderBtn: "Pesan Alphard via WhatsApp",
         },
         {
-          icon: "✈️", tag: "Terpercaya", title: "Airport Transfer", subtitle: "Jemput & Antar", highlight: false,
+          icon: "plane", tag: "Terpercaya", title: "Airport Transfer", subtitle: "Jemput & Antar", highlight: false,
           description: "Layanan jemput-antar bandara yang tepat waktu dan profesional. Kami memantau jadwal penerbangan Anda secara real-time sehingga tidak perlu khawatir meski ada delay.",
           features: ["Pantau jadwal penerbangan real-time","Penjemputan dengan papan nama","Tersedia 24/7","Suvarnabhumi & Don Mueang Airport","Tidak ada biaya tambahan untuk delay","Konfirmasi otomatis via WhatsApp","Anak & bayi welcome"],
-          price: "Mulai dari 600 THB", orderBtn: "Pesan via WhatsApp",
+          price: "3.000 THB", orderBtn: "Pesan via WhatsApp",
         },
         {
-          icon: "🗺️", tag: "Rekomendasi", title: "Day Tour", subtitle: "Wisata Sehari", highlight: false,
-          description: "Paket wisata sehari ke destinasi-destinasi ikonik Thailand dengan driver berlisensi dan sangat profesional.",
-          features: ["Driver berlisensi dan sangat profesional","Rute sudah terencana & efisien","Tiket masuk bisa di-include","Makan siang halal tersedia","Foto & dokumentasi perjalanan","Fleksibel: solo, couple, grup","Free itinerary consultation"],
-          price: "Mulai dari 900 THB/pax", orderBtn: "Pesan via WhatsApp",
+          icon: "bus", tag: "Kendaraan Alternatif", title: "Fortuner · Altis · Van · Bus", subtitle: "Sesuai Kapasitas & Budget", highlight: false,
+          description: "Butuh kapasitas lebih besar atau pilihan lain? Kami menyediakan armada alternatif untuk berbagai kebutuhan grup dan budget.",
+          features: ["Toyota Fortuner — 1–7 penumpang","Toyota Altis / Sedan — 1–4 penumpang","Van — 8–12 penumpang","Bus — 13–40 penumpang","Driver berlisensi untuk semua armada","Harga menyesuaikan rute & durasi"],
+          price: "Hubungi kami", orderBtn: "Tanya via WhatsApp",
         },
       ],
       destinations: {
@@ -1079,16 +1079,16 @@ export const extendedTranslations = {
       },
       priceTable: {
         eyebrow: "Perbandingan Harga",
-        title: "Lebih Murah. Lebih Aman. Driver Berlisensi & Profesional.",
-        subtitle: "Bandingkan sendiri sebelum memutuskan — harga per hari, bukan per perjalanan",
-        colService: "Layanan", colPrice: "Harga/Hari", colDriver: "Driver Berlisensi", colFixed: "Harga Tetap", colGuarantee: "Garansi",
+        title: "Alphard Premium, Harga yang Masuk Akal.",
+        subtitle: "Bandingkan charter Alphard 10 jam kami vs pilihan lain — harga tetap, driver berlisensi, tanpa kejutan",
+        colService: "Layanan", colPrice: "Harga (10 Jam)", colDriver: "Driver Berlisensi", colFixed: "Harga Tetap", colGuarantee: "Garansi",
         note: "~ = tergantung operator · ✓ = selalu tersedia · ✗ = tidak tersedia",
-        disclaimer: "* Harga dapat berubah tergantung destinasi dan durasi. Hubungi kami untuk penawaran custom.",
+        disclaimer: "* Harga competitor adalah estimasi pasar. Harga Keliling Thailand sudah all-in termasuk driver, BBM, tol, dan parkir.",
         rows: [
-          { name: "⭐ Keliling Thailand", badge: "PILIHAN TERBAIK", price: "1.200 THB", driver: "✓", fixed: "✓", guarantee: "✓", highlight: true },
-          { name: "Taksi Lokal Thailand", price: "3.000–5.000 THB", driver: "✗", fixed: "✗", guarantee: "✗", highlight: false },
-          { name: "Grab / Bolt Thailand", price: "2.000–3.500 THB", driver: "✗", fixed: "~", guarantee: "✗", highlight: false },
-          { name: "Travel Agent Umum", price: "2.500–4.000 THB", driver: "~", fixed: "~", guarantee: "✗", highlight: false },
+          { name: "Keliling Thailand (Alphard)", badge: "PILIHAN TERBAIK", price: "8.500 THB", driver: "✓", fixed: "✓", guarantee: "✓", highlight: true },
+          { name: "Travel Agent / Tour Operator", price: "12.000–20.000 THB", driver: "~", fixed: "✗", guarantee: "✗", highlight: false },
+          { name: "Sewa Mobil Mewah (tanpa driver)", price: "5.000–8.000 THB", driver: "✗", fixed: "~", guarantee: "✗", highlight: false },
+          { name: "Taksi Meter / Grab Premium", price: "6.000–10.000 THB", driver: "✗", fixed: "✗", guarantee: "✗", highlight: false },
         ],
       },
       faq: {
@@ -1114,14 +1114,14 @@ export const extendedTranslations = {
     about: {
       header: {
         eyebrow: "Tentang Kami",
-        title: "Teman Perjalanan Terpercaya Anda di Thailand",
-        subtitle: "Sejak 2021, kami telah membantu ratusan keluarga Indonesia menjelajahi Thailand dengan aman, nyaman, dan bebas masalah.",
+        title: "Transportasi Privat Premium di Thailand",
+        subtitle: "Keliling Thailand menghadirkan Alphard Experience dan layanan transportasi privat berstandar premium untuk tamu bisnis, keluarga, ekspat, dan perjalanan spesial di Bangkok.",
       },
       story: {
-        eyebrow: "Kisah Kami", title: "Lahir dari Kebutuhan Nyata",
-        p1: "Keliling Thailand lahir dari kegelisahan nyata: terlalu banyak turis Indonesia yang tiba di Thailand dengan penuh semangat, namun pulang dengan cerita buruk — taksi yang tidak tahu jalan, harga yang berubah-ubah, atau bahkan tidak dijemput sama sekali.",
-        p2: "Kami percaya bahwa liburan di Thailand seharusnya menjadi kenangan indah, bukan mimpi buruk. Itulah mengapa kami membangun layanan yang benar-benar memahami kebutuhan turis dari Indonesia.",
-        p3: "Sejak hari pertama, prinsip kami sederhana: tepat waktu, harga transparan, dan driver yang benar-benar profesional.",
+        eyebrow: "Kisah Kami", title: "Dibangun untuk Standar yang Lebih Tinggi",
+        p1: "Keliling Thailand dibangun untuk tamu yang menginginkan lebih dari sekadar kendaraan. Mereka membutuhkan layanan yang rapi, tepat waktu, nyaman, dan pantas mewakili standar perjalanan premium di Thailand.",
+        p2: "Dari airport transfer, agenda bisnis, hingga wedding trip, birthday celebration, dan perjalanan privat di Bangkok, kami merancang setiap layanan agar terasa lebih personal, tenang, dan berkelas dari awal sampai akhir.",
+        p3: "Karena itu, kami menjaga hal-hal yang paling penting: pengemudi profesional, komunikasi yang jelas, armada yang terawat, serta pengalaman perjalanan yang konsisten untuk setiap tamu.",
       },
       stats: [
         { value: "1.200+", label: "Trip Berhasil" },
@@ -1132,13 +1132,13 @@ export const extendedTranslations = {
       values: {
         eyebrow: "Nilai Kami", title: "Apa yang Kami Percaya",
         items: [
-          { icon: "⏱️", title: "Tepat Waktu Selalu", desc: "Waktu Anda berharga. Kami tidak pernah terlambat tanpa alasan, dan jika itu terjadi, Anda bayar setengahnya." },
-          { icon: "💬", title: "Komunikasi Terbuka", desc: "Dari konfirmasi H-1 hingga update real-time di bandara — kami selalu memberitahu Anda apa yang terjadi." },
-          { icon: "🛡️", title: "Keamanan Utama", desc: "Semua driver kami diverifikasi identitas dan SIM-nya. Tidak ada driver 'dadakan' tanpa rekam jejak." },
-          { icon: "💰", title: "Harga Jujur", desc: "Harga yang disepakati adalah harga final. Tidak ada argo, tidak ada biaya tambahan yang datang mendadak." },
+          { icon: "⏱️", title: "Presisi Waktu", desc: "Kami bekerja dengan standar yang menghargai jadwal Anda, baik untuk penerbangan pagi, meeting penting, maupun acara spesial." },
+          { icon: "💬", title: "Layanan yang Personal", desc: "Komunikasi kami cepat, jelas, dan rapi agar Anda selalu merasa ditangani dengan baik dari reservasi hingga perjalanan selesai." },
+          { icon: "🛡️", title: "Profesional & Terpercaya", desc: "Setiap pengemudi dipilih dengan standar tinggi, memahami etika layanan, privasi tamu, dan pentingnya pengalaman yang tenang." },
+          { icon: "💰", title: "Transparan Sejak Awal", desc: "Penawaran kami jelas sejak awal, tanpa biaya tersembunyi dan tanpa kejutan yang merusak pengalaman Anda." },
         ],
       },
-      cta: { title: "Siap Mulai Perjalanan?", subtitle: "Hubungi kami sekarang dan dapatkan konsultasi gratis untuk perjalanan Thailand Anda.", btn: "Chat WhatsApp Sekarang" },
+      cta: { title: "Siap Merencanakan Perjalanan Anda?", subtitle: "Hubungi kami untuk mendapatkan rekomendasi layanan privat premium yang paling sesuai dengan agenda Anda di Thailand.", btn: "Chat WhatsApp Sekarang" },
     },
     airportTransfer: {
       header: {
@@ -1162,7 +1162,7 @@ export const extendedTranslations = {
       },
       pricing: {
         eyebrow: "Harga", title: "Harga Transparan, Tidak Ada Kejutan",
-        from: "Mulai dari", price: "600 THB",
+        from: "Mulai dari", price: "3.000 THB",
         note: "Harga tergantung bandara, tujuan, dan jenis kendaraan. Hubungi kami untuk penawaran khusus.",
       },
       cta: { title: "Pesan Airport Transfer Sekarang", subtitle: "Konfirmasi dalam 1 jam. Tidak perlu daftar akun.", btn: "Chat WhatsApp" },
@@ -1175,10 +1175,10 @@ export const extendedTranslations = {
       tours: {
         eyebrow: "Pilihan Paket", title: "Paket Tour Populer",
         items: [
-          { emoji: "🏯", name: "Bangkok City Tour", desc: "Grand Palace, Wat Pho, Wat Arun, dan pasar lokal dalam satu hari penuh.", duration: "Full Day (8–10 jam)", from: "Mulai 1.200 THB" },
-          { emoji: "🏛️", name: "Ayutthaya Day Trip", desc: "Jelajahi ibu kota kuno Thailand dengan candi-candi bersejarah yang menakjubkan.", duration: "Full Day (8–9 jam)", from: "Mulai 1.500 THB" },
-          { emoji: "⛵", name: "Floating Market Tour", desc: "Pengalaman belanja dan kuliner di pasar terapung ikonik Thailand.", duration: "Half Day (4–5 jam)", from: "Mulai 900 THB" },
-          { emoji: "🏖️", name: "Pattaya Day Trip", desc: "Pantai, Walking Street, dan hiburan khas Pattaya dalam sehari.", duration: "Full Day (10–12 jam)", from: "Mulai 1.800 THB" },
+          { emoji: "🏯", name: "Bangkok City Tour", desc: "Grand Palace, Wat Pho, Wat Arun, dan pasar lokal dalam satu hari penuh.", duration: "Full Day (10 jam)", from: "8.500" },
+          { emoji: "🏛️", name: "Ayutthaya Day Trip", desc: "Jelajahi ibu kota kuno Thailand dengan candi-candi bersejarah yang menakjubkan.", duration: "Full Day (10 jam)", from: "8.500" },
+          { emoji: "⛵", name: "Floating Market Tour", desc: "Pengalaman belanja dan kuliner di pasar terapung ikonik Thailand.", duration: "Half Day (5 jam)", from: "5.000" },
+          { emoji: "🏖️", name: "Pattaya Day Trip", desc: "Pantai, Walking Street, dan hiburan khas Pattaya dalam sehari.", duration: "Full Day (10 jam)", from: "8.500" },
           { emoji: "🐘", name: "Chiang Mai Adventure", desc: "Gajah, kuil, dan alam Chiang Mai — paket multi-hari tersedia.", duration: "1–3 hari", from: "Hubungi kami" },
           { emoji: "🌊", name: "Koh Samui / Hua Hin", desc: "Pantai eksotis dan resort mewah di destinasi favorit wisatawan.", duration: "1–2 hari", from: "Hubungi kami" },
         ],
@@ -1219,18 +1219,18 @@ export const extendedTranslations = {
 
   en: {
     alts: {
-      slide1: "Black Toyota Fortuner SUV parked near the woods",
-      slide2: "White sedan car on asphalt road",
-      slide3: "White coach bus on road near scenic cliff",
-      fleet1: "White van vehicle",
+      slide1: "Black Toyota Alphard parked at a luxury resort driveway",
+      slide2: "Premium Toyota Alphard for private airport transfer",
+      slide3: "Toyota Alphard lineup for VIP family travel",
+      fleet1: "Black premium Toyota Alphard",
       fleet2: "Toyota Fortuner SUV",
       fleet3: "Toyota Altis sedan",
       fleet4: "Mini bus on road",
       fleet5: "Full-size bus",
     },
     meta: {
-      defaultTitle: "Keliling Thailand — Premium Transport for Tourists",
-      defaultDescription: "Premium transportation in Thailand. SUV charter, airport transfer, and day tours available. Contact us via WhatsApp!",
+      defaultTitle: "Alphard Experience — Premium Private Transport in Thailand",
+      defaultDescription: "Premium private transport in Thailand for Indonesian, Singaporean, Chinese, Middle Eastern, Western, and Thai guests. Ideal for corporate travel, weddings, birthday trips, influencer itineraries, and airport transfers.",
       servicesTitle: "Services — Keliling Thailand",
       servicesDescription: "SUV Charter, Airport Transfer, and Day Tours in Thailand. Premium fleet, experienced drivers, transparent pricing.",
       contactTitle: "Book Now — Keliling Thailand",
@@ -1248,22 +1248,22 @@ export const extendedTranslations = {
       },
       services: [
         {
-          icon: "🚙", tag: "Most Popular", title: "SUV Charter", subtitle: "Full Day / Half Day", highlight: true,
-          description: "Rent a premium SUV for a full day with our experienced driver. Set your own itinerary — we will take you anywhere in Thailand comfortably and safely.",
-          features: ["Toyota Fortuner / Innova / equivalent fleet","Licensed and highly professional driver","Capacity up to 7 passengers","Freedom to set your own route & destinations","Air-conditioned throughout the journey","Available full day (12 hrs) & half day (6 hrs)","Fuel & parking included"],
-          price: "From 1,200 THB", orderBtn: "Book via WhatsApp",
+          icon: "car", tag: "Primary Choice", title: "Alphard Experience", subtitle: "Premium Private Charter", highlight: true,
+          description: "A new standard in private travel across Thailand. Spacious cabin, captain seats, full privacy — for 1–6 guests who want the best.",
+          features: ["Captain seats with dual-zone AC","Licensed and highly professional driver","Capacity 1–6 passengers","USB & wireless charging available","Fuel, tolls & parking included","Fast WhatsApp confirmation"],
+          price: "5,000 THB (5 hrs) / 8,500 THB (10 hrs)", orderBtn: "Book Alphard via WhatsApp",
         },
         {
-          icon: "✈️", tag: "Trusted", title: "Airport Transfer", subtitle: "Pickup & Drop-off", highlight: false,
+          icon: "plane", tag: "Trusted", title: "Airport Transfer", subtitle: "Pickup & Drop-off", highlight: false,
           description: "Punctual and professional airport transfer service. We monitor your flight in real-time so you never have to worry about delays.",
           features: ["Real-time flight monitoring","Name board pickup at arrivals","Available 24/7","Suvarnabhumi & Don Mueang airports","No extra charge for flight delays","Automatic WhatsApp confirmation","Children & babies welcome"],
-          price: "From 600 THB", orderBtn: "Book via WhatsApp",
+          price: "3,000 THB", orderBtn: "Book via WhatsApp",
         },
         {
-          icon: "🗺️", tag: "Recommended", title: "Day Tour", subtitle: "One-Day Trip", highlight: false,
-          description: "Guided day trips to Thailand's iconic destinations with a licensed and highly professional driver.",
-          features: ["Licensed and highly professional driver","Pre-planned and efficient routes","Entry tickets can be included","Halal lunch available","Trip photos & documentation","Flexible: solo, couple, or group","Free itinerary consultation"],
-          price: "From 900 THB/pax", orderBtn: "Book via WhatsApp",
+          icon: "bus", tag: "Alternative Fleet", title: "Fortuner · Altis · Van · Bus", subtitle: "By Capacity & Budget", highlight: false,
+          description: "Need more seats or a different setup? We have the right vehicle for every group size and budget.",
+          features: ["Toyota Fortuner — 1–7 passengers","Toyota Altis / Sedan — 1–4 passengers","Van — 8–12 passengers","Bus — 13–40 passengers","Licensed driver for all vehicles","Pricing based on route & duration"],
+          price: "Contact us", orderBtn: "Ask via WhatsApp",
         },
       ],
       destinations: {
@@ -1283,16 +1283,16 @@ export const extendedTranslations = {
       },
       priceTable: {
         eyebrow: "Price Comparison",
-        title: "Cheaper. Safer. Licensed & Professional Drivers.",
-        subtitle: "Compare for yourself before deciding — price per day, not per trip",
-        colService: "Service", colPrice: "Price/Day", colDriver: "Licensed Driver", colFixed: "Fixed Price", colGuarantee: "Guarantee",
+        title: "Premium Alphard. Fair Price.",
+        subtitle: "Compare our 10-hour Alphard charter vs alternatives — fixed rate, licensed driver, no surprises",
+        colService: "Service", colPrice: "Price (10 hrs)", colDriver: "Licensed Driver", colFixed: "Fixed Price", colGuarantee: "Guarantee",
         note: "~ = depends on operator · ✓ = always available · ✗ = not available",
-        disclaimer: "* Prices may vary by destination and duration. Contact us for a custom quote.",
+        disclaimer: "* Competitor prices are market estimates. Keliling Thailand's price is all-in: driver, fuel, tolls & parking included.",
         rows: [
-          { name: "⭐ Keliling Thailand", badge: "BEST CHOICE", price: "1,200 THB", driver: "✓", fixed: "✓", guarantee: "✓", highlight: true },
-          { name: "Local Thai Taxi", price: "3,000–5,000 THB", driver: "✗", fixed: "✗", guarantee: "✗", highlight: false },
-          { name: "Grab / Bolt Thailand", price: "2,000–3,500 THB", driver: "✗", fixed: "~", guarantee: "✗", highlight: false },
-          { name: "General Travel Agent", price: "2,500–4,000 THB", driver: "~", fixed: "~", guarantee: "✗", highlight: false },
+          { name: "Keliling Thailand (Alphard)", badge: "BEST CHOICE", price: "8,500 THB", driver: "✓", fixed: "✓", guarantee: "✓", highlight: true },
+          { name: "Travel Agent / Tour Operator", price: "12,000–20,000 THB", driver: "~", fixed: "✗", guarantee: "✗", highlight: false },
+          { name: "Luxury Car Rental (no driver)", price: "5,000–8,000 THB", driver: "✗", fixed: "~", guarantee: "✗", highlight: false },
+          { name: "Metered Taxi / Grab Premium", price: "6,000–10,000 THB", driver: "✗", fixed: "✗", guarantee: "✗", highlight: false },
         ],
       },
       faq: {
@@ -1318,14 +1318,14 @@ export const extendedTranslations = {
     about: {
       header: {
         eyebrow: "About Us",
-        title: "Your Trusted Travel Companion in Thailand",
-        subtitle: "Since 2021, we have helped hundreds of families explore Thailand safely, comfortably, and without hassle.",
+        title: "Premium Private Transport in Thailand",
+        subtitle: "Keliling Thailand presents Alphard Experience and premium private transport for business travellers, families, expats, and special occasions in Bangkok.",
       },
       story: {
-        eyebrow: "Our Story", title: "Born from a Real Need",
-        p1: "Keliling Thailand was born from a genuine frustration: too many tourists were arriving in Thailand full of excitement, only to return home with bad stories — taxis that didn't know the roads, prices that kept changing, or drivers who never showed up.",
-        p2: "We believe a holiday in Thailand should create beautiful memories, not nightmares. That is why we built a service that truly understands the needs of travellers.",
-        p3: "From day one, our principles have been simple: on time, transparent pricing, and genuinely professional drivers.",
+        eyebrow: "Our Story", title: "Built for a Higher Standard",
+        p1: "Keliling Thailand was built for guests who expect more than just a car. They need a service that is polished, punctual, comfortable, and worthy of a premium travel experience in Thailand.",
+        p2: "From airport transfers and business schedules to wedding trips, birthday celebrations, and private travel across Bangkok, we shape every service to feel more personal, seamless, and elevated from start to finish.",
+        p3: "That is why we stay focused on what matters most: professional drivers, clear communication, well-maintained vehicles, and a consistently refined experience for every guest.",
       },
       stats: [
         { value: "1,200+", label: "Trips Completed" },
@@ -1336,13 +1336,13 @@ export const extendedTranslations = {
       values: {
         eyebrow: "Our Values", title: "What We Believe In",
         items: [
-          { icon: "⏱️", title: "Always On Time", desc: "Your time is precious. We are never late without reason — and if it happens, you pay half." },
-          { icon: "💬", title: "Open Communication", desc: "From day-before confirmation to real-time airport updates — we always keep you informed." },
-          { icon: "🛡️", title: "Safety First", desc: "All our drivers have verified IDs and licences. No last-minute unverified replacements." },
-          { icon: "💰", title: "Honest Pricing", desc: "The agreed price is the final price. No meter, no surprise surcharges." },
+          { icon: "⏱️", title: "Time Precision", desc: "We operate with the kind of precision your schedule deserves, whether it is an early flight, an important meeting, or a once-in-a-lifetime event." },
+          { icon: "💬", title: "Personal Service", desc: "Our communication is fast, clear, and thoughtful, so you feel well handled from reservation to final drop-off." },
+          { icon: "🛡️", title: "Professional & Trusted", desc: "Every driver is selected to meet a higher service standard, with respect for guest privacy, comfort, and professionalism." },
+          { icon: "💰", title: "Transparent from the Start", desc: "Our quotations are clear from the beginning, with no hidden fees and no surprises that undermine the experience." },
         ],
       },
-      cta: { title: "Ready to Start Your Journey?", subtitle: "Contact us now for a free consultation on your Thailand trip.", btn: "Chat on WhatsApp Now" },
+      cta: { title: "Ready to Plan Your Journey?", subtitle: "Contact us for tailored recommendations on the right premium private transport for your time in Thailand.", btn: "Chat on WhatsApp Now" },
     },
     airportTransfer: {
       header: {
@@ -1366,7 +1366,7 @@ export const extendedTranslations = {
       },
       pricing: {
         eyebrow: "Pricing", title: "Transparent Pricing, No Surprises",
-        from: "Starting from", price: "600 THB",
+        from: "Starting from", price: "3,000 THB",
         note: "Price depends on airport, destination, and vehicle type. Contact us for a custom quote.",
       },
       cta: { title: "Book Airport Transfer Now", subtitle: "Confirmation within 1 hour. No account needed.", btn: "Chat on WhatsApp" },
@@ -1379,10 +1379,10 @@ export const extendedTranslations = {
       tours: {
         eyebrow: "Tour Packages", title: "Popular Tour Packages",
         items: [
-          { emoji: "🏯", name: "Bangkok City Tour", desc: "Grand Palace, Wat Pho, Wat Arun, and local markets — all in one full day.", duration: "Full Day (8–10 hrs)", from: "From 1,200 THB" },
-          { emoji: "🏛️", name: "Ayutthaya Day Trip", desc: "Explore Thailand's ancient capital with its stunning historical temples.", duration: "Full Day (8–9 hrs)", from: "From 1,500 THB" },
-          { emoji: "⛵", name: "Floating Market Tour", desc: "A unique shopping and dining experience at Thailand's iconic floating market.", duration: "Half Day (4–5 hrs)", from: "From 900 THB" },
-          { emoji: "🏖️", name: "Pattaya Day Trip", desc: "Beach, Walking Street, and Pattaya's entertainment in one day.", duration: "Full Day (10–12 hrs)", from: "From 1,800 THB" },
+          { emoji: "🏯", name: "Bangkok City Tour", desc: "Grand Palace, Wat Pho, Wat Arun, and local markets — all in one full day.", duration: "Full Day (10 hrs)", from: "8,500" },
+          { emoji: "🏛️", name: "Ayutthaya Day Trip", desc: "Explore Thailand's ancient capital with its stunning historical temples.", duration: "Full Day (10 hrs)", from: "8,500" },
+          { emoji: "⛵", name: "Floating Market Tour", desc: "A unique shopping and dining experience at Thailand's iconic floating market.", duration: "Half Day (5 hrs)", from: "5,000" },
+          { emoji: "🏖️", name: "Pattaya Day Trip", desc: "Beach, Walking Street, and Pattaya's entertainment in one day.", duration: "Full Day (10 hrs)", from: "8,500" },
           { emoji: "🐘", name: "Chiang Mai Adventure", desc: "Elephants, temples, and Chiang Mai's nature — multi-day packages available.", duration: "1–3 days", from: "Contact us" },
           { emoji: "🌊", name: "Koh Samui / Hua Hin", desc: "Exotic beaches and luxury resorts at tourists' favourite destinations.", duration: "1–2 days", from: "Contact us" },
         ],
@@ -1423,18 +1423,18 @@ export const extendedTranslations = {
 
   th: {
     alts: {
-      slide1: "รถ SUV Toyota Fortuner สีดำจอดอยู่ใกล้ป่า",
-      slide2: "รถซีดานสีขาวบนถนนลาดยาง",
-      slide3: "รถบัสสีขาวบนถนนใกล้หน้าผา",
-      fleet1: "รถแวนสีขาว",
+      slide1: "Toyota Alphard สีดำจอดอยู่หน้าทางเข้าระดับลักชัวรี",
+      slide2: "Toyota Alphard พรีเมียมสำหรับรับส่งสนามบินแบบส่วนตัว",
+      slide3: "ขบวน Toyota Alphard สำหรับทริปครอบครัวแบบ VIP",
+      fleet1: "Toyota Alphard สีดำระดับพรีเมียม",
       fleet2: "รถ SUV Toyota Fortuner",
       fleet3: "รถซีดาน Toyota Altis",
       fleet4: "รถมินิบัส",
       fleet5: "รถบัสขนาดใหญ่",
     },
     meta: {
-      defaultTitle: "Keliling Thailand — บริการรถรับส่งพรีเมียม",
-      defaultDescription: "บริการรถรับส่งพรีเมียมในประเทศไทย เช่า SUV รับส่งสนามบิน และทัวร์รายวัน ติดต่อผ่าน WhatsApp!",
+      defaultTitle: "Alphard Experience — บริการรถส่วนตัวพรีเมียมในประเทศไทย",
+      defaultDescription: "บริการรถส่วนตัวพรีเมียมในประเทศไทยสำหรับแขกจากอินโดนีเซีย สิงคโปร์ จีน ตะวันออกกลาง ชาติตะวันตก และไทย เหมาะสำหรับทริปธุรกิจ งานแต่งงาน วันเกิด อินฟลูเอนเซอร์ และรับส่งสนามบิน",
       servicesTitle: "บริการ — Keliling Thailand",
       servicesDescription: "เช่า SUV รับส่งสนามบิน และทัวร์รายวันในประเทศไทย รถพรีเมียม คนขับมีประสบการณ์ ราคาโปร่งใส",
       contactTitle: "จองเลย — Keliling Thailand",
@@ -1452,22 +1452,22 @@ export const extendedTranslations = {
       },
       services: [
         {
-          icon: "🚙", tag: "ยอดนิยม", title: "เช่า SUV", subtitle: "เต็มวัน / ครึ่งวัน", highlight: true,
-          description: "เช่า SUV พรีเมียมทั้งวันพร้อมคนขับที่มีประสบการณ์ กำหนดเส้นทางเองได้ เราพาคุณไปได้ทุกที่ในประเทศไทยอย่างสะดวกสบายและปลอดภัย",
-          features: ["รถ Toyota Fortuner / Innova หรือเทียบเท่า","คนขับมีใบอนุญาตและมืออาชีพสูง","รองรับผู้โดยสารสูงสุด 7 คน","เลือกเส้นทางและจุดหมายได้เอง","แอร์เย็นตลอดการเดินทาง","มีให้บริการทั้งวัน (12 ชม.) และครึ่งวัน (6 ชม.)","รวมน้ำมันและค่าจอดรถ"],
-          price: "เริ่มต้น 1,200 บาท", orderBtn: "จองผ่าน WhatsApp",
+          icon: "car", tag: "ตัวเลือกหลัก", title: "Alphard Experience", subtitle: "เช่าเหมาส่วนตัวระดับพรีเมียม", highlight: true,
+          description: "มาตรฐานใหม่ของการเดินทางส่วนตัวในไทย ห้องโดยสารกว้าง เบาะ captain เป็นส่วนตัวสูง สำหรับ 1–6 ท่านที่ต้องการสิ่งที่ดีที่สุด",
+          features: ["เบาะ captain พร้อมแอร์ dual-zone","คนขับมีใบอนุญาตและมืออาชีพสูง","รองรับ 1–6 ผู้โดยสาร","USB & wireless charging","รวมน้ำมัน ค่าทางด่วน & ที่จอดรถ","ยืนยันรวดเร็วผ่าน WhatsApp"],
+          price: "5,000 บาท (5 ชม.) / 8,500 บาท (10 ชม.)", orderBtn: "จอง Alphard ผ่าน WhatsApp",
         },
         {
-          icon: "✈️", tag: "น่าเชื่อถือ", title: "รับส่งสนามบิน", subtitle: "รับและส่ง", highlight: false,
+          icon: "plane", tag: "น่าเชื่อถือ", title: "รับส่งสนามบิน", subtitle: "รับและส่ง", highlight: false,
           description: "บริการรับส่งสนามบินที่ตรงเวลาและมืออาชีพ เราติดตามตารางบินของคุณแบบเรียลไทม์ ไม่ต้องกังวลแม้มีดีเลย์",
           features: ["ติดตามตารางบินแบบเรียลไทม์","รับผู้โดยสารพร้อมป้ายชื่อ","ให้บริการ 24/7","สนามบินสุวรรณภูมิและดอนเมือง","ไม่มีค่าใช้จ่ายเพิ่มสำหรับเที่ยวบินดีเลย์","ยืนยันอัตโนมัติผ่าน WhatsApp","ยินดีต้อนรับเด็กและทารก"],
-          price: "เริ่มต้น 600 บาท", orderBtn: "จองผ่าน WhatsApp",
+          price: "3,000 บาท", orderBtn: "จองผ่าน WhatsApp",
         },
         {
-          icon: "🗺️", tag: "แนะนำ", title: "ทัวร์รายวัน", subtitle: "ทริปเต็มวัน", highlight: false,
-          description: "ทริปท่องเที่ยวรายวันสู่จุดหมายอันเป็นสัญลักษณ์ของประเทศไทย พร้อมคนขับที่มีใบอนุญาตและมืออาชีพสูง",
-          features: ["คนขับมีใบอนุญาตและมืออาชีพสูง","เส้นทางวางแผนไว้ล่วงหน้าและมีประสิทธิภาพ","รวมค่าเข้าชมได้","อาหารกลางวันฮาลาลมีให้บริการ","ถ่ายภาพและบันทึกการเดินทาง","ยืดหยุ่น: เดี่ยว คู่ หรือกลุ่ม","ปรึกษาเส้นทางฟรี"],
-          price: "เริ่มต้น 900 บาท/คน", orderBtn: "จองผ่าน WhatsApp",
+          icon: "bus", tag: "ยานพาหนะทางเลือก", title: "Fortuner · Altis · Van · Bus", subtitle: "ตามขนาดกลุ่มและงบประมาณ", highlight: false,
+          description: "ต้องการที่นั่งมากขึ้นหรือตัวเลือกอื่น? เรามีรถที่เหมาะกับทุกขนาดกลุ่มและงบประมาณ",
+          features: ["Toyota Fortuner — 1–7 ผู้โดยสาร","Toyota Altis / Sedan — 1–4 ผู้โดยสาร","Van — 8–12 ผู้โดยสาร","Bus — 13–40 ผู้โดยสาร","คนขับมีใบอนุญาตสำหรับทุกคัน","ราคาตามเส้นทางและระยะเวลา"],
+          price: "ติดต่อเรา", orderBtn: "สอบถามผ่าน WhatsApp",
         },
       ],
       destinations: {
@@ -1487,16 +1487,16 @@ export const extendedTranslations = {
       },
       priceTable: {
         eyebrow: "เปรียบเทียบราคา",
-        title: "ถูกกว่า ปลอดภัยกว่า คนขับมีใบอนุญาตและมืออาชีพ",
-        subtitle: "เปรียบเทียบด้วยตัวเองก่อนตัดสินใจ — ราคาต่อวัน ไม่ใช่ต่อเที่ยว",
-        colService: "บริการ", colPrice: "ราคา/วัน", colDriver: "คนขับมีใบอนุญาต", colFixed: "ราคาคงที่", colGuarantee: "การรับประกัน",
+        title: "Alphard พรีเมียม ราคาสมเหตุสมผล",
+        subtitle: "เปรียบเทียบแพ็คเกจ Alphard 10 ชม. ของเรากับตัวเลือกอื่น — ราคาคงที่ คนขับมีใบอนุญาต ไม่มีค่าใช้จ่ายซ่อนเร้น",
+        colService: "บริการ", colPrice: "ราคา (10 ชม.)", colDriver: "คนขับมีใบอนุญาต", colFixed: "ราคาคงที่", colGuarantee: "การรับประกัน",
         note: "~ = ขึ้นอยู่กับผู้ให้บริการ · ✓ = มีเสมอ · ✗ = ไม่มี",
-        disclaimer: "* ราคาอาจแตกต่างกันขึ้นอยู่กับจุดหมายและระยะเวลา ติดต่อเราสำหรับราคาพิเศษ",
+        disclaimer: "* ราคาคู่แข่งเป็นการประมาณการตลาด ราคา Keliling Thailand รวมทุกอย่าง: คนขับ น้ำมัน ทางด่วน และที่จอดรถ",
         rows: [
-          { name: "⭐ Keliling Thailand", badge: "ตัวเลือกที่ดีที่สุด", price: "1,200 บาท", driver: "✓", fixed: "✓", guarantee: "✓", highlight: true },
-          { name: "แท็กซี่ท้องถิ่นไทย", price: "3,000–5,000 บาท", driver: "✗", fixed: "✗", guarantee: "✗", highlight: false },
-          { name: "Grab / Bolt ไทย", price: "2,000–3,500 บาท", driver: "✗", fixed: "~", guarantee: "✗", highlight: false },
-          { name: "บริษัททัวร์ทั่วไป", price: "2,500–4,000 บาท", driver: "~", fixed: "~", guarantee: "✗", highlight: false },
+          { name: "Keliling Thailand (Alphard)", badge: "ตัวเลือกที่ดีที่สุด", price: "8,500 บาท", driver: "✓", fixed: "✓", guarantee: "✓", highlight: true },
+          { name: "Travel Agent / ทัวร์ออเปอเรเตอร์", price: "12,000–20,000 บาท", driver: "~", fixed: "✗", guarantee: "✗", highlight: false },
+          { name: "เช่ารถหรู (ไม่มีคนขับ)", price: "5,000–8,000 บาท", driver: "✗", fixed: "~", guarantee: "✗", highlight: false },
+          { name: "แท็กซี่มิเตอร์ / Grab Premium", price: "6,000–10,000 บาท", driver: "✗", fixed: "✗", guarantee: "✗", highlight: false },
         ],
       },
       faq: {
@@ -1522,14 +1522,14 @@ export const extendedTranslations = {
     about: {
       header: {
         eyebrow: "เกี่ยวกับเรา",
-        title: "เพื่อนร่วมเดินทางที่คุณไว้ใจได้ในประเทศไทย",
-        subtitle: "ตั้งแต่ปี 2021 เราได้ช่วยให้ครอบครัวหลายร้อยครอบครัวสำรวจประเทศไทยอย่างปลอดภัย สะดวกสบาย และไม่มีปัญหา",
+        title: "บริการรถรับส่งส่วนตัวระดับพรีเมียมในประเทศไทย",
+        subtitle: "Keliling Thailand นำเสนอ Alphard Experience และบริการรถรับส่งส่วนตัวระดับพรีเมียมสำหรับนักธุรกิจ ครอบครัว ชาวต่างชาติ และโอกาสพิเศษในกรุงเทพฯ",
       },
       story: {
-        eyebrow: "เรื่องราวของเรา", title: "เกิดจากความต้องการที่แท้จริง",
-        p1: "Keliling Thailand เกิดขึ้นจากความผิดหวังที่แท้จริง นักท่องเที่ยวจำนวนมากเดินทางมาถึงประเทศไทยด้วยความตื่นเต้น แต่กลับบ้านพร้อมกับเรื่องราวที่ไม่ดี",
-        p2: "เราเชื่อว่าการพักผ่อนในประเทศไทยควรสร้างความทรงจำที่สวยงาม ไม่ใช่ฝันร้าย นั่นเป็นเหตุผลที่เราสร้างบริการที่เข้าใจความต้องการของนักท่องเที่ยวอย่างแท้จริง",
-        p3: "ตั้งแต่วันแรก หลักการของเราเรียบง่าย ตรงเวลา ราคาโปร่งใส และคนขับที่มืออาชีพจริงๆ",
+        eyebrow: "เรื่องราวของเรา", title: "สร้างขึ้นเพื่อมาตรฐานที่สูงกว่า",
+        p1: "Keliling Thailand สร้างขึ้นสำหรับผู้ที่ต้องการมากกว่าการเดินทางด้วยรถทั่วไป เราออกแบบบริการให้เรียบร้อย ตรงเวลา สะดวกสบาย และเหมาะกับประสบการณ์การเดินทางระดับพรีเมียมในประเทศไทย",
+        p2: "ไม่ว่าจะเป็นรับส่งสนามบิน ภารกิจทางธุรกิจ ทริปงานแต่ง งานวันเกิด หรือการเดินทางส่วนตัวในกรุงเทพฯ เราใส่ใจให้ทุกช่วงของบริการรู้สึกเป็นส่วนตัว ราบรื่น และมีระดับตั้งแต่ต้นจนจบ",
+        p3: "สิ่งที่เราให้ความสำคัญเสมอคือคนขับมืออาชีพ การสื่อสารที่ชัดเจน รถที่ดูแลอย่างดี และประสบการณ์ที่สม่ำเสมอสำหรับแขกทุกคน",
       },
       stats: [
         { value: "1,200+", label: "ทริปสำเร็จ" },
@@ -1540,13 +1540,13 @@ export const extendedTranslations = {
       values: {
         eyebrow: "ค่านิยมของเรา", title: "สิ่งที่เราเชื่อ",
         items: [
-          { icon: "⏱️", title: "ตรงเวลาเสมอ", desc: "เวลาของคุณมีค่า เราไม่เคยสาย และถ้าเกิดขึ้น คุณจ่ายครึ่งเดียว" },
-          { icon: "💬", title: "สื่อสารเปิดเผย", desc: "ตั้งแต่การยืนยันวันก่อนถึงการอัปเดตแบบเรียลไทม์ที่สนามบิน เราแจ้งให้คุณทราบเสมอ" },
-          { icon: "🛡️", title: "ความปลอดภัยคือสิ่งสำคัญ", desc: "คนขับทุกคนมีการตรวจสอบตัวตนและใบอนุญาต ไม่มีการเปลี่ยนคนขับกะทันหัน" },
-          { icon: "💰", title: "ราคาซื่อสัตย์", desc: "ราคาที่ตกลงกันคือราคาสุดท้าย ไม่มีมิเตอร์ ไม่มีค่าใช้จ่ายเซอร์ไพรส์" },
+          { icon: "⏱️", title: "ตรงต่อเวลาอย่างแม่นยำ", desc: "เราให้ความสำคัญกับเวลาของคุณเสมอ ไม่ว่าจะเป็นเที่ยวบินเช้า นัดประชุมสำคัญ หรือโอกาสพิเศษที่พลาดไม่ได้" },
+          { icon: "💬", title: "บริการที่ใส่ใจเป็นพิเศษ", desc: "เราสื่อสารอย่างรวดเร็ว ชัดเจน และเป็นระบบ เพื่อให้คุณมั่นใจตั้งแต่เริ่มจองจนจบทริป" },
+          { icon: "🛡️", title: "มืออาชีพและไว้วางใจได้", desc: "คนขับทุกคนถูกคัดเลือกตามมาตรฐานบริการที่สูง พร้อมดูแลความเป็นส่วนตัว ความสบาย และภาพลักษณ์ของแขกทุกคน" },
+          { icon: "💰", title: "ชัดเจนตั้งแต่แรก", desc: "ใบเสนอราคาของเราชัดเจนตั้งแต่ต้น ไม่มีค่าใช้จ่ายแอบแฝง และไม่มีเรื่องไม่คาดคิดที่ทำลายประสบการณ์ของคุณ" },
         ],
       },
-      cta: { title: "พร้อมเริ่มต้นการเดินทางหรือยัง?", subtitle: "ติดต่อเราเดี๋ยวนี้เพื่อปรึกษาฟรีสำหรับทริปประเทศไทยของคุณ", btn: "แชท WhatsApp เดี๋ยวนี้" },
+      cta: { title: "พร้อมวางแผนการเดินทางของคุณหรือยัง?", subtitle: "ติดต่อเราเพื่อรับคำแนะนำเกี่ยวกับบริการรถรับส่งส่วนตัวระดับพรีเมียมที่เหมาะกับแผนการเดินทางของคุณในประเทศไทย", btn: "แชท WhatsApp เดี๋ยวนี้" },
     },
     airportTransfer: {
       header: {
@@ -1570,7 +1570,7 @@ export const extendedTranslations = {
       },
       pricing: {
         eyebrow: "ราคา", title: "ราคาโปร่งใส ไม่มีเซอร์ไพรส์",
-        from: "เริ่มต้นจาก", price: "600 บาท",
+        from: "เริ่มต้นจาก", price: "3,000 บาท",
         note: "ราคาขึ้นอยู่กับสนามบิน จุดหมาย และประเภทรถ ติดต่อเราสำหรับราคาพิเศษ",
       },
       cta: { title: "จองรับส่งสนามบินเดี๋ยวนี้", subtitle: "ยืนยันภายใน 1 ชั่วโมง ไม่ต้องลงทะเบียนบัญชี", btn: "แชท WhatsApp" },
@@ -1583,10 +1583,10 @@ export const extendedTranslations = {
       tours: {
         eyebrow: "แพ็คเกจทัวร์", title: "แพ็คเกจทัวร์ยอดนิยม",
         items: [
-          { emoji: "🏯", name: "Bangkok City Tour", desc: "พระบรมมหาราชวัง วัดโพธิ์ วัดอรุณ และตลาดท้องถิ่น ทั้งหมดในวันเดียว", duration: "เต็มวัน (8–10 ชม.)", from: "เริ่มต้น 1,200 บาท" },
-          { emoji: "🏛️", name: "Ayutthaya Day Trip", desc: "สำรวจเมืองหลวงโบราณของไทยกับวัดประวัติศาสตร์อันงดงาม", duration: "เต็มวัน (8–9 ชม.)", from: "เริ่มต้น 1,500 บาท" },
-          { emoji: "⛵", name: "Floating Market Tour", desc: "ประสบการณ์ช้อปปิ้งและอาหารที่ตลาดน้ำอันเป็นสัญลักษณ์ของไทย", duration: "ครึ่งวัน (4–5 ชม.)", from: "เริ่มต้น 900 บาท" },
-          { emoji: "🏖️", name: "Pattaya Day Trip", desc: "ชายหาด Walking Street และความบันเทิงแบบพัทยาในวันเดียว", duration: "เต็มวัน (10–12 ชม.)", from: "เริ่มต้น 1,800 บาท" },
+          { emoji: "🏯", name: "Bangkok City Tour", desc: "พระบรมมหาราชวัง วัดโพธิ์ วัดอรุณ และตลาดท้องถิ่น ทั้งหมดในวันเดียว", duration: "เต็มวัน (10 ชม.)", from: "8,500" },
+          { emoji: "🏛️", name: "Ayutthaya Day Trip", desc: "สำรวจเมืองหลวงโบราณของไทยกับวัดประวัติศาสตร์อันงดงาม", duration: "เต็มวัน (10 ชม.)", from: "8,500" },
+          { emoji: "⛵", name: "Floating Market Tour", desc: "ประสบการณ์ช้อปปิ้งและอาหารที่ตลาดน้ำอันเป็นสัญลักษณ์ของไทย", duration: "ครึ่งวัน (5 ชม.)", from: "5,000" },
+          { emoji: "🏖️", name: "Pattaya Day Trip", desc: "ชายหาด Walking Street และความบันเทิงแบบพัทยาในวันเดียว", duration: "เต็มวัน (10 ชม.)", from: "8,500" },
           { emoji: "🐘", name: "Chiang Mai Adventure", desc: "ช้าง วัด และธรรมชาติเชียงใหม่ มีแพ็คเกจหลายวัน", duration: "1–3 วัน", from: "ติดต่อเรา" },
           { emoji: "🌊", name: "เกาะสมุย / หัวหิน", desc: "ชายหาดแปลกตาและรีสอร์ทหรูในจุดหมายที่นักท่องเที่ยวชื่นชอบ", duration: "1–2 วัน", from: "ติดต่อเรา" },
         ],

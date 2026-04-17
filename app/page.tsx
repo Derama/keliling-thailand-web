@@ -7,38 +7,255 @@ import { extendedTranslations } from "@/lib/translations";
 import { useEffect, useState } from "react";
 import DatePicker from "@/components/DatePicker";
 import LocationSearch from "@/components/LocationSearch";
+import ScrollReveal from "@/components/ScrollReveal";
 
 const WA_LINK =
   "https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!%20Saya%20ingin%20memesan%20layanan%20transportasi.";
 
 const HERO_SLIDES = [
   {
-    src: "https://images.pexels.com/photos/11143602/pexels-photo-11143602.jpeg?auto=compress&cs=tinysrgb&w=1920",
-    label: "Toyota Fortuner",
-    tag: "SUV · Airport & City",
+    src: "/Toyota_Alphard_Vellfire_001.jpg",
+    label: "Toyota Alphard & Vellfire",
+    tag: "Full-Day Alphard Charter",
     altKey: "slide1" as const,
+    imagePosition: "72% center",
+    mobileImagePosition: "68% center",
   },
   {
-    src: "https://images.pexels.com/photos/88628/pexels-photo-88628.jpeg?auto=compress&cs=tinysrgb&w=1920",
-    label: "Toyota Altis",
-    tag: "Sedan · City Transfers",
+    src: "/toyotaalphard.jpg",
+    label: "Toyota Alphard",
+    tag: "Airport Transfer Premium",
     altKey: "slide2" as const,
+    imagePosition: "70% center",
+    mobileImagePosition: "62% center",
   },
   {
-    src: "https://images.pexels.com/photos/1178448/pexels-photo-1178448.jpeg?auto=compress&cs=tinysrgb&w=1920",
-    label: "Bus",
-    tag: "Bus · Large Groups",
+    src: "/toyotaalphard1.jpg",
+    label: "Toyota Alphard Lineup",
+    tag: "City Tour & Intercity",
     altKey: "slide3" as const,
+    imagePosition: "60% center",
+    mobileImagePosition: "58% center",
   },
 ];
 
 const FLEET_VEHICLE_SRCS = [
-  { src: "https://images.pexels.com/photos/1004409/pexels-photo-1004409.jpeg?auto=compress&cs=tinysrgb&w=800", altKey: "fleet1" as const },
-  { src: "https://images.pexels.com/photos/11143602/pexels-photo-11143602.jpeg?auto=compress&cs=tinysrgb&w=800", altKey: "fleet2" as const },
-  { src: "https://images.pexels.com/photos/88628/pexels-photo-88628.jpeg?auto=compress&cs=tinysrgb&w=800", altKey: "fleet3" as const },
-  { src: "https://images.pexels.com/photos/7263971/pexels-photo-7263971.jpeg?auto=compress&cs=tinysrgb&w=800", altKey: "fleet4" as const },
-  { src: "https://images.pexels.com/photos/1178448/pexels-photo-1178448.jpeg?auto=compress&cs=tinysrgb&w=800", altKey: "fleet5" as const },
+  { src: "/Alphard.webp", altKey: "fleet1" as const },
+  { src: "/Fortuner.webp", altKey: "fleet2" as const },
+  { src: "/Altis.webp", altKey: "fleet3" as const },
+  { src: "/luxury van .webp", altKey: "fleet4" as const },
+  { src: "/bus", altKey: "fleet5" as const },
 ];
+
+const HOMEPAGE_COPY = {
+  id: {
+    heroLabel: "Signature Offer",
+    heroTitle: "Standar baru perjalanan privat premium di Thailand",
+    heroAccent: "The Alphard Experience",
+    heroSubtitle:
+      "Pilihan utama untuk airport transfer, city ride, dan full-day charter dengan kenyamanan yang lebih eksklusif. Fortuner, Sedan, Van, dan Bus tetap tersedia sebagai alternatif sesuai kebutuhan perjalanan Anda.",
+    heroHighlights: [
+      "Pilihan utama untuk 1-6 tamu dengan standar VIP",
+      "Ideal untuk airport pickup, city ride, dan charter seharian",
+      "Driver profesional, harga transparan, konfirmasi cepat via WhatsApp",
+    ],
+    primaryCta: "Pesan Alphard via WhatsApp",
+    secondaryCta: "Lihat opsi kendaraan",
+    bookingBadge: "Direkomendasikan",
+    bookingTitle: "Reservasi Cepat",
+    bookingSubtitle:
+      "Default ke Alphard. Ubah bila perlu.",
+    fleetEyebrow: "Pilihan Kendaraan",
+    fleetTitle: "Alphard jadi fokus utama. Kendaraan lain tetap tersedia.",
+    fleetSubtitle:
+      "Pilih Alphard untuk pengalaman premium. Fortuner, Sedan, Van, dan Bus tetap siap untuk kebutuhan kapasitas dan budget yang berbeda.",
+    featuredLabel: "Primary Offer",
+    featuredCapacity: "Ideal untuk 1-6 tamu premium",
+    featuredDescription:
+      "Pilih Alphard saat Anda menginginkan kabin yang lebih lega, arrival yang lebih rapi, dan perjalanan privat yang terasa lebih eksklusif sepanjang trip.",
+    featuredPoints: [
+      "Airport transfer premium tanpa repot",
+      "Nyaman untuk keluarga, eksekutif, dan honeymoon",
+      "Cocok untuk rute Bangkok maupun antar kota",
+    ],
+    alternativesLabel: "Alternative Options",
+    alternativesTitle: "Perlu setup perjalanan yang berbeda?",
+    alternativesSubtitle:
+      "Gunakan opsi di bawah jika prioritas Anda adalah kapasitas grup yang lebih besar, bentuk kendaraan tertentu, atau kebutuhan operasional khusus.",
+    fleetCta: "Konsultasikan kendaraan yang tepat",
+    servicesSubtitle:
+      "Setiap layanan kami dapat dimulai dari Alphard sebagai opsi premium, lalu dialihkan ke kendaraan alternatif saat rute, jumlah tamu, atau budget Anda menuntut format yang berbeda.",
+    whyUsSubtitle:
+      "Alphard Experience bukan sekadar upgrade kendaraan. Ini adalah standar layanan privat kami untuk memastikan perjalanan Anda terasa halus, tepat waktu, dan premium dari awal sampai selesai.",
+    ctaTitle: "Jadikan Alphard standar perjalanan Anda di Thailand.",
+    ctaSubtitle:
+      "Kirim rute, tanggal, dan jumlah tamu Anda. Kami prioritaskan Alphard terlebih dahulu, lalu sarankan Fortuner, Sedan, Van, atau Bus hanya jika itu lebih cocok untuk trip Anda.",
+    ctaPrimary: "Cek Ketersediaan Alphard",
+    ctaSecondary: "Lihat Semua Layanan",
+    alphardHighlights: [
+      "Captain chair dengan sandaran individual",
+      "Dual-zone climate control",
+      "Tirai privasi & kabin senyap",
+      "USB & wireless charging",
+    ],
+    errorDate: "Silakan pilih tanggal terlebih dahulu.",
+    errorPickup: "Silakan isi lokasi penjemputan.",
+    errorDropoff: "Silakan isi lokasi pengantaran.",
+    errorTourDestination: "Silakan isi tujuan tour.",
+    errorMeetingPoint: "Silakan isi titik jemput.",
+    errorDepartureCity: "Silakan isi kota keberangkatan.",
+    errorDestinationCity: "Silakan isi kota tujuan.",
+    waIntro: "Halo Keliling Thailand! Saya ingin memesan:",
+    waPickup: "Penjemputan",
+    waDropoff: "Pengantaran",
+    waTourDestination: "Tujuan",
+    waMeetingPoint: "Titik Jemput",
+    waFrom: "Dari",
+    waTo: "Ke",
+    waService: "Layanan",
+    waVehicle: "Kendaraan",
+    waDate: "Tanggal",
+    waPax: "Jumlah orang",
+  },
+  en: {
+    heroLabel: "Signature Offer",
+    heroTitle: "A new standard for premium private travel in Thailand",
+    heroAccent: "The Alphard Experience",
+    heroSubtitle:
+      "Our lead option for airport transfers, city rides, and full-day charters with a more polished private travel experience. Fortuner, Sedan, Van, and Bus remain available when a different setup fits better.",
+    heroHighlights: [
+      "Primary choice for 1-6 guests seeking a VIP standard",
+      "Ideal for airport pickups, city rides, and full-day charters",
+      "Professional driver, transparent pricing, fast WhatsApp confirmation",
+    ],
+    primaryCta: "Reserve Alphard on WhatsApp",
+    secondaryCta: "See vehicle options",
+    bookingBadge: "Recommended",
+    bookingTitle: "Quick Reservation",
+    bookingSubtitle:
+      "Defaulted to Alphard. Change it if needed.",
+    fleetEyebrow: "Vehicle Options",
+    fleetTitle: "Alphard leads. The rest of the fleet stays available.",
+    fleetSubtitle:
+      "Choose Alphard for the most premium ride. Fortuner, Sedan, Van, and Bus are still ready for different group sizes and budgets.",
+    featuredLabel: "Primary Offer",
+    featuredCapacity: "Ideal for 1-6 premium guests",
+    featuredDescription:
+      "Choose Alphard when you want more cabin space, a more polished arrival, and a private ride that feels more refined throughout the trip.",
+    featuredPoints: [
+      "Premium airport transfers with less friction",
+      "Comfortable for families, executives, and honeymoon trips",
+      "Strong fit for Bangkok itineraries and intercity rides",
+    ],
+    alternativesLabel: "Alternative Options",
+    alternativesTitle: "Need a different travel setup?",
+    alternativesSubtitle:
+      "Use the options below when larger group capacity, a different vehicle format, or operational needs matter more than the Alphard cabin experience.",
+    fleetCta: "Get help choosing the right vehicle",
+    servicesSubtitle:
+      "Each service can begin with Alphard as the premium default, then move to an alternative vehicle when route shape, guest count, or budget makes more sense.",
+    whyUsSubtitle:
+      "Alphard Experience is not just a vehicle upgrade. It is our clearest premium standard for keeping your private trip smooth, punctual, and polished from arrival to drop-off.",
+    ctaTitle: "Make Alphard your travel standard in Thailand.",
+    ctaSubtitle:
+      "Send your route, date, and guest count. We prioritise Alphard first, then recommend Fortuner, Sedan, Van, or Bus only when it is the better fit for your trip.",
+    ctaPrimary: "Check Alphard Availability",
+    ctaSecondary: "Explore All Services",
+    alphardHighlights: [
+      "Captain chairs with individual recline",
+      "Dual-zone climate control",
+      "Privacy curtains & quiet cabin",
+      "USB & wireless charging",
+    ],
+    errorDate: "Please select a date.",
+    errorPickup: "Please enter a pickup location.",
+    errorDropoff: "Please enter a drop-off location.",
+    errorTourDestination: "Please enter a tour destination.",
+    errorMeetingPoint: "Please enter a meeting point.",
+    errorDepartureCity: "Please enter the departure city.",
+    errorDestinationCity: "Please enter the destination city.",
+    waIntro: "Hello Keliling Thailand! I would like to book:",
+    waPickup: "Pickup",
+    waDropoff: "Drop-off",
+    waTourDestination: "Destination",
+    waMeetingPoint: "Meeting Point",
+    waFrom: "From",
+    waTo: "To",
+    waService: "Service",
+    waVehicle: "Vehicle",
+    waDate: "Date",
+    waPax: "Passengers",
+  },
+  th: {
+    heroLabel: "ข้อเสนอหลัก",
+    heroTitle: "การเดินทางส่วนตัวระดับพรีเมียมในไทยกับ",
+    heroAccent: "Alphard Experience",
+    heroSubtitle:
+      "ตัวเลือกหลักสำหรับรับส่งสนามบิน เดินทางในเมือง และเหมาส่วนตัวทั้งวัน ส่วน Fortuner, Sedan, Van และ Bus ยังพร้อมเป็นตัวเลือกทางเลือก",
+    heroHighlights: [
+      "ตัวเลือกหลักสำหรับกลุ่มพรีเมียม 1-6 ท่าน",
+      "เหมาะกับรับส่งสนามบิน เดินทางในเมือง และเหมาทั้งวัน",
+      "คนขับมืออาชีพ ราคาชัดเจน ตอบ WhatsApp รวดเร็ว",
+    ],
+    primaryCta: "จอง Alphard ทาง WhatsApp",
+    secondaryCta: "ดูตัวเลือกยานพาหนะ",
+    bookingBadge: "แนะนำ",
+    bookingTitle: "จองแบบรวดเร็ว",
+    bookingSubtitle:
+      "ตั้งต้นเป็น Alphard และเปลี่ยนได้หากจำเป็น",
+    fleetEyebrow: "ตัวเลือกยานพาหนะ",
+    fleetTitle: "ให้ Alphard เป็นตัวเลือกหลัก และรถอื่นยังพร้อมใช้งาน",
+    fleetSubtitle:
+      "เลือก Alphard เมื่ออยากได้ประสบการณ์พรีเมียมที่สุด ส่วน Fortuner, Sedan, Van และ Bus ยังพร้อมสำหรับจำนวนผู้โดยสารและงบประมาณที่ต่างกัน",
+    featuredLabel: "ข้อเสนอหลัก",
+    featuredCapacity: "เหมาะสำหรับแขกระดับพรีเมียม 1-6 ท่าน",
+    featuredDescription:
+      "เลือก Alphard เมื่อต้องการพื้นที่ห้องโดยสารมากขึ้น ภาพลักษณ์การเดินทางที่ดูดีขึ้น และประสบการณ์รถส่วนตัวที่พรีเมียมตลอดทริป",
+    featuredPoints: [
+      "รับส่งสนามบินแบบพรีเมียมที่ลื่นไหลกว่า",
+      "สบายสำหรับครอบครัว ผู้บริหาร และฮันนีมูน",
+      "เหมาะกับเส้นทางในกรุงเทพและข้ามเมือง",
+    ],
+    alternativesLabel: "ทางเลือกอื่น",
+    alternativesTitle: "ต้องการรูปแบบการเดินทางแบบอื่น?",
+    alternativesSubtitle:
+      "ใช้ตัวเลือกด้านล่างเมื่อจำนวนผู้โดยสารมากขึ้น ต้องการรูปแบบรถที่ต่างออกไป หรือมีข้อกำหนดการใช้งานเฉพาะมากกว่าประสบการณ์ห้องโดยสารของ Alphard",
+    fleetCta: "ให้เราช่วยเลือกรถที่เหมาะ",
+    servicesSubtitle:
+      "ทุกบริการของเราสามารถเริ่มต้นด้วย Alphard ในฐานะตัวเลือกระดับพรีเมียม แล้วค่อยเปลี่ยนเป็นรถทางเลือกเมื่อเส้นทาง จำนวนผู้โดยสาร หรือ งบประมาณเหมาะสมกว่า",
+    whyUsSubtitle:
+      "Alphard Experience ไม่ใช่แค่การอัปเกรดยานพาหนะ แต่เป็นมาตรฐานบริการพรีเมียมของเราที่ทำให้ทริปส่วนตัวของคุณราบรื่น ตรงเวลา และดูดีตั้งแต่ต้นจนจบ",
+    ctaTitle: "ให้ Alphard เป็นมาตรฐานการเดินทางของคุณในไทย",
+    ctaSubtitle:
+      "ส่งเส้นทาง วันที่ และจำนวนผู้โดยสารมาให้เรา เราจะให้ Alphard มาก่อน แล้วค่อยแนะนำ Fortuner, Sedan, Van หรือ Bus หากเหมาะกับทริปมากกว่า",
+    ctaPrimary: "เช็กคิว Alphard",
+    ctaSecondary: "ดูบริการทั้งหมด",
+    alphardHighlights: [
+      "เบาะ captain chair ปรับเอนได้",
+      "ระบบแอร์ dual-zone",
+      "ม่านบังตา & ห้องโดยสารเงียบ",
+      "USB & wireless charging",
+    ],
+    errorDate: "กรุณาเลือกวันที่",
+    errorPickup: "กรุณากรอกจุดรับ",
+    errorDropoff: "กรุณากรอกจุดส่ง",
+    errorTourDestination: "กรุณากรอกจุดหมายปลายทาง",
+    errorMeetingPoint: "กรุณากรอกจุดนัดพบ",
+    errorDepartureCity: "กรุณากรอกเมืองต้นทาง",
+    errorDestinationCity: "กรุณากรอกเมืองปลายทาง",
+    waIntro: "สวัสดี Keliling Thailand! ฉันต้องการจอง:",
+    waPickup: "จุดรับ",
+    waDropoff: "จุดส่ง",
+    waTourDestination: "จุดหมาย",
+    waMeetingPoint: "จุดนัดพบ",
+    waFrom: "จาก",
+    waTo: "ถึง",
+    waService: "บริการ",
+    waVehicle: "รถ",
+    waDate: "วันที่",
+    waPax: "จำนวนผู้โดยสาร",
+  },
+} as const;
 
 // ── Service icons ──
 const IconCar = ({ className }: { className?: string }) => (
@@ -142,11 +359,12 @@ function StarRating({ count }: { count: number }) {
 export default function HomePage() {
   const { t, language } = useLanguage();
   const alts = extendedTranslations[language].alts;
+  const pageCopy = HOMEPAGE_COPY[language];
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [transitioning, setTransitioning] = useState(false);
   const [bookingService, setBookingService] = useState(0); // 0=airport, 1=city tour, 2=intercity
-  const [bookingVehicle, setBookingVehicle] = useState("");
+  const [bookingVehicle, setBookingVehicle] = useState(t.booking.vehicle1);
   // Airport Transfer
   const [airportPickup, setAirportPickup] = useState("");
   const [airportDropoff, setAirportDropoff] = useState("");
@@ -160,18 +378,100 @@ export default function HomePage() {
   const [bookingDate, setBookingDate] = useState("");
   const [bookingPax, setBookingPax] = useState(1);
   const [bookingError, setBookingError] = useState("");
+  const primaryVehicle = t.fleetItems[0];
+  const alternativeVehicles = t.fleetItems.slice(1);
+  const bookingVehicleOptions = [
+    t.booking.vehicle1,
+    t.booking.vehicle2,
+    t.booking.vehicle3,
+    t.booking.vehicle4,
+    t.booking.vehicle5,
+  ];
+  const selectedBookingVehicle = bookingVehicleOptions.includes(bookingVehicle)
+    ? bookingVehicle
+    : t.booking.vehicle1;
+
+  function resetRouteFields(nextService: number) {
+    if (nextService !== 0) {
+      setAirportPickup("");
+      setAirportDropoff("");
+    }
+    if (nextService !== 1) {
+      setTourDest("");
+      setTourMeet("");
+    }
+    if (nextService !== 2) {
+      setIntercityFrom("");
+      setIntercityTo("");
+    }
+  }
+
+  function handleBookingServiceChange(nextService: number) {
+    setBookingService(nextService);
+    resetRouteFields(nextService);
+    setBookingError("");
+  }
+
+  function clearBookingError() {
+    if (bookingError) setBookingError("");
+  }
+
+  function handleBookingVehicleChange(nextVehicle: string) {
+    setBookingVehicle(nextVehicle);
+    clearBookingError();
+  }
+
+  function handleAirportPickupChange(value: string) {
+    setAirportPickup(value);
+    clearBookingError();
+  }
+
+  function handleAirportDropoffChange(value: string) {
+    setAirportDropoff(value);
+    clearBookingError();
+  }
+
+  function handleTourDestChange(value: string) {
+    setTourDest(value);
+    clearBookingError();
+  }
+
+  function handleTourMeetChange(value: string) {
+    setTourMeet(value);
+    clearBookingError();
+  }
+
+  function handleIntercityFromChange(value: string) {
+    setIntercityFrom(value);
+    clearBookingError();
+  }
+
+  function handleIntercityToChange(value: string) {
+    setIntercityTo(value);
+    clearBookingError();
+  }
+
+  function handleBookingDateChange(value: string) {
+    setBookingDate(value);
+    clearBookingError();
+  }
+
+  function updateBookingPax(nextPax: number) {
+    setBookingPax(nextPax);
+    clearBookingError();
+  }
 
   function validateBooking(): boolean {
-    if (!bookingDate) { setBookingError("Please select a date."); return false; }
+    if (!bookingDate) { setBookingError(pageCopy.errorDate); return false; }
     if (bookingService === 0) {
-      if (!airportPickup) { setBookingError("Please enter a pickup location."); return false; }
-      if (!airportDropoff) { setBookingError("Please enter a drop-off location."); return false; }
+      if (!airportPickup) { setBookingError(pageCopy.errorPickup); return false; }
+      if (!airportDropoff) { setBookingError(pageCopy.errorDropoff); return false; }
     } else if (bookingService === 1) {
-      if (!tourDest) { setBookingError("Please enter a tour destination."); return false; }
-      if (!tourMeet) { setBookingError("Please enter a meeting point."); return false; }
+      if (!tourDest) { setBookingError(pageCopy.errorTourDestination); return false; }
+      if (!tourMeet) { setBookingError(pageCopy.errorMeetingPoint); return false; }
     } else {
-      if (!intercityFrom) { setBookingError("Please enter the departure city."); return false; }
-      if (!intercityTo) { setBookingError("Please enter the destination city."); return false; }
+      if (!intercityFrom) { setBookingError(pageCopy.errorDepartureCity); return false; }
+      if (!intercityTo) { setBookingError(pageCopy.errorDestinationCity); return false; }
     }
     setBookingError("");
     return true;
@@ -185,20 +485,20 @@ export default function HomePage() {
   function buildBookingWaLink() {
     const services = [t.booking.service1, t.booking.service2, t.booking.service3];
     const service = services[bookingService];
-    const vehicle = bookingVehicle || t.booking.vehicle1;
+    const vehicle = selectedBookingVehicle;
     const date = bookingDate || "-";
     const pax = bookingPax >= 8 ? t.booking.pax8plus : `${bookingPax} ${t.booking.paxUnit}`;
 
     let locationLine = "";
     if (bookingService === 0) {
-      locationLine = `- Penjemputan: ${airportPickup || "-"}\n- Pengantaran: ${airportDropoff || "-"}`;
+      locationLine = `- ${pageCopy.waPickup}: ${airportPickup || "-"}\n- ${pageCopy.waDropoff}: ${airportDropoff || "-"}`;
     } else if (bookingService === 1) {
-      locationLine = `- Tujuan: ${tourDest || "-"}\n- Titik Jemput: ${tourMeet || "-"}`;
+      locationLine = `- ${pageCopy.waTourDestination}: ${tourDest || "-"}\n- ${pageCopy.waMeetingPoint}: ${tourMeet || "-"}`;
     } else {
-      locationLine = `- Dari: ${intercityFrom || "-"}\n- Ke: ${intercityTo || "-"}`;
+      locationLine = `- ${pageCopy.waFrom}: ${intercityFrom || "-"}\n- ${pageCopy.waTo}: ${intercityTo || "-"}`;
     }
 
-    const msg = `Halo Keliling Thailand! Saya ingin memesan:\n- Layanan: ${service}\n- Kendaraan: ${vehicle}\n${locationLine}\n- Tanggal: ${date}\n- Jumlah orang: ${pax}`;
+    const msg = `${pageCopy.waIntro}\n- ${pageCopy.waService}: ${service}\n- ${pageCopy.waVehicle}: ${vehicle}\n${locationLine}\n- ${pageCopy.waDate}: ${date}\n- ${pageCopy.waPax}: ${pax}`;
     return `https://wa.me/66647646597?text=${encodeURIComponent(msg)}`;
   }
 
@@ -233,7 +533,6 @@ export default function HomePage() {
     <>
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-[#1B2A4A]">
-        {/* Slide images — crossfade */}
         {HERO_SLIDES.map((slide, i) => (
           <div
             key={slide.src}
@@ -251,34 +550,32 @@ export default function HomePage() {
               className="object-cover object-center"
               sizes="100vw"
             />
-            {/* dark + brand gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1B2A4A]/90 via-[#1B2A4A]/60 to-[#1B2A4A]/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1B2A4A]/85 via-[#1B2A4A]/50 to-[#1B2A4A]/10" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#1B2A4A]/60 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
           </div>
         ))}
 
-        {/* Slide dots — bottom center */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-          {HERO_SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              aria-label={`Slide ${i + 1}`}
-              className={`rounded-full transition-all duration-500 ${
-                i === current
-                  ? "bg-[#F5C518] w-3 h-3"
-                  : "bg-white/50 w-2 h-2 hover:bg-white/80"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Slide tag — top-right floating chip */}
-        <div className="absolute top-28 right-8 z-20">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3">
           <div
             key={current}
             className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest animate-fade-in"
           >
             {HERO_SLIDES[current].tag}
+          </div>
+          <div className="flex items-center gap-2">
+            {HERO_SLIDES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                aria-label={`Slide ${i + 1}`}
+                className={`rounded-full transition-all duration-500 ${
+                  i === current
+                    ? "bg-[#F5C518] w-3 h-3"
+                    : "bg-white/50 w-2 h-2 hover:bg-white/80"
+                }`}
+              />
+            ))}
           </div>
         </div>
 
@@ -286,25 +583,23 @@ export default function HomePage() {
 
         <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left — headline */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#F5C518]/10 border border-[#F5C518]/30 text-[#F5C518] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#F5C518]/10 border border-[#F5C518]/30 text-[#F5C518] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 animate-slide-up">
                 {t.hero.badge}
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
                 {t.hero.title1}{" "}
                 <span className="text-[#F5C518]">{t.hero.title2}</span>
                 <br />
                 {t.hero.title3}
               </h1>
 
-              <p className="text-white/70 text-lg max-w-lg mb-8 leading-relaxed">
+              <p className="text-white/70 text-lg max-w-lg mb-8 leading-relaxed animate-slide-up" style={{ animationDelay: '200ms' }}>
                 {t.hero.subtitle}
               </p>
 
-              {/* Stats row */}
-              <div className="flex mb-10">
+              <div className="flex mb-10 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 {[
                   { value: t.hero.stat1Value, label: t.hero.stat1Label },
                   { value: t.hero.stat2Value, label: t.hero.stat2Label },
@@ -320,7 +615,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 animate-slide-up" style={{ animationDelay: '400ms' }}>
                 <a
                   href={WA_LINK}
                   target="_blank"
@@ -340,20 +635,18 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right — booking card */}
             <div className="bg-[#1B2A4A]/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-6 lg:p-8 text-white">
               <h2 className="text-xl font-extrabold mb-1">{t.booking.title}</h2>
               <p className="text-white/60 text-sm mb-6">{t.booking.subtitle}</p>
 
               <div className="space-y-4">
-                {/* Service selector */}
                 <div>
                   <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                     {t.booking.serviceLabel}
                   </label>
                   <select
                     value={bookingService}
-                    onChange={(e) => setBookingService(Number(e.target.value))}
+                    onChange={(e) => handleBookingServiceChange(Number(e.target.value))}
                     className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#F5C518] focus:border-transparent"
                   >
                     <option value={0} className="text-black">{t.booking.service1}</option>
@@ -362,120 +655,80 @@ export default function HomePage() {
                   </select>
                 </div>
 
-                {/* Vehicle selector */}
                 <div>
                   <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                     {t.booking.vehicleLabel}
                   </label>
                   <select
-                    value={bookingVehicle}
-                    onChange={(e) => setBookingVehicle(e.target.value)}
+                    value={selectedBookingVehicle}
+                    onChange={(e) => handleBookingVehicleChange(e.target.value)}
                     className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#F5C518] focus:border-transparent"
                   >
-                    <option className="text-black">{t.booking.vehicle1}</option>
-                    <option className="text-black">{t.booking.vehicle2}</option>
-                    <option className="text-black">{t.booking.vehicle3}</option>
-                    <option className="text-black">{t.booking.vehicle4}</option>
-                    <option className="text-black">{t.booking.vehicle5}</option>
+                    <option value={t.booking.vehicle1} className="text-black">{t.booking.vehicle1}</option>
+                    <option value={t.booking.vehicle2} className="text-black">{t.booking.vehicle2}</option>
+                    <option value={t.booking.vehicle3} className="text-black">{t.booking.vehicle3}</option>
+                    <option value={t.booking.vehicle4} className="text-black">{t.booking.vehicle4}</option>
+                    <option value={t.booking.vehicle5} className="text-black">{t.booking.vehicle5}</option>
                   </select>
                 </div>
 
-                {/* Airport Transfer: pickup + drop-off */}
                 {bookingService === 0 && (
                   <>
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.airportPickupLabel}
                       </label>
-                      <LocationSearch
-                        dark
-                        value={airportPickup}
-                        onChange={setAirportPickup}
-                        placeholder={t.booking.airportPickupPlaceholder}
-                      />
+                      <LocationSearch dark value={airportPickup} onChange={handleAirportPickupChange} placeholder={t.booking.airportPickupPlaceholder} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.airportDropoffLabel}
                       </label>
-                      <LocationSearch
-                        dark
-                        value={airportDropoff}
-                        onChange={setAirportDropoff}
-                        placeholder={t.booking.airportDropoffPlaceholder}
-                      />
+                      <LocationSearch dark value={airportDropoff} onChange={handleAirportDropoffChange} placeholder={t.booking.airportDropoffPlaceholder} />
                     </div>
                   </>
                 )}
 
-                {/* City Tours: destination + meeting point */}
                 {bookingService === 1 && (
                   <>
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.tourDestLabel}
                       </label>
-                      <LocationSearch
-                        dark
-                        value={tourDest}
-                        onChange={setTourDest}
-                        placeholder={t.booking.tourDestPlaceholder}
-                      />
+                      <LocationSearch dark value={tourDest} onChange={handleTourDestChange} placeholder={t.booking.tourDestPlaceholder} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.tourMeetLabel}
                       </label>
-                      <LocationSearch
-                        dark
-                        value={tourMeet}
-                        onChange={setTourMeet}
-                        placeholder={t.booking.tourMeetPlaceholder}
-                      />
+                      <LocationSearch dark value={tourMeet} onChange={handleTourMeetChange} placeholder={t.booking.tourMeetPlaceholder} />
                     </div>
                   </>
                 )}
 
-                {/* Inter City: from + to */}
                 {bookingService === 2 && (
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.intercityFromLabel}
                       </label>
-                      <LocationSearch
-                        dark
-                        value={intercityFrom}
-                        onChange={setIntercityFrom}
-                        placeholder={t.booking.intercityFromPlaceholder}
-                      />
+                      <LocationSearch dark value={intercityFrom} onChange={handleIntercityFromChange} placeholder={t.booking.intercityFromPlaceholder} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.intercityToLabel}
                       </label>
-                      <LocationSearch
-                        dark
-                        value={intercityTo}
-                        onChange={setIntercityTo}
-                        placeholder={t.booking.intercityToPlaceholder}
-                      />
+                      <LocationSearch dark value={intercityTo} onChange={handleIntercityToChange} placeholder={t.booking.intercityToPlaceholder} />
                     </div>
                   </div>
                 )}
 
-                {/* Date + Pax */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5 truncate">
                       {t.booking.dateLabel}
                     </label>
-                    <DatePicker
-                      dark
-                      value={bookingDate}
-                      onChange={setBookingDate}
-                      placeholder={t.booking.dateLabel}
-                    />
+                    <DatePicker dark value={bookingDate} onChange={handleBookingDateChange} placeholder={t.booking.dateLabel} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5 truncate">
@@ -484,7 +737,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-between w-full border border-white/20 rounded-xl bg-white/10 px-4 h-11">
                       <button
                         type="button"
-                        onClick={() => setBookingPax(p => Math.max(1, p - 1))}
+                        onClick={() => updateBookingPax(Math.max(1, bookingPax - 1))}
                         disabled={bookingPax <= 1}
                         className="w-7 h-7 flex items-center justify-center rounded-lg text-white font-bold text-lg hover:bg-white/20 disabled:opacity-30 transition"
                       >−</button>
@@ -493,7 +746,7 @@ export default function HomePage() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => setBookingPax(p => Math.min(8, p + 1))}
+                        onClick={() => updateBookingPax(Math.min(8, bookingPax + 1))}
                         disabled={bookingPax >= 8}
                         className="w-7 h-7 flex items-center justify-center rounded-lg text-white font-bold text-lg hover:bg-white/20 disabled:opacity-30 transition"
                       >+</button>
@@ -538,47 +791,136 @@ export default function HomePage() {
       </section>
 
       {/* ── FLEET ── */}
-      <section className="py-24 bg-amber-50">
+      <section id="vehicle-options" className="py-24 bg-amber-50 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
-              {t.fleet.eyebrow}
+              {pageCopy.fleetEyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">
-              {t.fleet.title}
+              {pageCopy.fleetTitle}
             </h2>
-            <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm">
-              {t.fleet.subtitle}
+            <p className="text-gray-500 mt-3 max-w-3xl mx-auto text-sm">
+              {pageCopy.fleetSubtitle}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {t.fleetItems.map((v, i) => (
-              <div
-                key={v.name}
-                className="group relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="relative h-52">
-                  <Image
-                    src={FLEET_VEHICLE_SRCS[i].src}
-                    alt={alts[FLEET_VEHICLE_SRCS[i].altKey]}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1B2A4A]/90 via-[#1B2A4A]/30 to-transparent" />
-                  <span className="absolute top-3 left-3 bg-[#F5C518] text-black text-[10px] font-extrabold uppercase tracking-wider px-2 py-1 rounded-full">
-                    {v.tag}
-                  </span>
+          <ScrollReveal className="grid items-start gap-8 lg:grid-cols-[1.35fr_1fr]">
+            <div className="self-start overflow-hidden rounded-[2rem] border border-[#F5C518]/30 bg-white/95 shadow-[0_24px_70px_rgba(16,32,60,0.12)]">
+              <div className="relative aspect-[6/5] min-h-[320px] sm:min-h-[360px]">
+                <Image
+                  src={HERO_SLIDES[0].src}
+                  alt={alts[HERO_SLIDES[0].altKey]}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                  style={{ objectPosition: HERO_SLIDES[0].imagePosition }}
+                />
+                <div className="absolute left-5 top-5 rounded-full bg-[#F5C518] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-black">
+                  {pageCopy.featuredLabel}
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-white font-extrabold text-base leading-tight">{v.name}</h3>
-                  <p className="text-[#F5C518] text-xs font-semibold mt-0.5">{v.capacity}</p>
-                  <p className="text-white/70 text-xs mt-1.5 leading-relaxed">{v.desc}</p>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1B2A4A]/88 via-[#1B2A4A]/52 to-transparent p-5 sm:p-7">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-white/70">
+                    {primaryVehicle.tag}
+                  </p>
+                  <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <h3 className="text-3xl font-extrabold text-white sm:text-[2rem]">
+                        {primaryVehicle.name}
+                      </h3>
+                      <p className="mt-2 text-sm font-semibold text-[#F5C518]">
+                        {pageCopy.featuredCapacity}
+                      </p>
+                    </div>
+                    <a
+                      href={WA_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#1B2A4A] transition-colors hover:bg-[#F5C518]"
+                    >
+                      <WhatsAppIcon />
+                      {pageCopy.fleetCta}
+                    </a>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className="border-t border-[#1B2A4A]/8 bg-[#FFF8E3] px-6 py-5 sm:px-8">
+                <p className="max-w-2xl text-sm leading-relaxed text-gray-700">
+                  {pageCopy.featuredDescription}
+                </p>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {pageCopy.featuredPoints.map((point) => (
+                    <div
+                      key={point}
+                      className="rounded-2xl border border-[#F5C518]/20 bg-white px-4 py-3 text-sm text-gray-700"
+                    >
+                      {point}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 border-t border-[#F5C518]/20 pt-5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1B2A4A]/40 mb-3">
+                    What&apos;s inside
+                  </p>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                    {pageCopy.alphardHighlights.map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="text-[#F5C518] font-bold shrink-0">✓</span>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-[#1B2A4A]/10 bg-white p-6 shadow-lg">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#1B2A4A]/50">
+                {pageCopy.alternativesLabel}
+              </p>
+              <h3 className="mt-3 text-2xl font-extrabold text-[#1B2A4A]">
+                {pageCopy.alternativesTitle}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                {pageCopy.alternativesSubtitle}
+              </p>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                {alternativeVehicles.map((vehicle, i) => (
+                  <div
+                    key={vehicle.name}
+                    className="group overflow-hidden rounded-2xl border border-gray-100 bg-amber-50/40 transition-all duration-300 hover:-translate-y-1 hover:border-[#F5C518] hover:shadow-md"
+                  >
+                    <div className="relative h-40">
+                      <Image
+                        src={FLEET_VEHICLE_SRCS[i + 1].src}
+                        alt={alts[FLEET_VEHICLE_SRCS[i + 1].altKey]}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 1024px) 50vw, 30vw"
+                      />
+                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#1B2A4A]">
+                        {vehicle.tag}
+                      </span>
+                    </div>
+
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <h4 className="text-base font-extrabold text-[#1B2A4A]">{vehicle.name}</h4>
+                        <span className="rounded-full bg-[#F5C518]/15 px-2.5 py-1 text-[11px] font-bold text-[#9D7400]">
+                          {vehicle.capacity}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-600">{vehicle.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -592,12 +934,12 @@ export default function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
               {t.services.title}
             </h2>
-            <p className="text-white/60 mt-3 max-w-xl mx-auto text-sm">
-              {t.services.subtitle}
+            <p className="text-white/60 mt-3 max-w-2xl mx-auto text-sm">
+              {pageCopy.servicesSubtitle}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <ScrollReveal stagger className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {t.serviceItems.map((s, i) => {
               const ServiceIcon = SERVICE_ICONS[i] ?? IconCar;
               return (
@@ -622,7 +964,7 @@ export default function HomePage() {
               </div>
               );
             })}
-          </div>
+          </ScrollReveal>
 
           <div className="text-center mt-12">
             <Link
@@ -647,7 +989,7 @@ export default function HomePage() {
                 {t.whyUs.title}
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-8">
-                {t.whyUs.subtitle}
+                {pageCopy.whyUsSubtitle}
               </p>
 
               <a
@@ -661,7 +1003,7 @@ export default function HomePage() {
               </a>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ScrollReveal stagger className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {t.reasonItems.map((r, i) => {
                 const ReasonIcon = REASON_ICONS[i] ?? IconShield;
                 return (
@@ -677,7 +1019,7 @@ export default function HomePage() {
                 </div>
                 );
               })}
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -752,7 +1094,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <ScrollReveal stagger className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {t.guarantee.items.map((item) => (
               <div
                 key={item.title}
@@ -763,7 +1105,7 @@ export default function HomePage() {
                 <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -783,7 +1125,7 @@ export default function HomePage() {
           </div>
 
           {/* Featured 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <ScrollReveal stagger className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {t.testimonialItems.map((testimonial, i) => (
               <div
                 key={testimonial.name}
@@ -812,7 +1154,7 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
-          </div>
+          </ScrollReveal>
 
           {/* More reviews */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -855,10 +1197,10 @@ export default function HomePage() {
             {t.cta.eyebrow}
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2 mb-4">
-            {t.cta.title}
+            {pageCopy.ctaTitle}
           </h2>
           <p className="text-white/60 text-base mb-10 max-w-xl mx-auto">
-            {t.cta.subtitle}
+            {pageCopy.ctaSubtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -868,13 +1210,13 @@ export default function HomePage() {
               className="whatsapp-btn text-base shadow-lg"
             >
               <WhatsAppIcon />
-              {t.cta.chatBtn}
+              {pageCopy.ctaPrimary}
             </a>
             <Link
-              href="/contact"
+              href="/services"
               className="inline-flex items-center justify-center gap-2 bg-[#F5C518] text-black px-6 py-3 rounded-full font-bold hover:bg-yellow-400 transition-colors group"
             >
-              {t.cta.bookingBtn}
+              {pageCopy.ctaSecondary}
               <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </Link>
           </div>

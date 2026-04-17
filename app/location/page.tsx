@@ -10,7 +10,10 @@ export default function LocationPage() {
   return (
     <main className="min-h-screen bg-white pt-16">
       {/* Hero */}
-      <section className="bg-black py-20">
+      <section
+        className="py-20 relative"
+        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
             {loc.header.eyebrow}
@@ -18,7 +21,7 @@ export default function LocationPage() {
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
             {loc.header.title}
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/70 text-lg max-w-2xl mx-auto">
             {loc.header.subtitle}
           </p>
         </div>
@@ -31,7 +34,7 @@ export default function LocationPage() {
             <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-3">
               {loc.cities.eyebrow}
             </p>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
               {loc.cities.title}
             </h2>
           </div>
@@ -39,9 +42,11 @@ export default function LocationPage() {
             {loc.cities.items.map((city, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-gray-100 p-6 sm:p-8 hover:shadow-md transition-shadow"
+                className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#F5C518] hover:shadow-md transition-all"
               >
-                <div className="text-4xl mb-4">{city.emoji}</div>
+                <div className="bg-[#F5C518]/10 rounded-xl p-3 w-fit mb-4">
+                  <div className="text-4xl">{city.emoji}</div>
+                </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {city.name}
                 </h3>
@@ -55,13 +60,16 @@ export default function LocationPage() {
       </section>
 
       {/* Note Box */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-amber-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto rounded-2xl border border-gray-200 p-8 text-center bg-white shadow-sm">
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+          <div
+            className="max-w-2xl mx-auto rounded-2xl p-8 text-center shadow-lg"
+            style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+          >
+            <h3 className="text-2xl font-bold text-white mb-3">
               {loc.note.title}
             </h3>
-            <p className="text-gray-600 mb-6">{loc.note.desc}</p>
+            <p className="text-white/70 mb-6">{loc.note.desc}</p>
             <a
               href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
               className="whatsapp-btn"
@@ -73,12 +81,15 @@ export default function LocationPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#F5C518] py-20">
+      <section
+        className="py-20"
+        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1B2A4A] mb-4">
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
             {loc.note.title}
           </h2>
-          <p className="text-[#1B2A4A]/80 text-lg mb-8 max-w-xl mx-auto">
+          <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
             {loc.note.desc}
           </p>
           <a

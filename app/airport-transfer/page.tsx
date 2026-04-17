@@ -10,15 +10,18 @@ export default function AirportTransferPage() {
   return (
     <main className="min-h-screen bg-white pt-16">
       {/* Hero */}
-      <section className="bg-black py-20">
+      <section
+        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        className="relative py-20"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
+          <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-4">
             {at.header.eyebrow}
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
             {at.header.title}
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/70 text-lg max-w-2xl mx-auto">
             {at.header.subtitle}
           </p>
         </div>
@@ -28,17 +31,17 @@ export default function AirportTransferPage() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-3">
+            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
               {at.routes.eyebrow}
             </p>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
               {at.routes.title}
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse rounded-2xl overflow-hidden shadow-sm border border-gray-100">
               <thead>
-                <tr className="bg-[#1B2A4A] text-white">
+                <tr className="bg-[#F5C518] text-[#1B2A4A]">
                   <th className="text-left px-6 py-4 font-semibold">From</th>
                   <th className="text-left px-6 py-4 font-semibold">To</th>
                   <th className="text-left px-6 py-4 font-semibold">Duration</th>
@@ -48,7 +51,7 @@ export default function AirportTransferPage() {
                 {at.routes.items.map((route, i) => (
                   <tr
                     key={i}
-                    className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                    className={i % 2 === 0 ? "bg-white" : "bg-amber-50"}
                   >
                     <td className="px-6 py-4 text-gray-800 font-medium">
                       {route.from}
@@ -66,13 +69,13 @@ export default function AirportTransferPage() {
       </section>
 
       {/* What's Included */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-amber-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-3">
+            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
               {at.includes.eyebrow}
             </p>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
               {at.includes.title}
             </h2>
           </div>
@@ -80,7 +83,7 @@ export default function AirportTransferPage() {
             <ul className="space-y-4">
               {at.includes.items.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="mt-1 text-[#25D366] text-lg font-bold flex-shrink-0">
+                  <span className="mt-1 text-[#F5C518] text-lg font-bold flex-shrink-0">
                     ✓
                   </span>
                   <span className="text-gray-700 text-base">{item}</span>
@@ -95,10 +98,10 @@ export default function AirportTransferPage() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-3">
+            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
               {at.pricing.eyebrow}
             </p>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
               {at.pricing.title}
             </h2>
           </div>
@@ -112,17 +115,23 @@ export default function AirportTransferPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-[#F5C518] py-20">
+      {/* CTA section */}
+      <section
+        style={{ background: "#1B2A4A" }}
+        className="py-20"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1B2A4A] mb-4">
+          <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
+            {at.header.eyebrow}
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
             {at.cta.title}
           </h2>
-          <p className="text-[#1B2A4A]/80 text-lg mb-8 max-w-xl mx-auto">
+          <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
             {at.cta.subtitle}
           </p>
           <a
-            href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+            href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!%20Saya%20ingin%20Airport%20Transfer"
             className="whatsapp-btn"
           >
             {at.cta.btn}
