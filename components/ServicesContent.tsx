@@ -55,7 +55,7 @@ export default function ServicesContent() {
                   </div>
                 )}
 
-                <div className="p-8 flex flex-col flex-1">
+                <div className="p-6 sm:p-8 flex flex-col flex-1">
                   <div className="text-xs text-gray-400 font-semibold uppercase tracking-widest mb-1">
                     {svc.subtitle}
                   </div>

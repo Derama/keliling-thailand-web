@@ -532,7 +532,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-[#1B2A4A]">
+      <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-[#1B2A4A]">
         {HERO_SLIDES.map((slide, i) => (
           <div
             key={slide.src}
@@ -581,8 +581,8 @@ export default function HomePage() {
 
         <div className="absolute top-0 left-0 h-1 w-full bg-[#F5C518] z-20" />
 
-        <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 lg:pb-32">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
               <div className="inline-flex items-center gap-2 bg-[#F5C518]/10 border border-[#F5C518]/30 text-[#F5C518] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 animate-slide-up">
                 {t.hero.badge}
@@ -707,7 +707,7 @@ export default function HomePage() {
                 )}
 
                 {bookingService === 2 && (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
                         {t.booking.intercityFromLabel}

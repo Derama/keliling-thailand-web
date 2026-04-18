@@ -8,7 +8,7 @@ export default function CityToursPage() {
   const ct = extendedTranslations[language].cityTours;
 
   return (
-    <main className="min-h-screen bg-white pt-20">
+    <main className="min-h-[100dvh] bg-white pt-20">
       {/* Hero */}
       <section
         style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}

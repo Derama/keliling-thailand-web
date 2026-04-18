@@ -16,7 +16,7 @@ export default function AboutPage() {
   const about = extendedTranslations[language].about;
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-[100dvh] bg-white">
       <section className="relative overflow-hidden bg-[#1B2A4A] pt-24 pb-20">
         <div className="absolute inset-x-0 top-0 h-1 bg-[#F5C518]" />
         <Image
@@ -55,7 +55,7 @@ export default function AboutPage() {
           </div>
 
           <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-white/7 p-7 shadow-2xl backdrop-blur-sm sm:p-8">
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-white/7 p-5 shadow-2xl backdrop-blur-sm sm:p-8">
               <div className="mb-7 flex items-end justify-between gap-4 border-b border-white/10 pb-5">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/40">
@@ -193,7 +193,7 @@ export default function AboutPage() {
       <section className="relative overflow-hidden bg-white py-24 sm:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-[#1B2A4A] px-8 py-16 text-center shadow-[0_30px_90px_rgba(16,32,60,0.22)] sm:px-16 sm:py-20">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-[#1B2A4A] px-6 py-12 text-center shadow-[0_30px_90px_rgba(16,32,60,0.22)] sm:px-16 sm:py-20">
               <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-[#F5C518]/10 blur-3xl" />
               <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[#F5C518]/10 blur-3xl" />
               

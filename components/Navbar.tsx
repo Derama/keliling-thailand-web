@@ -294,21 +294,21 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ${
-          isOpen ? "max-h-[520px] opacity-100" : "max-h-0 opacity-0"
+          isOpen ? "max-h-[640px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="bg-[#F5C518] border-t border-black/20 px-4 py-4 flex flex-col gap-1">
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
-            className={`text-sm font-semibold py-2 transition-colors ${pathname === "/" ? "text-[#1B2A4A] underline" : "text-[#1B2A4A]"}`}
+            className={`text-sm font-semibold py-3 transition-colors ${pathname === "/" ? "text-[#1B2A4A] underline" : "text-[#1B2A4A]"}`}
           >
             {t.nav.home}
           </Link>
           <Link
             href="/about"
             onClick={() => setIsOpen(false)}
-            className={`text-sm font-semibold py-2 transition-colors ${pathname === "/about" ? "text-[#1B2A4A] underline" : "text-[#1B2A4A]"}`}
+            className={`text-sm font-semibold py-3 transition-colors ${pathname === "/about" ? "text-[#1B2A4A] underline" : "text-[#1B2A4A]"}`}
           >
             {t.nav.about}
           </Link>
@@ -319,7 +319,7 @@ export default function Navbar() {
               <Link
                 href="/services"
                 onClick={() => setIsOpen(false)}
-                className={`flex-1 text-sm font-semibold py-2 text-[#1B2A4A] ${isServicesActive ? "underline" : ""}`}
+                className={`flex-1 text-sm font-semibold py-3 text-[#1B2A4A] ${isServicesActive ? "underline" : ""}`}
               >
                 {t.nav.services}
               </Link>
@@ -358,14 +358,14 @@ export default function Navbar() {
           <Link
             href="/testimony"
             onClick={() => setIsOpen(false)}
-            className={`text-sm font-semibold py-2 transition-colors ${pathname === "/testimony" ? "text-[#1B2A4A] underline" : "text-[#1B2A4A]"}`}
+            className={`text-sm font-semibold py-3 transition-colors ${pathname === "/testimony" ? "text-[#1B2A4A] underline" : "text-[#1B2A4A]"}`}
           >
             {t.nav.testimony}
           </Link>
           <Link
             href="/contact"
             onClick={() => setIsOpen(false)}
-            className="mt-2 bg-[#1B2A4A] text-[#F5C518] px-4 py-2.5 rounded-full text-sm font-bold text-center"
+            className="mt-2 bg-[#1B2A4A] text-[#F5C518] px-4 py-3 rounded-full text-sm font-bold text-center"
           >
             {t.nav.reservation}
           </Link>

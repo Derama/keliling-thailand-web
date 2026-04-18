@@ -8,7 +8,7 @@ export default function LocationPage() {
   const loc = extendedTranslations[language].location;
 
   return (
-    <main className="min-h-screen bg-white pt-16">
+    <main className="min-h-[100dvh] bg-white pt-16">
       {/* Hero */}
       <section
         className="py-20 relative"
