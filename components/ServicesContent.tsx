@@ -233,7 +233,7 @@ export default function ServicesContent() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">{s.cta.title}</h2>
           <p className="text-white/70 mb-8">{s.cta.subtitle}</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
             <a
               href={WA_LINK}
               target="_blank"
@@ -247,7 +247,7 @@ export default function ServicesContent() {
             </a>
             <Link
               href="/contact"
-              className="bg-white text-[#1B2A4A] px-6 py-3 rounded-full font-bold hover:bg-[#F5C518] hover:text-[#1B2A4A] transition-colors inline-flex items-center gap-2"
+              className="bg-white text-[#1B2A4A] px-6 py-3 rounded-full font-bold hover:bg-[#F5C518] hover:text-[#1B2A4A] transition-colors inline-flex items-center justify-center gap-2"
             >
               {s.cta.bookingBtn}
             </Link>

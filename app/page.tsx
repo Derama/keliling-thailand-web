@@ -618,7 +618,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 animate-slide-up" style={{ animationDelay: '400ms' }}>
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start animate-slide-up" style={{ animationDelay: '400ms' }}>
                 <a
                   href={WA_LINK}
                   target="_blank"
@@ -638,7 +638,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-[#1B2A4A]/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-6 lg:p-8 text-white">
+            <div className="relative z-30 bg-[#1B2A4A]/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-6 lg:p-8 text-white">
               <h2 className="text-xl font-extrabold mb-1">{t.booking.title}</h2>
               <p className="text-white/60 text-sm mb-6">{t.booking.subtitle}</p>
 
@@ -781,7 +781,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TRUST BAR ── */}
-      <section className="bg-[#F5C518] py-4">
+      <section className="relative z-0 bg-[#F5C518] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-black text-sm font-bold">
             {t.trust.map((item) => (
@@ -1206,7 +1206,7 @@ export default function HomePage() {
           <p className="text-white/60 text-base mb-10 max-w-xl mx-auto">
             {pageCopy.ctaSubtitle}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
             <a
               href={WA_LINK}
               target="_blank"

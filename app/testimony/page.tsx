@@ -28,7 +28,7 @@ export default function TestimonyPage() {
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/68">
               {testimony.header.subtitle}
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:items-start">
               <a
                 href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
                 className="whatsapp-btn text-base font-bold shadow-lg shadow-green-900/35"
@@ -164,7 +164,7 @@ export default function TestimonyPage() {
           <p className="mx-auto mt-5 max-w-2xl text-lg text-white/65">
             {testimony.header.subtitle}
           </p>
-          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
               href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
               className="whatsapp-btn text-base shadow-lg"

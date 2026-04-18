@@ -99,8 +99,32 @@ export default function AirportTransferPage() {
         </div>
       </section>
 
-      {/* Pricing Card */}
+      {/* What's Not Included */}
       <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
+              {at.notIncluded.eyebrow}
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+              {at.notIncluded.title}
+            </h2>
+          </div>
+          <div className="max-w-3xl mx-auto">
+            <ul className="space-y-3">
+              {at.notIncluded.items.map((item, i) => (
+                <li key={i} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-amber-50/50 px-5 py-4">
+                  <span className="mt-0.5 text-[#1B2A4A] font-bold flex-shrink-0">&bull;</span>
+                  <span className="text-gray-700 text-base">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Card */}
+      <section className="bg-amber-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">

@@ -1167,6 +1167,10 @@ export const extendedTranslations = {
         eyebrow: "Yang Termasuk", title: "Semua Sudah Termasuk",
         items: ["Pemantauan jadwal penerbangan real-time","Penjemputan dengan papan nama bertuliskan nama Anda","Tidak ada biaya tambahan untuk delay penerbangan","Tersedia 24/7 termasuk malam dan hari libur","Konfirmasi via WhatsApp H-1 & hari-H","Anak dan bayi welcome, kursi bayi tersedia","Armada bersih dan ber-AC"],
       },
+      notIncluded: {
+        eyebrow: "Tidak Termasuk dalam Paket", title: "Biaya Tambahan yang Perlu Diperhatikan",
+        items: ["Biaya overtime","Akomodasi driver jika perjalanan dilakukan keluar kota atau menginap","Tiket masuk wisata","Tips driver","Asuransi perjalanan pribadi"],
+      },
       pricing: {
         eyebrow: "Harga", title: "Harga Transparan, Tidak Ada Kejutan",
         from: "Mulai dari", price: "3.000 THB",
@@ -1379,6 +1383,10 @@ export const extendedTranslations = {
         eyebrow: "What's Included", title: "Everything Already Included",
         items: ["Real-time flight schedule monitoring","Name board pickup at arrivals hall","No extra charge for flight delays","Available 24/7 including nights and holidays","WhatsApp confirmation day before & on the day","Children and babies welcome, baby seats available","Clean, air-conditioned fleet"],
       },
+      notIncluded: {
+        eyebrow: "Not Included", title: "Additional Costs to Note",
+        items: ["Overtime charges","Driver accommodation if the trip goes out of town or requires an overnight stay","Attraction entrance tickets","Driver tips","Personal travel insurance"],
+      },
       pricing: {
         eyebrow: "Pricing", title: "Transparent Pricing, No Surprises",
         from: "Starting from", price: "3,000 THB",
@@ -1590,6 +1598,10 @@ export const extendedTranslations = {
       includes: {
         eyebrow: "รวมอยู่แล้ว", title: "ทุกอย่างรวมอยู่ในราคา",
         items: ["ติดตามตารางบินแบบเรียลไทม์","รับผู้โดยสารพร้อมป้ายชื่อที่ผู้โดยสารขาเข้า","ไม่มีค่าใช้จ่ายเพิ่มสำหรับเที่ยวบินดีเลย์","ให้บริการ 24/7 รวมถึงกลางคืนและวันหยุดนักขัตฤกษ์","ยืนยันผ่าน WhatsApp ในวันก่อนและวันที่เดินทาง","ยินดีต้อนรับเด็กและทารก มีที่นั่งเด็กให้บริการ","รถสะอาดและมีแอร์"],
+      },
+      notIncluded: {
+        eyebrow: "ไม่รวมในแพ็คเกจ", title: "ค่าใช้จ่ายเพิ่มเติมที่ควรทราบ",
+        items: ["ค่าโอที","ค่าที่พักคนขับ หากเดินทางออกนอกเมืองหรือมีการค้างคืน","ค่าบัตรเข้าสถานที่ท่องเที่ยว","ทิปคนขับ","ประกันการเดินทางส่วนบุคคล"],
       },
       pricing: {
         eyebrow: "ราคา", title: "ราคาโปร่งใส ไม่มีเซอร์ไพรส์",

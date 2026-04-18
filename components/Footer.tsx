@@ -38,7 +38,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
-          <div className="flex flex-col items-center md:items-start gap-4 text-center md:text-left">
+          <div className="flex flex-col items-center gap-4 text-center">
             <Image
               src="/Full logo.png"
               alt="Keliling Thailand"
@@ -46,7 +46,7 @@ export default function Footer() {
               height={144}
               className="h-16 md:h-28 w-auto object-contain"
             />
-            <p className="text-white text-sm leading-relaxed max-w-xs text-center md:text-left">
+            <p className="text-white text-sm leading-relaxed max-w-xs text-center">
               {footerCopy.description}
             </p>
           </div>

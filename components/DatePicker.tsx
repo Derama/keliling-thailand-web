@@ -125,7 +125,7 @@ export default function DatePicker({ value, onChange, placeholder = "Select date
 
       {/* Dropdown calendar — white card style */}
       {open && (
-        <div className="absolute z-50 mt-2 left-0 w-72 max-w-[calc(100vw-2rem)] bg-white border border-gray-100 rounded-2xl shadow-2xl shadow-black/20 p-4 animate-fade-in">
+        <div className="absolute z-[100] mt-2 left-0 w-72 max-w-[calc(100vw-2rem)] bg-white border border-gray-100 rounded-2xl shadow-2xl shadow-black/20 p-4 animate-fade-in">
           {/* Month / Year nav */}
           <div className="flex items-center justify-between mb-4">
             <button
