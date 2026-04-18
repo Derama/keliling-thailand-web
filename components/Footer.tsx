@@ -5,17 +5,17 @@ export default function Footer() {
   return (
     <footer className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
           {/* Brand */}
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col items-center md:items-start gap-4">
             <Image
               src="/Full logo.png"
               alt="Keliling Thailand"
               width={480}
               height={144}
-              className="h-20 md:h-36 w-auto object-contain flex-shrink-0"
+              className="h-16 md:h-28 w-auto object-contain"
             />
-            <p className="text-white text-base leading-relaxed">
+            <p className="text-white text-sm leading-relaxed max-w-xs">
               Solusi transportasi terpercaya untuk wisatawan Indonesia di Thailand.
               Nyaman, aman, dan berkesan.
             </p>
@@ -51,16 +51,13 @@ export default function Footer() {
               Hubungi Kami
             </h3>
             <ul className="space-y-2 text-sm text-white">
-              <li className="flex items-center gap-2">
+              <li className="flex items-center justify-center md:justify-start gap-2">
                 <span>📱</span>
-                <a
-                  href="https://wa.me/66647646597"
-                  className="hover:text-[#F5C518] transition-colors"
-                >
+                <a href="https://wa.me/66647646597" className="hover:text-[#F5C518] transition-colors">
                   WhatsApp
                 </a>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center justify-center md:justify-start gap-2">
                 <span>📸</span>
                 <a
                   href="https://instagram.com/kelilingthailand"
@@ -71,7 +68,7 @@ export default function Footer() {
                   @kelilingthailand
                 </a>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center justify-center md:justify-start gap-2">
                 <span>📍</span>
                 <span>Bangkok, Thailand</span>
               </li>
