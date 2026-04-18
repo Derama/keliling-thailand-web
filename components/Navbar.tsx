@@ -291,7 +291,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ${
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          isOpen ? "max-h-[520px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="bg-[#F5C518] border-t border-black/20 px-4 py-4 flex flex-col gap-1">
@@ -312,20 +312,29 @@ export default function Navbar() {
 
           {/* Services expandable on mobile */}
           <div>
-            <button
-              onClick={() => setServicesOpen(!servicesOpen)}
-              className="w-full flex items-center justify-between text-sm font-semibold py-2 text-[#1B2A4A]"
-            >
-              <span>{t.nav.services}</span>
-              <svg
-                className={`w-3.5 h-3.5 transition-transform ${servicesOpen ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex items-center justify-between">
+              <Link
+                href="/services"
+                onClick={() => setIsOpen(false)}
+                className={`flex-1 text-sm font-semibold py-2 text-[#1B2A4A] ${isServicesActive ? "underline" : ""}`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+                {t.nav.services}
+              </Link>
+              <button
+                onClick={() => setServicesOpen(!servicesOpen)}
+                aria-label="Toggle services menu"
+                className="p-2 text-[#1B2A4A]"
+              >
+                <svg
+                  className={`w-3.5 h-3.5 transition-transform ${servicesOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
             {servicesOpen && (
               <div className="pl-4 flex flex-col gap-1 pb-1">
                 {serviceDropdownLinks.map((link) => (
