@@ -23,6 +23,7 @@ export default function Navbar() {
   const langDesktopRef = useRef<HTMLDivElement>(null);
   const langMobileRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
+  const mobileServicesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -37,7 +38,9 @@ export default function Navbar() {
       if (!inDesktop && !inMobile) {
         setLangOpen(false);
       }
-      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
+      const inDesktopServices = servicesRef.current?.contains(e.target as Node);
+      const inMobileServices = mobileServicesRef.current?.contains(e.target as Node);
+      if (!inDesktopServices && !inMobileServices) {
         setServicesOpen(false);
       }
     };
@@ -311,7 +314,7 @@ export default function Navbar() {
           </Link>
 
           {/* Services expandable on mobile */}
-          <div>
+          <div ref={mobileServicesRef}>
             <div className="flex items-center justify-between">
               <Link
                 href="/services"
