@@ -599,7 +599,7 @@ export default function HomePage() {
                 {t.hero.subtitle}
               </p>
 
-              <div className="flex mb-10 animate-slide-up" style={{ animationDelay: '300ms' }}>
+              <div className="flex flex-wrap gap-y-4 mb-10 animate-slide-up" style={{ animationDelay: '300ms' }}>
                 {[
                   { value: t.hero.stat1Value, label: t.hero.stat1Label },
                   { value: t.hero.stat2Value, label: t.hero.stat2Label },
@@ -607,7 +607,7 @@ export default function HomePage() {
                 ].map((s, i, arr) => (
                   <div
                     key={s.label}
-                    className={`pr-8 ${i < arr.length - 1 ? "mr-8 border-r border-white/20" : ""}`}
+                    className={`pr-6 sm:pr-8 ${i < arr.length - 1 ? "mr-6 sm:mr-8 border-r border-white/20" : ""}`}
                   >
                     <div className="text-2xl font-extrabold text-[#F5C518]">{s.value}</div>
                     <div className="text-white/50 text-xs mt-0.5">{s.label}</div>
@@ -779,7 +779,7 @@ export default function HomePage() {
       {/* ── TRUST BAR ── */}
       <section className="bg-[#F5C518] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-nowrap justify-center gap-x-8 overflow-x-auto text-black text-sm font-bold whitespace-nowrap">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-black text-sm font-bold">
             {t.trust.map((item) => (
               <span key={item} className="flex items-center gap-1.5">
                 <IconCheck className="w-4 h-4 text-[#1B2A4A] shrink-0" />
@@ -1131,7 +1131,7 @@ export default function HomePage() {
                 key={testimonial.name}
                 className={`rounded-2xl p-8 border ${
                   i === 1
-                    ? "bg-[#F5C518] border-[#F5C518] shadow-xl scale-105"
+                    ? "bg-[#F5C518] border-[#F5C518] shadow-xl md:scale-105"
                     : "bg-white border-gray-100 shadow-sm"
                 }`}
               >
