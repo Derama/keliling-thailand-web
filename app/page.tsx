@@ -78,18 +78,19 @@ const HOMEPAGE_COPY = {
       "Nyaman untuk keluarga, eksekutif, dan honeymoon",
       "Cocok untuk rute Bangkok maupun antar kota",
     ],
-    alternativesLabel: "Alternative Options",
+    alternativesLabel: "Pilihan Kendaraan Lainnya",
     alternativesTitle: "Perlu setup perjalanan yang berbeda?",
     alternativesSubtitle:
-      "Gunakan opsi di bawah jika prioritas Anda adalah kapasitas grup yang lebih besar, bentuk kendaraan tertentu, atau kebutuhan operasional khusus.",
+      "Gunakan pilihan di bawah jika prioritas Anda adalah kapasitas grup yang lebih besar, bentuk kendaraan tertentu, atau kebutuhan operasional khusus.",
     fleetCta: "Konsultasikan kendaraan yang tepat",
     servicesSubtitle:
-      "Setiap layanan kami dapat dimulai dari Alphard sebagai opsi premium, lalu dialihkan ke kendaraan alternatif saat rute, jumlah tamu, atau budget Anda menuntut format yang berbeda.",
+      "Setiap layanan kami dapat dimulai dari Alphard sebagai opsi premium, lalu disesuaikan ke Fortuner, Sedan, Van, atau Bus saat rute, jumlah tamu, atau budget menuntut format yang berbeda.",
     whyUsSubtitle:
       "Alphard Experience bukan sekadar upgrade kendaraan. Ini adalah standar layanan privat kami untuk memastikan perjalanan Anda terasa halus, tepat waktu, dan premium dari awal sampai selesai.",
     ctaTitle: "Jadikan Alphard standar perjalanan Anda di Thailand.",
     ctaSubtitle:
-      "Kirim rute, tanggal, dan jumlah tamu Anda. Kami prioritaskan Alphard terlebih dahulu, lalu sarankan Fortuner, Sedan, Van, atau Bus hanya jika itu lebih cocok untuk trip Anda.",
+      "Kirim rute, tanggal, dan jumlah tamu Anda. Kami prioritaskan Alphard terlebih dahulu, lalu sarankan Fortuner, Sedan, Van, atau Bus bila itu lebih cocok untuk trip Anda.",
+    insideLabel: "Yang Anda Dapatkan",
     ctaPrimary: "Cek Ketersediaan Alphard",
     ctaSecondary: "Lihat Semua Layanan",
     alphardHighlights: [
@@ -147,18 +148,19 @@ const HOMEPAGE_COPY = {
       "Comfortable for families, executives, and honeymoon trips",
       "Strong fit for Bangkok itineraries and intercity rides",
     ],
-    alternativesLabel: "Alternative Options",
+    alternativesLabel: "Other Vehicle Choices",
     alternativesTitle: "Need a different travel setup?",
     alternativesSubtitle:
       "Use the options below when larger group capacity, a different vehicle format, or operational needs matter more than the Alphard cabin experience.",
     fleetCta: "Get help choosing the right vehicle",
     servicesSubtitle:
-      "Each service can begin with Alphard as the premium default, then move to an alternative vehicle when route shape, guest count, or budget makes more sense.",
+      "Each service can begin with Alphard as the premium default, then shift to Fortuner, Sedan, Van, or Bus when route shape, guest count, or budget makes more sense.",
     whyUsSubtitle:
       "Alphard Experience is not just a vehicle upgrade. It is our clearest premium standard for keeping your private trip smooth, punctual, and polished from arrival to drop-off.",
     ctaTitle: "Make Alphard your travel standard in Thailand.",
     ctaSubtitle:
-      "Send your route, date, and guest count. We prioritise Alphard first, then recommend Fortuner, Sedan, Van, or Bus only when it is the better fit for your trip.",
+      "Send your route, date, and guest count. We prioritise Alphard first, then recommend Fortuner, Sedan, Van, or Bus when it is the better fit for your trip.",
+    insideLabel: "What You Get",
     ctaPrimary: "Check Alphard Availability",
     ctaSecondary: "Explore All Services",
     alphardHighlights: [
@@ -216,18 +218,19 @@ const HOMEPAGE_COPY = {
       "สบายสำหรับครอบครัว ผู้บริหาร และฮันนีมูน",
       "เหมาะกับเส้นทางในกรุงเทพและข้ามเมือง",
     ],
-    alternativesLabel: "ทางเลือกอื่น",
+    alternativesLabel: "ตัวเลือกรถเพิ่มเติม",
     alternativesTitle: "ต้องการรูปแบบการเดินทางแบบอื่น?",
     alternativesSubtitle:
       "ใช้ตัวเลือกด้านล่างเมื่อจำนวนผู้โดยสารมากขึ้น ต้องการรูปแบบรถที่ต่างออกไป หรือมีข้อกำหนดการใช้งานเฉพาะมากกว่าประสบการณ์ห้องโดยสารของ Alphard",
     fleetCta: "ให้เราช่วยเลือกรถที่เหมาะ",
     servicesSubtitle:
-      "ทุกบริการของเราสามารถเริ่มต้นด้วย Alphard ในฐานะตัวเลือกระดับพรีเมียม แล้วค่อยเปลี่ยนเป็นรถทางเลือกเมื่อเส้นทาง จำนวนผู้โดยสาร หรือ งบประมาณเหมาะสมกว่า",
+      "ทุกบริการของเราสามารถเริ่มต้นด้วย Alphard ในฐานะตัวเลือกระดับพรีเมียม แล้วค่อยเปลี่ยนเป็น Fortuner, Sedan, Van หรือ Bus เมื่อเส้นทาง จำนวนผู้โดยสาร หรือ งบประมาณเหมาะสมกว่า",
     whyUsSubtitle:
       "Alphard Experience ไม่ใช่แค่การอัปเกรดยานพาหนะ แต่เป็นมาตรฐานบริการพรีเมียมของเราที่ทำให้ทริปส่วนตัวของคุณราบรื่น ตรงเวลา และดูดีตั้งแต่ต้นจนจบ",
     ctaTitle: "ให้ Alphard เป็นมาตรฐานการเดินทางของคุณในไทย",
     ctaSubtitle:
       "ส่งเส้นทาง วันที่ และจำนวนผู้โดยสารมาให้เรา เราจะให้ Alphard มาก่อน แล้วค่อยแนะนำ Fortuner, Sedan, Van หรือ Bus หากเหมาะกับทริปมากกว่า",
+    insideLabel: "สิ่งที่คุณจะได้รับ",
     ctaPrimary: "เช็กคิว Alphard",
     ctaSecondary: "ดูบริการทั้งหมด",
     alphardHighlights: [
@@ -863,7 +866,7 @@ export default function HomePage() {
 
                 <div className="mt-5 border-t border-[#F5C518]/20 pt-5">
                   <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1B2A4A]/40 mb-3">
-                    What&apos;s inside
+                    {pageCopy.insideLabel}
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                     {pageCopy.alphardHighlights.map((item) => (

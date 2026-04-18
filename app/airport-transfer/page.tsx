@@ -42,9 +42,9 @@ export default function AirportTransferPage() {
             <table className="w-full border-collapse rounded-2xl overflow-hidden shadow-sm border border-gray-100">
               <thead>
                 <tr className="bg-[#F5C518] text-[#1B2A4A]">
-                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">From</th>
-                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">To</th>
-                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">Duration</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colFrom}</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colTo}</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colDuration}</th>
                 </tr>
               </thead>
               <tbody>
@@ -53,9 +53,14 @@ export default function AirportTransferPage() {
                     key={i}
                     className={i % 2 === 0 ? "bg-white" : "bg-amber-50"}
                   >
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-800 font-medium">
-                      {route.from}
-                    </td>
+                    {i === 0 ? (
+                      <td
+                        rowSpan={at.routes.items.length}
+                        className="align-top px-3 py-3 sm:px-6 sm:py-4 text-gray-800 font-semibold"
+                      >
+                        {at.routes.airportLabel}
+                      </td>
+                    ) : null}
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{route.to}</td>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 text-[#F5C518] font-semibold">
                       {route.duration}

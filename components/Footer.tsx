@@ -1,7 +1,38 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/components/LanguageContext";
 
 export default function Footer() {
+  const { language } = useLanguage();
+  const footerCopy = {
+    id: {
+      description:
+        "Solusi transportasi terpercaya untuk semua wisatawan di Thailand. Nyaman, aman, dan berkesan.",
+      nav: "Navigasi",
+      services: "Layanan Kami",
+      book: "Pesan Sekarang",
+      contact: "Hubungi Kami",
+    },
+    en: {
+      description:
+        "Trusted transport solutions for all travellers in Thailand. Comfortable, safe, and memorable.",
+      nav: "Navigation",
+      services: "Our Services",
+      book: "Book Now",
+      contact: "Contact Us",
+    },
+    th: {
+      description:
+        "โซลูชันการเดินทางที่ไว้วางใจได้สำหรับนักท่องเที่ยวทุกคนในประเทศไทย สะดวกสบาย ปลอดภัย และน่าประทับใจ",
+      nav: "เมนู",
+      services: "บริการของเรา",
+      book: "จองตอนนี้",
+      contact: "ติดต่อเรา",
+    },
+  }[language];
+
   return (
     <footer className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -16,15 +47,14 @@ export default function Footer() {
               className="h-16 md:h-28 w-auto object-contain"
             />
             <p className="text-white text-sm leading-relaxed max-w-xs text-center md:text-left">
-              Solusi transportasi terpercaya untuk wisatawan Indonesia di Thailand.
-              Nyaman, aman, dan berkesan.
+              {footerCopy.description}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="text-center md:text-left">
             <h3 className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
-              Navigasi
+              {footerCopy.nav}
             </h3>
             <ul className="space-y-2 text-sm text-white">
               <li>
@@ -34,12 +64,12 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/services" className="hover:text-[#F5C518] transition-colors">
-                  Layanan Kami
+                  {footerCopy.services}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-[#F5C518] transition-colors">
-                  Pesan Sekarang
+                  {footerCopy.book}
                 </Link>
               </li>
             </ul>
@@ -48,7 +78,7 @@ export default function Footer() {
           {/* Contact */}
           <div className="text-center md:text-left">
             <h3 className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
-              Hubungi Kami
+              {footerCopy.contact}
             </h3>
             <ul className="space-y-2 text-sm text-white">
               <li className="flex items-center justify-center md:justify-start gap-2">
