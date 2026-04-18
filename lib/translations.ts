@@ -1050,7 +1050,7 @@ export const extendedTranslations = {
           price: "5.000 THB (5 jam) / 8.500 THB (10 jam)", orderBtn: "Pesan Alphard via WhatsApp",
         },
         {
-          icon: "plane", tag: "Terpercaya", title: "Airport Transfer", subtitle: "Jemput & Antar", highlight: false,
+          icon: "plane", tag: "Terpercaya", title: "Airport Transfer (Don Mueang / Suvarnabhumi Airport)", subtitle: "Jemput & Antar", highlight: false,
           description: "Layanan jemput-antar bandara yang tepat waktu dan profesional. Kami memantau jadwal penerbangan Anda secara real-time sehingga tidak perlu khawatir meski ada delay.",
           features: ["Pantau jadwal penerbangan real-time","Penjemputan dengan papan nama","Tersedia 24/7","Suvarnabhumi & Don Mueang Airport","Tidak ada biaya tambahan untuk delay","Konfirmasi otomatis via WhatsApp","Anak & bayi welcome"],
           price: "3.000 THB", orderBtn: "Pesan via WhatsApp",
@@ -1262,7 +1262,7 @@ export const extendedTranslations = {
           price: "5,000 THB (5 hrs) / 8,500 THB (10 hrs)", orderBtn: "Book Alphard via WhatsApp",
         },
         {
-          icon: "plane", tag: "Trusted", title: "Airport Transfer", subtitle: "Pickup & Drop-off", highlight: false,
+          icon: "plane", tag: "Trusted", title: "Airport Transfer (Don Mueang / Suvarnabhumi Airport)", subtitle: "Pickup & Drop-off", highlight: false,
           description: "Punctual and professional airport transfer service. We monitor your flight in real-time so you never have to worry about delays.",
           features: ["Real-time flight monitoring","Name board pickup at arrivals","Available 24/7","Suvarnabhumi & Don Mueang airports","No extra charge for flight delays","Automatic WhatsApp confirmation","Children & babies welcome"],
           price: "3,000 THB", orderBtn: "Book via WhatsApp",
@@ -1474,7 +1474,7 @@ export const extendedTranslations = {
           price: "5,000 บาท (5 ชม.) / 8,500 บาท (10 ชม.)", orderBtn: "จอง Alphard ผ่าน WhatsApp",
         },
         {
-          icon: "plane", tag: "น่าเชื่อถือ", title: "รับส่งสนามบิน", subtitle: "รับและส่ง", highlight: false,
+          icon: "plane", tag: "น่าเชื่อถือ", title: "รับส่งสนามบิน (Don Mueang / Suvarnabhumi Airport)", subtitle: "รับและส่ง", highlight: false,
           description: "บริการรับส่งสนามบินที่ตรงเวลาและมืออาชีพ เราติดตามตารางบินของคุณแบบเรียลไทม์ ไม่ต้องกังวลแม้มีดีเลย์",
           features: ["ติดตามตารางบินแบบเรียลไทม์","รับผู้โดยสารพร้อมป้ายชื่อ","ให้บริการ 24/7","สนามบินสุวรรณภูมิและดอนเมือง","ไม่มีค่าใช้จ่ายเพิ่มสำหรับเที่ยวบินดีเลย์","ยืนยันอัตโนมัติผ่าน WhatsApp","ยินดีต้อนรับเด็กและทารก"],
           price: "3,000 บาท", orderBtn: "จองผ่าน WhatsApp",
