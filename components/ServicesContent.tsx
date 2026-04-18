@@ -162,17 +162,17 @@ export default function ServicesContent() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-amber-50 border-b border-gray-100">
-                  <th className="text-left px-6 py-4 text-gray-500 font-semibold">{s.priceTable.colService}</th>
-                  <th className="text-center px-4 py-4 text-gray-500 font-semibold">{s.priceTable.colPrice}</th>
-                  <th className="text-center px-4 py-4 text-gray-500 font-semibold">{s.priceTable.colDriver}</th>
-                  <th className="text-center px-4 py-4 text-gray-500 font-semibold">{s.priceTable.colFixed}</th>
-                  <th className="text-center px-4 py-4 text-gray-500 font-semibold">{s.priceTable.colGuarantee}</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colService}</th>
+                  <th className="text-center px-2 py-3 sm:px-4 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colPrice}</th>
+                  <th className="text-center px-2 py-3 sm:px-4 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colDriver}</th>
+                  <th className="text-center px-2 py-3 sm:px-4 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colFixed}</th>
+                  <th className="text-center px-2 py-3 sm:px-4 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colGuarantee}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {s.priceTable.rows.map((row) => (
                   <tr key={row.name} className={row.highlight ? "bg-[#F5C518]/5" : ""}>
-                    <td className="px-6 py-4 font-extrabold text-black">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 font-extrabold text-black">
                       <div className="flex flex-col gap-1">
                         <span>{row.name}</span>
                         {row.highlight && row.badge && (
@@ -182,16 +182,16 @@ export default function ServicesContent() {
                         )}
                       </div>
                     </td>
-                    <td className={`text-center px-4 py-4 font-bold ${row.highlight ? "text-black" : "text-gray-600"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 font-bold ${row.highlight ? "text-black" : "text-gray-600"}`}>
                       {row.price}
                     </td>
-                    <td className={`text-center px-4 py-4 text-xl font-bold ${row.driver === "✓" ? "text-[#F5C518]" : row.driver === "~" ? "text-yellow-500" : "text-red-400"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.driver === "✓" ? "text-[#F5C518]" : row.driver === "~" ? "text-yellow-500" : "text-red-400"}`}>
                       {row.driver}
                     </td>
-                    <td className={`text-center px-4 py-4 text-xl font-bold ${row.fixed === "✓" ? "text-[#F5C518]" : row.fixed === "~" ? "text-yellow-500" : "text-red-400"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.fixed === "✓" ? "text-[#F5C518]" : row.fixed === "~" ? "text-yellow-500" : "text-red-400"}`}>
                       {row.fixed}
                     </td>
-                    <td className={`text-center px-4 py-4 text-xl font-bold ${row.guarantee === "✓" ? "text-[#F5C518]" : row.guarantee === "~" ? "text-yellow-500" : "text-red-400"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.guarantee === "✓" ? "text-[#F5C518]" : row.guarantee === "~" ? "text-yellow-500" : "text-red-400"}`}>
                       {row.guarantee}
                     </td>
                   </tr>

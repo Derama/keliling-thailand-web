@@ -8,7 +8,7 @@ export default function AirportTransferPage() {
   const at = extendedTranslations[language].airportTransfer;
 
   return (
-    <main className="min-h-screen bg-white pt-16">
+    <main className="min-h-screen bg-white pt-20">
       {/* Hero */}
       <section
         style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
@@ -42,9 +42,9 @@ export default function AirportTransferPage() {
             <table className="w-full border-collapse rounded-2xl overflow-hidden shadow-sm border border-gray-100">
               <thead>
                 <tr className="bg-[#F5C518] text-[#1B2A4A]">
-                  <th className="text-left px-6 py-4 font-semibold">From</th>
-                  <th className="text-left px-6 py-4 font-semibold">To</th>
-                  <th className="text-left px-6 py-4 font-semibold">Duration</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">From</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">To</th>
+                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">Duration</th>
                 </tr>
               </thead>
               <tbody>
@@ -53,11 +53,11 @@ export default function AirportTransferPage() {
                     key={i}
                     className={i % 2 === 0 ? "bg-white" : "bg-amber-50"}
                   >
-                    <td className="px-6 py-4 text-gray-800 font-medium">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-800 font-medium">
                       {route.from}
                     </td>
-                    <td className="px-6 py-4 text-gray-700">{route.to}</td>
-                    <td className="px-6 py-4 text-[#F5C518] font-semibold">
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{route.to}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-[#F5C518] font-semibold">
                       {route.duration}
                     </td>
                   </tr>

@@ -12,7 +12,7 @@ export default function TestimonyPage() {
   const more = translations[language].moreTestimonialItems;
 
   return (
-    <main className="min-h-screen bg-white pt-16">
+    <main className="min-h-screen bg-white pt-20">
       <section className="relative overflow-hidden bg-[#1B2A4A] pt-20 pb-16 sm:pt-24 sm:pb-18">
         <div className="absolute inset-x-0 top-0 h-1 bg-[#F5C518]" />
         <div className="absolute -left-12 top-24 h-40 w-40 rounded-full bg-[#F5C518]/12 blur-3xl" />

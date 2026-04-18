@@ -13,7 +13,7 @@ export default function Footer() {
               alt="Keliling Thailand"
               width={480}
               height={144}
-              className="h-36 w-auto object-contain flex-shrink-0"
+              className="h-20 md:h-36 w-auto object-contain flex-shrink-0"
             />
             <p className="text-white text-base leading-relaxed">
               Solusi transportasi terpercaya untuk wisatawan Indonesia di Thailand.
