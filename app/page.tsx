@@ -486,7 +486,7 @@ export default function HomePage() {
   }
 
   function buildBookingWaLink() {
-    const services = [t.booking.service1, t.booking.service2, t.booking.service3];
+    const services = [t.booking.service1, t.booking.service2, t.booking.service3, t.booking.service4];
     const service = services[bookingService];
     const vehicle = selectedBookingVehicle;
     const date = bookingDate || "-";
@@ -655,6 +655,7 @@ export default function HomePage() {
                     <option value={0} className="text-black">{t.booking.service1}</option>
                     <option value={1} className="text-black">{t.booking.service2}</option>
                     <option value={2} className="text-black">{t.booking.service3}</option>
+                    <option value={3} className="text-black">{t.booking.service4}</option>
                   </select>
                 </div>
 
