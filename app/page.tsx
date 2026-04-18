@@ -44,7 +44,7 @@ const FLEET_VEHICLE_SRCS = [
   { src: "/Fortuner.webp", altKey: "fleet2" as const },
   { src: "/Altis.webp", altKey: "fleet3" as const },
   { src: "/luxury van .webp", altKey: "fleet4" as const },
-  { src: "/bus", altKey: "fleet5" as const },
+  { src: "/bus.png", altKey: "fleet5" as const },
 ];
 
 const HOMEPAGE_COPY = {
