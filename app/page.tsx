@@ -535,7 +535,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-[#1B2A4A]">
+      <section className="relative min-h-[100dvh] flex items-center overflow-x-hidden bg-[#1B2A4A]">
         {HERO_SLIDES.map((slide, i) => (
           <div
             key={slide.src}
@@ -559,7 +559,7 @@ export default function HomePage() {
           </div>
         ))}
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3">
           <div
             key={current}
             className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest animate-fade-in"
@@ -584,8 +584,8 @@ export default function HomePage() {
 
         <div className="absolute top-0 left-0 h-1 w-full bg-[#F5C518] z-20" />
 
-        <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 lg:pb-32">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 lg:pb-32">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
             <div>
               <div className="inline-flex items-center gap-2 bg-[#F5C518]/10 border border-[#F5C518]/30 text-[#F5C518] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 animate-slide-up">
                 {t.hero.badge}
@@ -781,7 +781,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TRUST BAR ── */}
-      <section className="relative z-0 bg-[#F5C518] py-4">
+      <section className="relative z-[-1] bg-[#F5C518] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-black text-sm font-bold">
             {t.trust.map((item) => (
@@ -1206,12 +1206,12 @@ export default function HomePage() {
           <p className="text-white/60 text-base mb-10 max-w-xl mx-auto">
             {pageCopy.ctaSubtitle}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full">
             <a
               href={WA_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="whatsapp-btn text-base shadow-lg"
+              className="whatsapp-btn text-base shadow-lg justify-center"
             >
               <WhatsAppIcon />
               {pageCopy.ctaPrimary}
