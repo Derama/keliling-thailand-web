@@ -65,7 +65,6 @@ export default function TestimonyPage() {
                 </p>
                 <div className="mt-4 border-t border-white/10 pt-3">
                   <p className="text-sm font-extrabold text-white">{item.name}</p>
-                  <p className="text-xs text-white/50">{item.service}</p>
                 </div>
               </div>
             ))}

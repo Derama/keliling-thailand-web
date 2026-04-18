@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/components/LanguageContext";
-
-const geist = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Alphard Experience — Premium Private Transport in Thailand",
@@ -30,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${geist.variable} h-full antialiased`}>
+    <html lang="id" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-white text-black">
         <LanguageProvider>
           <Navbar />

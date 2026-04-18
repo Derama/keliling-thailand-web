@@ -4,6 +4,8 @@
   --background: #ffffff;
   --foreground: #000000;
   --yellow: #F5C518;
+  --font-geist-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-geist-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 
   /* Impeccable easing — natural deceleration, never bounce/elastic */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
