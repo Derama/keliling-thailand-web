@@ -3,6 +3,12 @@
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
 
+const CT_WA = {
+  id: "Halo Keliling Thailand! Saya tertarik dengan City Tour. [dari: City Tours Page]",
+  en: "Hello Keliling Thailand! I'm interested in City Tours. [from: City Tours Page]",
+  th: "สวัสดี Keliling Thailand! ฉันสนใจทัวร์เมือง [จาก: City Tours Page]",
+} as const;
+
 export default function CityToursPage() {
   const { language } = useLanguage();
   const ct = extendedTranslations[language].cityTours;
@@ -129,7 +135,7 @@ export default function CityToursPage() {
             {ct.cta.subtitle}
           </p>
           <a
-            href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!%20Saya%20tertarik%20dengan%20City%20Tour"
+            href={`https://wa.me/66647646597?text=${encodeURIComponent(CT_WA[language])}`}
             className="whatsapp-btn"
           >
             {ct.cta.btn}

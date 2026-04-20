@@ -9,8 +9,35 @@ import DatePicker from "@/components/DatePicker";
 import LocationSearch from "@/components/LocationSearch";
 import ScrollReveal from "@/components/ScrollReveal";
 
-const WA_LINK =
-  "https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!%20Saya%20ingin%20memesan%20layanan%20transportasi.";
+const WA_NUMBER = "66647646597";
+
+const WA_MESSAGES = {
+  id: {
+    hero: "Halo Keliling Thailand! Saya tertarik dengan Alphard Experience dan ingin konsultasi. [dari: Hero Section]",
+    fleet: "Halo Keliling Thailand! Saya butuh bantuan memilih kendaraan yang tepat. [dari: Fleet Section]",
+    whyUs: "Halo Keliling Thailand! Saya ingin konsultasi gratis tentang layanan transportasi. [dari: Konsultasi Gratis]",
+    valueStack: "Halo Keliling Thailand! Saya ingin klaim penawaran charter 10 jam Alphard. [dari: Grand Slam Offer]",
+    cta: "Halo Keliling Thailand! Saya ingin cek ketersediaan Alphard. [dari: CTA Section]",
+  },
+  en: {
+    hero: "Hello Keliling Thailand! I'm interested in the Alphard Experience and would like a consultation. [from: Hero Section]",
+    fleet: "Hello Keliling Thailand! I need help choosing the right vehicle. [from: Fleet Section]",
+    whyUs: "Hello Keliling Thailand! I'd like a free consultation about your transport services. [from: Free Consultation]",
+    valueStack: "Hello Keliling Thailand! I'd like to claim the 10-hour Alphard charter offer. [from: Grand Slam Offer]",
+    cta: "Hello Keliling Thailand! I'd like to check Alphard availability. [from: CTA Section]",
+  },
+  th: {
+    hero: "สวัสดี Keliling Thailand! ฉันสนใจ Alphard Experience และต้องการปรึกษา [จาก: Hero Section]",
+    fleet: "สวัสดี Keliling Thailand! ฉันต้องการความช่วยเหลือในการเลือกรถ [จาก: Fleet Section]",
+    whyUs: "สวัสดี Keliling Thailand! ฉันต้องการปรึกษาฟรีเกี่ยวกับบริการรถ [จาก: ปรึกษาฟรี]",
+    valueStack: "สวัสดี Keliling Thailand! ฉันต้องการใช้ข้อเสนอเช่า Alphard 10 ชั่วโมง [จาก: Grand Slam Offer]",
+    cta: "สวัสดี Keliling Thailand! ฉันต้องการเช็กคิว Alphard [จาก: CTA Section]",
+  },
+} as const;
+
+function buildWaLink(section: keyof typeof WA_MESSAGES.id, lang: "id" | "en" | "th") {
+  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_MESSAGES[lang][section])}`;
+}
 
 const HERO_SLIDES = [
   {
@@ -559,10 +586,10 @@ export default function HomePage() {
           </div>
         ))}
 
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 w-full max-w-[90vw]">
           <div
             key={current}
-            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest animate-fade-in"
+            className="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest animate-fade-in text-center whitespace-nowrap"
           >
             {HERO_SLIDES[current].tag}
           </div>
@@ -620,7 +647,7 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row gap-3 items-center justify-center sm:justify-start animate-slide-up" style={{ animationDelay: '400ms' }}>
                 <a
-                  href={WA_LINK}
+                  href={buildWaLink("hero", language)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="whatsapp-btn text-base font-bold shadow-lg shadow-green-900/40"
@@ -837,7 +864,7 @@ export default function HomePage() {
                       </p>
                     </div>
                     <a
-                      href={WA_LINK}
+                      href={buildWaLink("fleet", language)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#1B2A4A] transition-colors hover:bg-[#F5C518]"
@@ -997,7 +1024,7 @@ export default function HomePage() {
               </p>
 
               <a
-                href={WA_LINK}
+                href={buildWaLink("whyUs", language)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="whatsapp-btn font-bold"
@@ -1071,7 +1098,7 @@ export default function HomePage() {
 
           <div className="text-center mt-8">
             <a
-              href={WA_LINK}
+              href={buildWaLink("valueStack", language)}
               target="_blank"
               rel="noopener noreferrer"
               className="whatsapp-btn text-base shadow-lg"
@@ -1208,7 +1235,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full">
             <a
-              href={WA_LINK}
+              href={buildWaLink("cta", language)}
               target="_blank"
               rel="noopener noreferrer"
               className="whatsapp-btn text-base shadow-lg justify-center"

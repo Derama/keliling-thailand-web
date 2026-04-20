@@ -4,8 +4,31 @@ import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
 
-const WA_LINK =
-  "https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!%20Saya%20ingin%20memesan%20layanan%20transportasi.";
+const WA_NUMBER = "66647646597";
+
+const SVC_WA_MESSAGES = {
+  id: [
+    "Halo Keliling Thailand! Saya ingin memesan Alphard Experience. [dari: Services - Alphard]",
+    "Halo Keliling Thailand! Saya ingin memesan Airport Transfer. [dari: Services - Airport Transfer]",
+    "Halo Keliling Thailand! Saya ingin bertanya tentang kendaraan lain. [dari: Services - Other Vehicles]",
+  ],
+  en: [
+    "Hello Keliling Thailand! I'd like to book the Alphard Experience. [from: Services - Alphard]",
+    "Hello Keliling Thailand! I'd like to book an Airport Transfer. [from: Services - Airport Transfer]",
+    "Hello Keliling Thailand! I'd like to ask about other vehicles. [from: Services - Other Vehicles]",
+  ],
+  th: [
+    "สวัสดี Keliling Thailand! ฉันต้องการจอง Alphard Experience [จาก: Services - Alphard]",
+    "สวัสดี Keliling Thailand! ฉันต้องการจองรับส่งสนามบิน [จาก: Services - Airport Transfer]",
+    "สวัสดี Keliling Thailand! ฉันต้องการสอบถามเกี่ยวกับรถอื่น [จาก: Services - Other Vehicles]",
+  ],
+} as const;
+
+const SVC_CTA_WA = {
+  id: "Halo Keliling Thailand! Saya punya pertanyaan tentang layanan. [dari: Services - CTA]",
+  en: "Hello Keliling Thailand! I have questions about your services. [from: Services - CTA]",
+  th: "สวัสดี Keliling Thailand! ฉันมีคำถามเกี่ยวกับบริการ [จาก: Services - CTA]",
+} as const;
 
 export default function ServicesContent() {
   const { language } = useLanguage();
@@ -35,7 +58,7 @@ export default function ServicesContent() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {s.services.map((svc) => (
+            {s.services.map((svc, i) => (
               <div
                 key={svc.title}
                 className={`rounded-2xl overflow-hidden border-2 flex flex-col transition-all ${
@@ -93,7 +116,7 @@ export default function ServicesContent() {
                       </div>
                     )}
                     <a
-                      href={WA_LINK}
+                      href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(SVC_WA_MESSAGES[language][i] ?? SVC_WA_MESSAGES[language][0])}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-sm transition-colors ${
@@ -235,7 +258,7 @@ export default function ServicesContent() {
           <p className="text-white/70 mb-8">{s.cta.subtitle}</p>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
             <a
-              href={WA_LINK}
+              href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(SVC_CTA_WA[language])}`}
               target="_blank"
               rel="noopener noreferrer"
               className="whatsapp-btn text-base shadow-lg"

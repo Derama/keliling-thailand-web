@@ -3,6 +3,12 @@
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
 
+const AT_WA = {
+  id: "Halo Keliling Thailand! Saya ingin memesan Airport Transfer. [dari: Airport Transfer Page]",
+  en: "Hello Keliling Thailand! I'd like to book an Airport Transfer. [from: Airport Transfer Page]",
+  th: "สวัสดี Keliling Thailand! ฉันต้องการจองรับส่งสนามบิน [จาก: Airport Transfer Page]",
+} as const;
+
 export default function AirportTransferPage() {
   const { language } = useLanguage();
   const at = extendedTranslations[language].airportTransfer;
@@ -160,7 +166,7 @@ export default function AirportTransferPage() {
             {at.cta.subtitle}
           </p>
           <a
-            href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!%20Saya%20ingin%20Airport%20Transfer"
+            href={`https://wa.me/66647646597?text=${encodeURIComponent(AT_WA[language])}`}
             className="whatsapp-btn"
           >
             {at.cta.btn}

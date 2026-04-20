@@ -3,6 +3,12 @@
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
 
+const LOC_WA = {
+  id: "Halo Keliling Thailand! Saya ingin menanyakan layanan di area saya. [dari: Location Page]",
+  en: "Hello Keliling Thailand! I'd like to ask about services in my area. [from: Location Page]",
+  th: "สวัสดี Keliling Thailand! ฉันต้องการสอบถามบริการในพื้นที่ [จาก: Location Page]",
+} as const;
+
 export default function LocationPage() {
   const { language } = useLanguage();
   const loc = extendedTranslations[language].location;
@@ -71,7 +77,7 @@ export default function LocationPage() {
             </h3>
             <p className="text-white/70 mb-6">{loc.note.desc}</p>
             <a
-              href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+              href={`https://wa.me/66647646597?text=${encodeURIComponent(LOC_WA[language])}`}
               className="whatsapp-btn"
             >
               {loc.note.btn}
@@ -93,7 +99,7 @@ export default function LocationPage() {
             {loc.note.desc}
           </p>
           <a
-            href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+            href={`https://wa.me/66647646597?text=${encodeURIComponent(LOC_WA[language])}`}
             className="whatsapp-btn"
           >
             {loc.note.btn}

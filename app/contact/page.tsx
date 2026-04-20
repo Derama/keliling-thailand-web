@@ -9,8 +9,14 @@ import { useLanguage } from "@/components/LanguageContext";
 const WA_NUMBER = "66647646597";
 const WA_BASE = `https://wa.me/${WA_NUMBER}`;
 
+const CONTACT_WA = {
+  id: "Halo Keliling Thailand! Saya ingin bertanya tentang layanan transportasi. [dari: Contact Page - Chat Langsung]",
+  en: "Hello Keliling Thailand! I'd like to ask about your transport services. [from: Contact Page - Direct Chat]",
+  th: "สวัสดี Keliling Thailand! ฉันต้องการสอบถามเกี่ยวกับบริการรถ [จาก: Contact Page - แชทตรง]",
+} as const;
+
 export default function ContactPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const c = t.contact;
   const alphardVehicle = c.vehicles.find((vehicle) =>
     vehicle.toLowerCase().includes("alphard")
@@ -103,7 +109,7 @@ export default function ContactPage() {
                   {c.chatDirectDesc}
                 </p>
                 <a
-                  href={`${WA_BASE}?text=Halo%20Keliling%20Thailand!%20Saya%20ingin%20bertanya%20tentang%20layanan%20transportasi.`}
+                  href={`${WA_BASE}?text=${encodeURIComponent(CONTACT_WA[language])}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="whatsapp-btn w-full justify-center text-sm"

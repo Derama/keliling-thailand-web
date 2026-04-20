@@ -11,6 +11,21 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
+const ABOUT_WA = {
+  id: {
+    hero: "Halo Keliling Thailand! Saya ingin tahu lebih lanjut. [dari: About Page - Hero]",
+    cta: "Halo Keliling Thailand! Saya siap merencanakan perjalanan. [dari: About Page - CTA]",
+  },
+  en: {
+    hero: "Hello Keliling Thailand! I'd like to learn more. [from: About Page - Hero]",
+    cta: "Hello Keliling Thailand! I'm ready to plan my trip. [from: About Page - CTA]",
+  },
+  th: {
+    hero: "สวัสดี Keliling Thailand! ฉันต้องการทราบข้อมูลเพิ่มเติม [จาก: About Page - Hero]",
+    cta: "สวัสดี Keliling Thailand! ฉันพร้อมวางแผนทริป [จาก: About Page - CTA]",
+  },
+} as const;
+
 export default function AboutPage() {
   const { language } = useLanguage();
   const about = extendedTranslations[language].about;
@@ -45,7 +60,7 @@ export default function AboutPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <a
-                href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+                href={`https://wa.me/66647646597?text=${encodeURIComponent(ABOUT_WA[language].hero)}`}
                 className="whatsapp-btn text-base shadow-lg shadow-green-900/40"
               >
                 <WhatsAppIcon />
@@ -209,7 +224,7 @@ export default function AboutPage() {
                 </p>
                 <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <a
-                    href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+                    href={`https://wa.me/66647646597?text=${encodeURIComponent(ABOUT_WA[language].cta)}`}
                     className="whatsapp-btn text-lg px-10 py-4 shadow-xl shadow-green-900/40"
                   >
                     <WhatsAppIcon />

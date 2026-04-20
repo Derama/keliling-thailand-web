@@ -5,6 +5,27 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations, translations } from "@/lib/translations";
 
+const TESTI_WA = {
+  id: {
+    hero: "Halo Keliling Thailand! Saya tertarik setelah membaca testimoni. [dari: Testimony Page]",
+    cta: "Halo Keliling Thailand! Saya tertarik setelah membaca testimoni. [dari: Testimony Page - CTA]",
+  },
+  en: {
+    hero: "Hello Keliling Thailand! I'm interested after reading the testimonials. [from: Testimony Page]",
+    cta: "Hello Keliling Thailand! I'm interested after reading the testimonials. [from: Testimony Page - CTA]",
+  },
+  th: {
+    hero: "สวัสดี Keliling Thailand! ฉันสนใจหลังจากอ่านรีวิว [จาก: Testimony Page]",
+    cta: "สวัสดี Keliling Thailand! ฉันสนใจหลังจากอ่านรีวิว [จาก: Testimony Page - CTA]",
+  },
+} as const;
+
+const TESTI_BTN = {
+  id: { chat: "Chat WhatsApp", reserve: "Reservasi Sekarang", openForm: "Buka Form Reservasi" },
+  en: { chat: "Chat WhatsApp", reserve: "Book Now", openForm: "Open Booking Form" },
+  th: { chat: "แชท WhatsApp", reserve: "จองตอนนี้", openForm: "เปิดแบบฟอร์มจอง" },
+} as const;
+
 export default function TestimonyPage() {
   const { language } = useLanguage();
   const testimony = extendedTranslations[language].testimony;
@@ -30,16 +51,16 @@ export default function TestimonyPage() {
             </p>
             <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:items-start">
               <a
-                href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+                href={`https://wa.me/66647646597?text=${encodeURIComponent(TESTI_WA[language].hero)}`}
                 className="whatsapp-btn text-base font-bold shadow-lg shadow-green-900/35"
               >
-                Chat WhatsApp
+                {TESTI_BTN[language].chat}
               </a>
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/35 px-6 py-3 font-bold text-white transition-colors hover:border-[#F5C518] hover:text-[#F5C518]"
               >
-                Reservasi Sekarang
+                {TESTI_BTN[language].reserve}
               </Link>
             </div>
           </div>
@@ -166,16 +187,16 @@ export default function TestimonyPage() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="https://wa.me/66647646597?text=Halo%20Keliling%20Thailand!"
+              href={`https://wa.me/66647646597?text=${encodeURIComponent(TESTI_WA[language].cta)}`}
               className="whatsapp-btn text-base shadow-lg"
             >
-              Chat WhatsApp
+              {TESTI_BTN[language].chat}
             </a>
             <Link
               href="/contact"
               className="inline-flex items-center justify-center rounded-full bg-[#F5C518] px-6 py-3 font-bold text-black transition-colors hover:bg-yellow-400"
             >
-              Buka Form Reservasi
+              {TESTI_BTN[language].openForm}
             </Link>
           </div>
         </div>
