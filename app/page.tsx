@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import HomeContent from "@/components/HomeContent";
 
-const sharePreviewImage = "/preview-black-car.png?v=20260420";
+const sharePreviewImage = "/Group 10.png?v=20260420b";
 
 export const metadata: Metadata = {
   title: "Keliling Thailand | Premium Alphard, Airport Transfer & Private Tours",
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: sharePreviewImage,
-        width: 2856,
-        height: 1755,
+        width: 1945,
+        height: 958,
         alt: "Keliling Thailand premium Toyota Alphard preview",
       },
     ],
