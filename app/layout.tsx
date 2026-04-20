@@ -14,6 +14,8 @@ const metadataBase = productionUrl.startsWith("http")
   ? new URL(productionUrl)
   : new URL(`https://${productionUrl}`);
 
+const shareImage = "/newlog.png?v=20260420";
+
 export const metadata: Metadata = {
   metadataBase,
   title: {
@@ -37,9 +39,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/newlog.png",
-        width: 1325,
-        height: 653,
+        url: shareImage,
+        width: 2856,
+        height: 1755,
         alt: "Keliling Thailand premium private transport in Thailand",
       },
     ],
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
     title: "Alphard Experience — Premium Private Transport in Thailand",
     description:
       "Premium private transport in Thailand for business, celebrations, and high-comfort travel.",
-    images: ["/newlog.png"],
+    images: [shareImage],
   },
 };
 
