@@ -9,7 +9,7 @@ import { LanguageProvider } from "@/components/LanguageContext";
 const productionUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   process.env.VERCEL_PROJECT_PRODUCTION_URL ??
-  "https://keliling-thailand-web.vercel.app";
+  "https://kelilingthailand.com";
 
 const metadataBase = productionUrl.startsWith("http")
   ? new URL(productionUrl)
