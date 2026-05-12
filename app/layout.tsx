@@ -19,6 +19,11 @@ const siteUrl = metadataBase.toString().replace(/\/$/, "");
 
 export const metadata: Metadata = {
   metadataBase,
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+    shortcut: "/icon.png",
+  },
   title: {
     default: "Alphard Experience — Premium Private Transport in Thailand",
     template: "%s | Keliling Thailand",
