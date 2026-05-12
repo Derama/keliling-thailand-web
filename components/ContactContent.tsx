@@ -6,7 +6,7 @@ import DatePicker from "@/components/DatePicker";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useLanguage } from "@/components/LanguageContext";
 
-const WA_NUMBER = "66647646597";
+const WA_NUMBER = "6285750923934";
 const WA_BASE = `https://wa.me/${WA_NUMBER}`;
 
 const CONTACT_WA = {

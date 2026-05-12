@@ -51,7 +51,7 @@ export default function TestimonyContent() {
             </p>
             <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:items-start">
               <a
-                href={`https://wa.me/66647646597?text=${encodeURIComponent(TESTI_WA[language].hero)}`}
+                href={`https://wa.me/6285750923934?text=${encodeURIComponent(TESTI_WA[language].hero)}`}
                 className="whatsapp-btn text-base font-bold shadow-lg shadow-green-900/35"
               >
                 {TESTI_BTN[language].chat}
@@ -187,7 +187,7 @@ export default function TestimonyContent() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href={`https://wa.me/66647646597?text=${encodeURIComponent(TESTI_WA[language].cta)}`}
+              href={`https://wa.me/6285750923934?text=${encodeURIComponent(TESTI_WA[language].cta)}`}
               className="whatsapp-btn text-base shadow-lg"
             >
               {TESTI_BTN[language].chat}

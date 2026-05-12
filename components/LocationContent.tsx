@@ -77,7 +77,7 @@ export default function LocationContent() {
             </h3>
             <p className="text-white/70 mb-6">{loc.note.desc}</p>
             <a
-              href={`https://wa.me/66647646597?text=${encodeURIComponent(LOC_WA[language])}`}
+              href={`https://wa.me/6285750923934?text=${encodeURIComponent(LOC_WA[language])}`}
               className="whatsapp-btn"
             >
               {loc.note.btn}
@@ -99,7 +99,7 @@ export default function LocationContent() {
             {loc.note.desc}
           </p>
           <a
-            href={`https://wa.me/66647646597?text=${encodeURIComponent(LOC_WA[language])}`}
+            href={`https://wa.me/6285750923934?text=${encodeURIComponent(LOC_WA[language])}`}
             className="whatsapp-btn"
           >
             {loc.note.btn}

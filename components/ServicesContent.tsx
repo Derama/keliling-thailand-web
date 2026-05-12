@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
 
-const WA_NUMBER = "66647646597";
+const WA_NUMBER = "6285750923934";
 
 const SVC_WA_MESSAGES = {
   id: [

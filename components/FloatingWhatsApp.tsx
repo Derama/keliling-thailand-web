@@ -2,7 +2,7 @@
 
 import { useLanguage } from "@/components/LanguageContext";
 
-const WA_NUMBER = "66647646597";
+const WA_NUMBER = "6285750923934";
 
 const FLOATING_WA = {
   id: {

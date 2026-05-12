@@ -87,7 +87,7 @@ const organizationLd = {
   image: `${siteUrl}/newlog.png`,
   description:
     "Premium private transport in Thailand with Toyota Alphard, Vellfire, Fortuner, and Altis. Airport transfers, city tours, corporate, and wedding transportation.",
-  telephone: "+66-64-764-6597",
+  telephone: "+62-857-5092-3934",
   priceRange: "$$",
   areaServed: [
     { "@type": "City", name: "Bangkok" },

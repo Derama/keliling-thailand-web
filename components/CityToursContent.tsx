@@ -135,7 +135,7 @@ export default function CityToursContent() {
             {ct.cta.subtitle}
           </p>
           <a
-            href={`https://wa.me/66647646597?text=${encodeURIComponent(CT_WA[language])}`}
+            href={`https://wa.me/6285750923934?text=${encodeURIComponent(CT_WA[language])}`}
             className="whatsapp-btn"
           >
             {ct.cta.btn}

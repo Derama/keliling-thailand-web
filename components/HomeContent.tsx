@@ -9,7 +9,7 @@ import DatePicker from "@/components/DatePicker";
 import LocationSearch from "@/components/LocationSearch";
 import ScrollReveal from "@/components/ScrollReveal";
 
-const WA_NUMBER = "66647646597";
+const WA_NUMBER = "6285750923934";
 
 const WA_MESSAGES = {
   id: {
@@ -529,7 +529,7 @@ export default function HomeContent() {
     }
 
     const msg = `${pageCopy.waIntro}\n- ${pageCopy.waService}: ${service}\n- ${pageCopy.waVehicle}: ${vehicle}\n${locationLine}\n- ${pageCopy.waDate}: ${date}\n- ${pageCopy.waPax}: ${pax}`;
-    return `https://wa.me/66647646597?text=${encodeURIComponent(msg)}`;
+    return `https://wa.me/6285750923934?text=${encodeURIComponent(msg)}`;
   }
 
   useEffect(() => {

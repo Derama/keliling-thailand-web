@@ -83,7 +83,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-white">
               <li className="flex items-center justify-center md:justify-start gap-2">
                 <span>📱</span>
-                <a href="https://wa.me/66647646597" className="hover:text-[#F5C518] transition-colors">
+                <a href="https://wa.me/6285750923934" className="hover:text-[#F5C518] transition-colors">
                   WhatsApp
                 </a>
               </li>
