@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import DatePicker from "@/components/DatePicker";
 import LocationSearch from "@/components/LocationSearch";
 import ScrollReveal from "@/components/ScrollReveal";
+import ItineraryBuilder from "@/components/ItineraryBuilder";
 
 const WA_NUMBER = "6285750923934";
 
@@ -820,6 +821,9 @@ export default function HomeContent() {
           </div>
         </div>
       </section>
+
+      {/* ── ITINERARY BUILDER ── */}
+      <ItineraryBuilder />
 
       {/* ── FLEET ── */}
       <section id="vehicle-options" className="py-24 bg-[#FAE7B8] scroll-mt-24">

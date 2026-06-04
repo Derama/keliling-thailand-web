@@ -2,6 +2,7 @@
 
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
+import ItineraryBuilder from "@/components/ItineraryBuilder";
 
 const CT_WA = {
   id: "Halo Keliling Thailand! Saya tertarik dengan City Tour. [dari: City Tours Page]",
@@ -33,47 +34,8 @@ export default function CityToursContent() {
         </div>
       </section>
 
-      {/* Tour Packages Grid */}
-      <section className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <p className="text-[#FFC531] font-bold text-xs uppercase tracking-widest mb-3">
-              {ct.tours.eyebrow}
-            </p>
-            <h2 className="font-extrabold text-3xl sm:text-4xl text-gray-900">
-              {ct.tours.title}
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ct.tours.items.map((tour, i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#FFC531] hover:shadow-md transition-all flex flex-col"
-              >
-                <div className="text-4xl mb-4">{tour.emoji}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {tour.name}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-1">
-                  {tour.desc}
-                </p>
-                <div className="mt-auto space-y-1.5 border-t border-gray-100 pt-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    <span>{tour.duration}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-[#FFC531] font-bold shrink-0">฿</span>
-                    <span className="text-[#FFC531] font-bold">{tour.from}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Interactive itinerary builder */}
+      <ItineraryBuilder />
 
       {/* What's Included */}
       <section className="bg-[#FAE7B8] py-20">
