@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useLanguage } from "@/components/LanguageContext";
-import { extendedTranslations } from "@/lib/translations";
-import ItineraryBuilder from "@/components/ItineraryBuilder";
+import { extendedTranslations, itineraryTranslations } from "@/lib/translations";
+import ItineraryWizard from "@/components/ItineraryWizard";
 
 const CT_WA = {
   id: "Halo Keliling Thailand! Saya tertarik dengan City Tour. [dari: City Tours Page]",
@@ -13,6 +14,8 @@ const CT_WA = {
 export default function CityToursContent() {
   const { language } = useLanguage();
   const ct = extendedTranslations[language].cityTours;
+  const itinUi = itineraryTranslations[language].ui;
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   return (
     <main className="min-h-[100dvh] bg-white pt-20">
@@ -34,8 +37,26 @@ export default function CityToursContent() {
         </div>
       </section>
 
-      {/* Interactive itinerary builder */}
-      <ItineraryBuilder />
+      {/* Step-by-step itinerary planner launcher */}
+      <section className="bg-[#FAE7B8] py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/60">
+            {itinUi.eyebrow}
+          </p>
+          <h2 className="mt-3 text-3xl font-extrabold text-[#050505] sm:text-4xl">
+            {itinUi.title}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#050505]/70">{itinUi.subtitle}</p>
+          <button
+            onClick={() => setWizardOpen(true)}
+            className="mt-8 rounded-full border-2 border-[#050505] bg-[#FFC531] px-8 py-3.5 font-extrabold text-[#050505] shadow-[4px_4px_0_#050505] transition active:scale-95 hover:translate-x-[-1px] hover:translate-y-[-1px]"
+          >
+            {itinUi.step1} →
+          </button>
+        </div>
+      </section>
+
+      <ItineraryWizard open={wizardOpen} onClose={() => setWizardOpen(false)} />
 
       {/* What's Included */}
       <section className="bg-[#FAE7B8] py-20">

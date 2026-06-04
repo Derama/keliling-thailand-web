@@ -115,6 +115,19 @@
   .modal-card { animation: overlay-in 150ms ease both; }
 }
 
+/* ── Itinerary wizard (fullscreen) ── */
+.wizard-overlay { animation: overlay-in 200ms var(--ease-out-strong) both; }
+.wizard-step { animation: wizard-step-in 320ms var(--ease-out-strong) both; }
+
+@keyframes wizard-step-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-overlay, .wizard-step { animation: overlay-in 150ms ease both; }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

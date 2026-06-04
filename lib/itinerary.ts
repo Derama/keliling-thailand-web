@@ -12,11 +12,14 @@ export type VehicleId = "altis" | "suv" | "van" | "minibus";
 export interface Vehicle {
   id: VehicleId;
   pax: string; // e.g. "1-3"
+  image: string; // photo in /public
 }
 
 export interface Attraction {
   id: string;
   hours: number; // approx visit time, for itinerary total only
+  /** Optional photo (e.g. /itinerary/bangkok/grand-palace.jpg). Falls back to a gradient placeholder. */
+  image?: string;
 }
 
 export interface City {
@@ -29,10 +32,10 @@ export interface City {
 }
 
 export const vehicles: Vehicle[] = [
-  { id: "altis", pax: "1-3" },
-  { id: "suv", pax: "1-5" },
-  { id: "van", pax: "5-10" },
-  { id: "minibus", pax: "10-20" },
+  { id: "altis", pax: "1-3", image: "/Altis.webp" },
+  { id: "suv", pax: "1-5", image: "/Fortuner.webp" },
+  { id: "van", pax: "5-10", image: "/luxury van .webp" },
+  { id: "minibus", pax: "10-20", image: "/bus.png" },
 ];
 
 export const cities: City[] = [

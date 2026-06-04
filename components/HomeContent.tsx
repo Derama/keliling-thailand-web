@@ -3,12 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
-import { extendedTranslations } from "@/lib/translations";
+import { extendedTranslations, itineraryTranslations } from "@/lib/translations";
 import { useEffect, useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
-import ItineraryBuilder from "@/components/ItineraryBuilder";
 import HeroCityPicker from "@/components/HeroCityPicker";
-import ItineraryModal from "@/components/ItineraryModal";
+import ItineraryWizard from "@/components/ItineraryWizard";
 
 const WA_NUMBER = "6285750923934";
 
@@ -372,12 +371,20 @@ export default function HomeContent() {
   const [current, setCurrent] = useState(0);
   const primaryVehicle = t.fleetItems[0];
   const alternativeVehicles = t.fleetItems.slice(1);
+  const itinUi = itineraryTranslations[language].ui;
 
-  // Hero city picker -> opens the itinerary modal for the chosen city (no scroll).
-  const [modalCity, setModalCity] = useState<string | null>(null);
+  // Hero city picker -> opens the step-by-step itinerary wizard.
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardCity, setWizardCity] = useState<string | null>(null);
 
   function handlePickCity(cityId: string) {
-    setModalCity(cityId);
+    setWizardCity(cityId);
+    setWizardOpen(true);
+  }
+
+  function openPlanner() {
+    setWizardCity(null);
+    setWizardOpen(true);
   }
 
   useEffect(() => {
@@ -498,8 +505,24 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ── ITINERARY BUILDER ── */}
-      <ItineraryBuilder />
+      {/* ── ITINERARY PLANNER CTA ── */}
+      <section id="builder" className="bg-[#FAE7B8] py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/60">
+            {itinUi.eyebrow}
+          </p>
+          <h2 className="mt-3 text-3xl font-extrabold text-[#050505] sm:text-4xl">
+            {itinUi.title}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#050505]/70">{itinUi.subtitle}</p>
+          <button
+            onClick={openPlanner}
+            className="mt-8 rounded-full border-2 border-[#050505] bg-[#FFC531] px-8 py-3.5 font-extrabold text-[#050505] shadow-[4px_4px_0_#050505] transition active:scale-95 hover:translate-x-[-1px] hover:translate-y-[-1px]"
+          >
+            {itinUi.step1} →
+          </button>
+        </div>
+      </section>
 
       {/* ── FLEET ── */}
       <section id="vehicle-options" className="py-24 bg-[#FAE7B8] scroll-mt-24">
@@ -933,8 +956,12 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* Hero city picker -> itinerary modal */}
-      <ItineraryModal cityId={modalCity} onClose={() => setModalCity(null)} />
+      {/* Step-by-step itinerary wizard */}
+      <ItineraryWizard
+        open={wizardOpen}
+        initialCityId={wizardCity}
+        onClose={() => setWizardOpen(false)}
+      />
     </>
   );
 }
