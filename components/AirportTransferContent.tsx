@@ -50,7 +50,9 @@ export default function AirportTransferContent() {
                 <tr className="bg-[#FFC531] text-[#050505]">
                   <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colFrom}</th>
                   <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colTo}</th>
-                  <th className="text-left px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colDuration}</th>
+                  <th className="text-right px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colAltis}</th>
+                  <th className="text-right px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colSuv}</th>
+                  <th className="text-right px-3 py-3 sm:px-6 sm:py-4 font-semibold">{at.routes.colVan}</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,10 +69,10 @@ export default function AirportTransferContent() {
                         {at.routes.airportLabel}
                       </td>
                     ) : null}
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700">{route.to}</td>
-                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-[#FFC531] font-semibold">
-                      {route.duration}
-                    </td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-gray-700 font-medium">{route.to}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-right text-gray-800 font-semibold">{route.altis}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-right text-gray-800 font-semibold">{route.suv}</td>
+                    <td className="px-3 py-3 sm:px-6 sm:py-4 text-right text-[#050505] font-bold">{route.van}</td>
                   </tr>
                 ))}
               </tbody>
