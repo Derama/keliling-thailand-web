@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import ItineraryBuilder from "@/components/ItineraryBuilder";
 import HeroCityPicker from "@/components/HeroCityPicker";
+import ItineraryModal from "@/components/ItineraryModal";
 
 const WA_NUMBER = "6285750923934";
 
@@ -372,12 +373,11 @@ export default function HomeContent() {
   const primaryVehicle = t.fleetItems[0];
   const alternativeVehicles = t.fleetItems.slice(1);
 
-  // Hero city picker -> jumps the itinerary builder to the chosen city.
-  const [requestedCity, setRequestedCity] = useState<{ id: string; nonce: number } | null>(null);
+  // Hero city picker -> opens the itinerary modal for the chosen city (no scroll).
+  const [modalCity, setModalCity] = useState<string | null>(null);
 
   function handlePickCity(cityId: string) {
-    setRequestedCity({ id: cityId, nonce: Date.now() });
-    document.getElementById("builder")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setModalCity(cityId);
   }
 
   useEffect(() => {
@@ -499,7 +499,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── ITINERARY BUILDER ── */}
-      <ItineraryBuilder requestedCity={requestedCity} />
+      <ItineraryBuilder />
 
       {/* ── FLEET ── */}
       <section id="vehicle-options" className="py-24 bg-[#FAE7B8] scroll-mt-24">
@@ -932,6 +932,9 @@ export default function HomeContent() {
           </div>
         </div>
       </section>
+
+      {/* Hero city picker -> itinerary modal */}
+      <ItineraryModal cityId={modalCity} onClose={() => setModalCity(null)} />
     </>
   );
 }

@@ -93,6 +93,28 @@
   .city-picker-grid > * { animation: none; opacity: 1; transform: none; }
 }
 
+/* ── Itinerary modal ── */
+.modal-overlay { animation: overlay-in 200ms var(--ease-out-strong) both; }
+.modal-card {
+  /* Modals stay centered (not anchored to a trigger) */
+  transform-origin: center;
+  animation: modal-in 240ms var(--ease-out-strong) both;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay { animation: overlay-in 150ms ease both; }
+  .modal-card { animation: overlay-in 150ms ease both; }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
