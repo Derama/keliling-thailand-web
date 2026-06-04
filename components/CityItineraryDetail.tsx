@@ -38,12 +38,24 @@ export default function CityItineraryDetail({ cityId, onBack }: CityItineraryDet
   const [selected, setSelected] = useState<string[]>([]);
   const [vehicleId, setVehicleId] = useState<VehicleId | null>(null);
 
+  // AI suggestion state (attraction assist).
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<{
+    attractionIds: string[];
+    dayPlan: string;
+  } | null>(null);
+
   // Reset selections when the city changes (render-time pattern, no effect).
   const [activeCity, setActiveCity] = useState(cityId);
   if (cityId !== activeCity) {
     setActiveCity(cityId);
     setSelected([]);
     setVehicleId(null);
+    setAiPrompt("");
+    setAiSuggestion(null);
+    setAiError(null);
   }
 
   const city = getCity(cityId);
@@ -62,6 +74,40 @@ export default function CityItineraryDetail({ cityId, onBack }: CityItineraryDet
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+  }
+
+  async function requestAiSuggestion() {
+    if (!aiPrompt.trim()) return;
+    setAiLoading(true);
+    setAiError(null);
+    setAiSuggestion(null);
+    try {
+      const res = await fetch("/api/itinerary-suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cityId, prompt: aiPrompt.trim(), lang: language }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error === "ai_unavailable" || data.error === "rate_limited") {
+        setAiError(t.ui.aiError);
+        return;
+      }
+      if (data.error === "no_suggestion" || !data.attractionIds?.length) {
+        setAiError(t.ui.aiNoSuggestion);
+        return;
+      }
+      setAiSuggestion({ attractionIds: data.attractionIds, dayPlan: data.dayPlan ?? "" });
+    } catch {
+      setAiError(t.ui.aiError);
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  function applyAiSuggestion() {
+    if (!aiSuggestion) return;
+    setSelected(aiSuggestion.attractionIds);
+    setAiSuggestion(null);
   }
 
   function whatsappHref() {
@@ -102,6 +148,56 @@ export default function CityItineraryDetail({ cityId, onBack }: CityItineraryDet
           >
             ← {t.ui.back}
           </button>
+        )}
+      </div>
+
+      {/* AI assist */}
+      <div className="outline-card mb-6 bg-white p-5">
+        <p className="mb-3 font-bold text-[#050505]">{t.ui.aiHeading}</p>
+        <textarea
+          value={aiPrompt}
+          onChange={(e) => setAiPrompt(e.target.value)}
+          placeholder={t.ui.aiPlaceholder}
+          rows={2}
+          className="w-full resize-none rounded-xl border-2 border-[#050505] p-3 text-sm text-[#050505] outline-none focus:bg-[#FAE7B8]/30"
+        />
+        <button
+          onClick={requestAiSuggestion}
+          disabled={!aiPrompt.trim() || aiLoading}
+          className="mt-3 rounded-full border-2 border-[#050505] bg-[#FFC531] px-6 py-2.5 font-bold text-[#050505] transition hover:translate-x-[-1px] hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {aiLoading ? t.ui.aiLoading : "✨ " + t.ui.aiButton}
+        </button>
+
+        {aiError && <p className="mt-3 text-sm text-red-600">{aiError}</p>}
+
+        {aiSuggestion && (
+          <div className="mt-4 rounded-xl border-2 border-[#050505] bg-[#FAE7B8]/40 p-4">
+            <ol className="mb-3 space-y-1.5">
+              {aiSuggestion.attractionIds.map((id, i) => (
+                <li
+                  key={id}
+                  className="flex items-center gap-2 text-sm font-semibold text-[#050505]"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FFC531] text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  {t.attractions[id as keyof typeof t.attractions]}
+                </li>
+              ))}
+            </ol>
+            {aiSuggestion.dayPlan && (
+              <p className="mb-4 whitespace-pre-line text-sm text-[#050505]/80">
+                {aiSuggestion.dayPlan}
+              </p>
+            )}
+            <button
+              onClick={applyAiSuggestion}
+              className="rounded-full border-2 border-[#050505] bg-white px-5 py-2 font-bold text-[#050505] transition hover:bg-[#F4F4F4]"
+            >
+              {t.ui.aiApply}
+            </button>
+          </div>
         )}
       </div>
 
