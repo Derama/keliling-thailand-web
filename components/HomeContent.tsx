@@ -5,10 +5,9 @@ import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
 import { extendedTranslations } from "@/lib/translations";
 import { useEffect, useState } from "react";
-import DatePicker from "@/components/DatePicker";
-import LocationSearch from "@/components/LocationSearch";
 import ScrollReveal from "@/components/ScrollReveal";
 import ItineraryBuilder from "@/components/ItineraryBuilder";
+import HeroCityPicker from "@/components/HeroCityPicker";
 
 const WA_NUMBER = "6285750923934";
 
@@ -370,143 +369,15 @@ export default function HomeContent() {
   const alts = extendedTranslations[language].alts;
   const pageCopy = HOMEPAGE_COPY[language];
   const [current, setCurrent] = useState(0);
-  const [bookingService, setBookingService] = useState(0); // 0=airport, 1=city tour, 2=intercity
-  const [bookingVehicle, setBookingVehicle] = useState(t.booking.vehicle1);
-  // Airport Transfer
-  const [airportPickup, setAirportPickup] = useState("");
-  const [airportDropoff, setAirportDropoff] = useState("");
-  // City Tours
-  const [tourDest, setTourDest] = useState("");
-  const [tourMeet, setTourMeet] = useState("");
-  // Inter City
-  const [intercityFrom, setIntercityFrom] = useState("");
-  const [intercityTo, setIntercityTo] = useState("");
-  // Common
-  const [bookingDate, setBookingDate] = useState("");
-  const [bookingPax, setBookingPax] = useState(1);
-  const [bookingError, setBookingError] = useState("");
   const primaryVehicle = t.fleetItems[0];
   const alternativeVehicles = t.fleetItems.slice(1);
-  const bookingVehicleOptions = [
-    t.booking.vehicle1,
-    t.booking.vehicle2,
-    t.booking.vehicle3,
-    t.booking.vehicle4,
-    t.booking.vehicle5,
-  ];
-  const selectedBookingVehicle = bookingVehicleOptions.includes(bookingVehicle)
-    ? bookingVehicle
-    : t.booking.vehicle1;
 
-  function resetRouteFields(nextService: number) {
-    if (nextService !== 0) {
-      setAirportPickup("");
-      setAirportDropoff("");
-    }
-    if (nextService !== 1) {
-      setTourDest("");
-      setTourMeet("");
-    }
-    if (nextService !== 2) {
-      setIntercityFrom("");
-      setIntercityTo("");
-    }
-  }
+  // Hero city picker -> jumps the itinerary builder to the chosen city.
+  const [requestedCity, setRequestedCity] = useState<{ id: string; nonce: number } | null>(null);
 
-  function handleBookingServiceChange(nextService: number) {
-    setBookingService(nextService);
-    resetRouteFields(nextService);
-    setBookingError("");
-  }
-
-  function clearBookingError() {
-    if (bookingError) setBookingError("");
-  }
-
-  function handleBookingVehicleChange(nextVehicle: string) {
-    setBookingVehicle(nextVehicle);
-    clearBookingError();
-  }
-
-  function handleAirportPickupChange(value: string) {
-    setAirportPickup(value);
-    clearBookingError();
-  }
-
-  function handleAirportDropoffChange(value: string) {
-    setAirportDropoff(value);
-    clearBookingError();
-  }
-
-  function handleTourDestChange(value: string) {
-    setTourDest(value);
-    clearBookingError();
-  }
-
-  function handleTourMeetChange(value: string) {
-    setTourMeet(value);
-    clearBookingError();
-  }
-
-  function handleIntercityFromChange(value: string) {
-    setIntercityFrom(value);
-    clearBookingError();
-  }
-
-  function handleIntercityToChange(value: string) {
-    setIntercityTo(value);
-    clearBookingError();
-  }
-
-  function handleBookingDateChange(value: string) {
-    setBookingDate(value);
-    clearBookingError();
-  }
-
-  function updateBookingPax(nextPax: number) {
-    setBookingPax(nextPax);
-    clearBookingError();
-  }
-
-  function validateBooking(): boolean {
-    if (!bookingDate) { setBookingError(pageCopy.errorDate); return false; }
-    if (bookingService === 0) {
-      if (!airportPickup) { setBookingError(pageCopy.errorPickup); return false; }
-      if (!airportDropoff) { setBookingError(pageCopy.errorDropoff); return false; }
-    } else if (bookingService === 1) {
-      if (!tourDest) { setBookingError(pageCopy.errorTourDestination); return false; }
-      if (!tourMeet) { setBookingError(pageCopy.errorMeetingPoint); return false; }
-    } else {
-      if (!intercityFrom) { setBookingError(pageCopy.errorDepartureCity); return false; }
-      if (!intercityTo) { setBookingError(pageCopy.errorDestinationCity); return false; }
-    }
-    setBookingError("");
-    return true;
-  }
-
-  function handleBookingSubmit() {
-    if (!validateBooking()) return;
-    window.open(buildBookingWaLink(), "_blank", "noopener,noreferrer");
-  }
-
-  function buildBookingWaLink() {
-    const services = [t.booking.service1, t.booking.service2, t.booking.service3, t.booking.service4];
-    const service = services[bookingService];
-    const vehicle = selectedBookingVehicle;
-    const date = bookingDate || "-";
-    const pax = bookingPax >= 8 ? t.booking.pax8plus : `${bookingPax} ${t.booking.paxUnit}`;
-
-    let locationLine = "";
-    if (bookingService === 0) {
-      locationLine = `- ${pageCopy.waPickup}: ${airportPickup || "-"}\n- ${pageCopy.waDropoff}: ${airportDropoff || "-"}`;
-    } else if (bookingService === 1) {
-      locationLine = `- ${pageCopy.waTourDestination}: ${tourDest || "-"}\n- ${pageCopy.waMeetingPoint}: ${tourMeet || "-"}`;
-    } else {
-      locationLine = `- ${pageCopy.waFrom}: ${intercityFrom || "-"}\n- ${pageCopy.waTo}: ${intercityTo || "-"}`;
-    }
-
-    const msg = `${pageCopy.waIntro}\n- ${pageCopy.waService}: ${service}\n- ${pageCopy.waVehicle}: ${vehicle}\n${locationLine}\n- ${pageCopy.waDate}: ${date}\n- ${pageCopy.waPax}: ${pax}`;
-    return `https://wa.me/6285750923934?text=${encodeURIComponent(msg)}`;
+  function handlePickCity(cityId: string) {
+    setRequestedCity({ id: cityId, nonce: Date.now() });
+    document.getElementById("builder")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   useEffect(() => {
@@ -608,144 +479,7 @@ export default function HomeContent() {
               </div>
             </div>
 
-            <div className="relative z-30 bg-[#050505]/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-6 lg:p-8 text-white">
-              <h2 className="text-xl font-extrabold mb-1">{t.booking.title}</h2>
-              <p className="text-white/60 text-sm mb-6">{t.booking.subtitle}</p>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                    {t.booking.serviceLabel}
-                  </label>
-                  <select
-                    value={bookingService}
-                    onChange={(e) => handleBookingServiceChange(Number(e.target.value))}
-                    className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#FFC531] focus:border-transparent"
-                  >
-                    <option value={0} className="text-black">{t.booking.service1}</option>
-                    <option value={1} className="text-black">{t.booking.service2}</option>
-                    <option value={2} className="text-black">{t.booking.service3}</option>
-                    <option value={3} className="text-black">{t.booking.service4}</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                    {t.booking.vehicleLabel}
-                  </label>
-                  <select
-                    value={selectedBookingVehicle}
-                    onChange={(e) => handleBookingVehicleChange(e.target.value)}
-                    className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#FFC531] focus:border-transparent"
-                  >
-                    <option value={t.booking.vehicle1} className="text-black">{t.booking.vehicle1}</option>
-                    <option value={t.booking.vehicle2} className="text-black">{t.booking.vehicle2}</option>
-                    <option value={t.booking.vehicle3} className="text-black">{t.booking.vehicle3}</option>
-                    <option value={t.booking.vehicle4} className="text-black">{t.booking.vehicle4}</option>
-                    <option value={t.booking.vehicle5} className="text-black">{t.booking.vehicle5}</option>
-                  </select>
-                </div>
-
-                {bookingService === 0 && (
-                  <>
-                    <div>
-                      <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                        {t.booking.airportPickupLabel}
-                      </label>
-                      <LocationSearch dark value={airportPickup} onChange={handleAirportPickupChange} placeholder={t.booking.airportPickupPlaceholder} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                        {t.booking.airportDropoffLabel}
-                      </label>
-                      <LocationSearch dark value={airportDropoff} onChange={handleAirportDropoffChange} placeholder={t.booking.airportDropoffPlaceholder} />
-                    </div>
-                  </>
-                )}
-
-                {bookingService === 1 && (
-                  <>
-                    <div>
-                      <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                        {t.booking.tourDestLabel}
-                      </label>
-                      <LocationSearch dark value={tourDest} onChange={handleTourDestChange} placeholder={t.booking.tourDestPlaceholder} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                        {t.booking.tourMeetLabel}
-                      </label>
-                      <LocationSearch dark value={tourMeet} onChange={handleTourMeetChange} placeholder={t.booking.tourMeetPlaceholder} />
-                    </div>
-                  </>
-                )}
-
-                {bookingService === 2 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                        {t.booking.intercityFromLabel}
-                      </label>
-                      <LocationSearch dark value={intercityFrom} onChange={handleIntercityFromChange} placeholder={t.booking.intercityFromPlaceholder} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5">
-                        {t.booking.intercityToLabel}
-                      </label>
-                      <LocationSearch dark value={intercityTo} onChange={handleIntercityToChange} placeholder={t.booking.intercityToPlaceholder} />
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5 truncate">
-                      {t.booking.dateLabel}
-                    </label>
-                    <DatePicker dark value={bookingDate} onChange={handleBookingDateChange} placeholder={t.booking.dateLabel} />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-white/60 uppercase tracking-widest mb-1.5 truncate">
-                      {t.booking.paxLabel}
-                    </label>
-                    <div className="flex items-center justify-between w-full border border-white/20 rounded-xl bg-white/10 px-4 h-11">
-                      <button
-                        type="button"
-                        onClick={() => updateBookingPax(Math.max(1, bookingPax - 1))}
-                        disabled={bookingPax <= 1}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-white font-bold text-lg hover:bg-white/20 disabled:opacity-30 transition"
-                      >−</button>
-                      <span className="text-sm font-semibold text-white">
-                        {bookingPax >= 8 ? t.booking.pax8plus : `${bookingPax} ${t.booking.paxUnit}`}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateBookingPax(Math.min(8, bookingPax + 1))}
-                        disabled={bookingPax >= 8}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg text-white font-bold text-lg hover:bg-white/20 disabled:opacity-30 transition"
-                      >+</button>
-                    </div>
-                  </div>
-                </div>
-
-                {bookingError && (
-                  <p className="text-red-400 text-xs font-semibold text-center -mb-1">{bookingError}</p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleBookingSubmit}
-                  className="w-full bg-[#FFC531] text-black py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-yellow-400 transition-colors"
-                >
-                  <WhatsAppIcon />
-                  {t.booking.sendBtn}
-                </button>
-
-                <p className="text-center text-xs text-white/40">
-                  {t.booking.disclaimer}
-                </p>
-              </div>
-            </div>
+            <HeroCityPicker onPick={handlePickCity} />
           </div>
         </div>
       </section>
@@ -765,7 +499,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── ITINERARY BUILDER ── */}
-      <ItineraryBuilder />
+      <ItineraryBuilder requestedCity={requestedCity} />
 
       {/* ── FLEET ── */}
       <section id="vehicle-options" className="py-24 bg-[#FAE7B8] scroll-mt-24">

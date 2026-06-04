@@ -31,7 +31,12 @@ const VEHICLE_EMOJI: Record<VehicleId, string> = {
 
 const fmt = (n: number) => "฿" + n.toLocaleString("en-US");
 
-export default function ItineraryBuilder() {
+interface ItineraryBuilderProps {
+  /** External request (e.g. from the hero picker) to jump straight to a city's attractions. */
+  requestedCity?: { id: string; nonce: number } | null;
+}
+
+export default function ItineraryBuilder({ requestedCity }: ItineraryBuilderProps = {}) {
   const { language } = useLanguage();
   const t = itineraryTranslations[language];
 
@@ -39,6 +44,18 @@ export default function ItineraryBuilder() {
   const [cityId, setCityId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [vehicleId, setVehicleId] = useState<VehicleId | null>(null);
+
+  // Respond to an external city pick (hero picker) by adjusting state during render.
+  // nonce ensures repeat picks of the same city re-fire. This is the React-sanctioned
+  // "adjust state when a prop changes" pattern (no effect needed).
+  const [lastNonce, setLastNonce] = useState<number | null>(null);
+  if (requestedCity && requestedCity.nonce !== lastNonce && getCity(requestedCity.id)) {
+    setLastNonce(requestedCity.nonce);
+    setCityId(requestedCity.id);
+    setSelected([]);
+    setVehicleId(null);
+    setStep(2);
+  }
 
   const city = cityId ? getCity(cityId) : undefined;
   const vehicleOptions = useMemo(
