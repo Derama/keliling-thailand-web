@@ -39,10 +39,10 @@ export default function ServicesContent() {
       {/* Page Header */}
       <section
         className="pt-28 pb-16 relative"
-        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
       >
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
+          <span className="text-[#FFC531] font-bold text-sm uppercase tracking-widest">
             {s.header.eyebrow}
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mt-3 mb-4">
@@ -63,17 +63,17 @@ export default function ServicesContent() {
                 key={svc.title}
                 className={`rounded-2xl overflow-hidden border-2 flex flex-col transition-all ${
                   svc.highlight
-                    ? "border-[#F5C518] shadow-2xl shadow-yellow-100 lg:col-span-1"
-                    : "border-gray-100 hover:border-[#F5C518] hover:shadow-md"
+                    ? "border-[#FFC531] shadow-2xl shadow-yellow-100 lg:col-span-1"
+                    : "border-gray-100 hover:border-[#FFC531] hover:shadow-md"
                 }`}
               >
                 {/* Tag bar */}
                 {svc.highlight ? (
-                  <div className="bg-[#F5C518] text-black text-center text-xs font-bold py-2 uppercase tracking-widest">
+                  <div className="bg-[#FFC531] text-black text-center text-xs font-bold py-2 uppercase tracking-widest">
                     {svc.tag}
                   </div>
                 ) : (
-                  <div className="bg-amber-50 text-[#1B2A4A]/50 text-center text-xs font-bold py-2 uppercase tracking-widest">
+                  <div className="bg-[#FAE7B8] text-[#050505]/50 text-center text-xs font-bold py-2 uppercase tracking-widest">
                     {svc.tag}
                   </div>
                 )}
@@ -88,7 +88,7 @@ export default function ServicesContent() {
                   <ul className="space-y-2 mb-8 flex-1">
                     {svc.features.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
-                        <span className="text-[#F5C518] font-bold mt-0.5 shrink-0">✓</span>
+                        <span className="text-[#FFC531] font-bold mt-0.5 shrink-0">✓</span>
                         {f}
                       </li>
                     ))}
@@ -98,12 +98,12 @@ export default function ServicesContent() {
                     {svc.highlight ? (
                       /* Dual-price display for Alphard */
                       <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="bg-[#1B2A4A] rounded-xl py-5 px-3 text-center">
+                        <div className="bg-[#050505] rounded-xl py-5 px-3 text-center">
                           <div className="text-white/50 text-[10px] font-bold uppercase tracking-widest mb-2">5 jam</div>
-                          <div className="text-[#F5C518] text-2xl font-extrabold leading-none mb-1">5.000</div>
+                          <div className="text-[#FFC531] text-2xl font-extrabold leading-none mb-1">5.000</div>
                           <div className="text-white/60 text-xs">THB</div>
                         </div>
-                        <div className="bg-[#F5C518] rounded-xl py-5 px-3 text-center">
+                        <div className="bg-[#FFC531] rounded-xl py-5 px-3 text-center">
                           <div className="text-black/50 text-[10px] font-bold uppercase tracking-widest mb-2">10 jam</div>
                           <div className="text-black text-2xl font-extrabold leading-none mb-1">8.500</div>
                           <div className="text-black/60 text-xs">THB</div>
@@ -121,8 +121,8 @@ export default function ServicesContent() {
                       rel="noopener noreferrer"
                       className={`w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-sm transition-colors ${
                         svc.highlight
-                          ? "bg-[#F5C518] text-black hover:bg-yellow-400"
-                          : "bg-[#1B2A4A] text-white hover:bg-[#253d6b]"
+                          ? "bg-[#FFC531] text-black hover:bg-yellow-400"
+                          : "bg-[#050505] text-white hover:bg-[#2a2a2a]"
                       }`}
                     >
                       {svc.orderBtn}
@@ -140,11 +140,11 @@ export default function ServicesContent() {
       {/* Popular Destinations */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-sm uppercase tracking-widest">
               {s.destinations.eyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
@@ -156,9 +156,9 @@ export default function ServicesContent() {
             {s.destinations.items.map((d) => (
               <div
                 key={d.name}
-                className="bg-white/10 border border-white/20 rounded-xl p-4 text-center hover:border-[#F5C518] hover:bg-white/15 transition-all cursor-default"
+                className="bg-white/10 border border-white/20 rounded-xl p-4 text-center hover:border-[#FFC531] hover:bg-white/15 transition-all cursor-default"
               >
-                <svg className="w-5 h-5 text-[#F5C518] mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#FFC531] mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
                 <div className="text-white text-sm font-semibold leading-tight">{d.name}</div>
@@ -174,7 +174,7 @@ export default function ServicesContent() {
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
-            <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-sm uppercase tracking-widest">
               {s.priceTable.eyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">{s.priceTable.title}</h2>
@@ -184,7 +184,7 @@ export default function ServicesContent() {
           <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-amber-50 border-b border-gray-100">
+                <tr className="bg-[#FAE7B8] border-b border-gray-100">
                   <th className="text-left px-3 py-3 sm:px-6 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colService}</th>
                   <th className="text-center px-2 py-3 sm:px-4 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colPrice}</th>
                   <th className="text-center px-2 py-3 sm:px-4 sm:py-4 text-gray-500 font-semibold">{s.priceTable.colDriver}</th>
@@ -194,12 +194,12 @@ export default function ServicesContent() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {s.priceTable.rows.map((row) => (
-                  <tr key={row.name} className={row.highlight ? "bg-[#F5C518]/5" : ""}>
+                  <tr key={row.name} className={row.highlight ? "bg-[#FFC531]/5" : ""}>
                     <td className="px-3 py-3 sm:px-6 sm:py-4 font-extrabold text-black">
                       <div className="flex flex-col gap-1">
                         <span>{row.name}</span>
                         {row.highlight && row.badge && (
-                          <span className="text-xs bg-[#F5C518] text-black px-2 py-0.5 rounded-full font-bold w-fit">
+                          <span className="text-xs bg-[#FFC531] text-black px-2 py-0.5 rounded-full font-bold w-fit">
                             {row.badge}
                           </span>
                         )}
@@ -208,13 +208,13 @@ export default function ServicesContent() {
                     <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 font-bold ${row.highlight ? "text-black" : "text-gray-600"}`}>
                       {row.price}
                     </td>
-                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.driver === "✓" ? "text-[#F5C518]" : row.driver === "~" ? "text-yellow-500" : "text-red-400"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.driver === "✓" ? "text-[#FFC531]" : row.driver === "~" ? "text-yellow-500" : "text-red-400"}`}>
                       {row.driver}
                     </td>
-                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.fixed === "✓" ? "text-[#F5C518]" : row.fixed === "~" ? "text-yellow-500" : "text-red-400"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.fixed === "✓" ? "text-[#FFC531]" : row.fixed === "~" ? "text-yellow-500" : "text-red-400"}`}>
                       {row.fixed}
                     </td>
-                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.guarantee === "✓" ? "text-[#F5C518]" : row.guarantee === "~" ? "text-yellow-500" : "text-red-400"}`}>
+                    <td className={`text-center px-2 py-3 sm:px-4 sm:py-4 text-xl font-bold ${row.guarantee === "✓" ? "text-[#FFC531]" : row.guarantee === "~" ? "text-yellow-500" : "text-red-400"}`}>
                       {row.guarantee}
                     </td>
                   </tr>
@@ -228,10 +228,10 @@ export default function ServicesContent() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-amber-50">
+      <section className="py-20 bg-[#FAE7B8]">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-12">
-            <span className="text-[#F5C518] font-bold text-sm uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-sm uppercase tracking-widest">
               {s.faq.eyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">{s.faq.title}</h2>
@@ -251,7 +251,7 @@ export default function ServicesContent() {
       {/* Bottom CTA */}
       <section
         className="py-16"
-        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
       >
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">{s.cta.title}</h2>
@@ -270,7 +270,7 @@ export default function ServicesContent() {
             </a>
             <Link
               href="/contact"
-              className="bg-white text-[#1B2A4A] px-6 py-3 rounded-full font-bold hover:bg-[#F5C518] hover:text-[#1B2A4A] transition-colors inline-flex items-center justify-center gap-2"
+              className="bg-white text-[#050505] px-6 py-3 rounded-full font-bold hover:bg-[#FFC531] hover:text-[#050505] transition-colors inline-flex items-center justify-center gap-2"
             >
               {s.cta.bookingBtn}
             </Link>

@@ -106,13 +106,13 @@ export default function DatePicker({ value, onChange, placeholder = "Select date
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className={`w-full h-11 flex items-center gap-2 rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#F5C518] focus:border-transparent transition-colors text-left ${
+        className={`w-full h-11 flex items-center gap-2 rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#FFC531] focus:border-transparent transition-colors text-left ${
           dark
             ? "border border-white/20 bg-white/10 text-white hover:border-white/40"
-            : "border border-gray-200 bg-white text-gray-900 hover:border-[#F5C518]"
+            : "border border-gray-200 bg-white text-gray-900 hover:border-[#FFC531]"
         }`}
       >
-        <svg className="w-4 h-4 text-[#F5C518] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-4 h-4 text-[#FFC531] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
@@ -131,17 +131,17 @@ export default function DatePicker({ value, onChange, placeholder = "Select date
             <button
               type="button"
               onClick={prevMonth}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[#1B2A4A]/60 hover:text-[#1B2A4A] transition-colors text-lg font-bold"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[#050505]/60 hover:text-[#050505] transition-colors text-lg font-bold"
             >
               ‹
             </button>
-            <span className="text-[#1B2A4A] font-extrabold text-sm">
+            <span className="text-[#050505] font-extrabold text-sm">
               {MONTHS[viewMonth]} {viewYear}
             </span>
             <button
               type="button"
               onClick={nextMonth}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[#1B2A4A]/60 hover:text-[#1B2A4A] transition-colors text-lg font-bold"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[#050505]/60 hover:text-[#050505] transition-colors text-lg font-bold"
             >
               ›
             </button>
@@ -150,7 +150,7 @@ export default function DatePicker({ value, onChange, placeholder = "Select date
           {/* Day-of-week headers */}
           <div className="grid grid-cols-7 mb-1">
             {DAYS.map(d => (
-              <div key={d} className="text-center text-xs font-bold text-[#1B2A4A]/40 py-1">
+              <div key={d} className="text-center text-xs font-bold text-[#050505]/40 py-1">
                 {d}
               </div>
             ))}
@@ -171,10 +171,10 @@ export default function DatePicker({ value, onChange, placeholder = "Select date
                   onClick={() => selectDay(day)}
                   className={`
                     w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-sm font-medium transition-all
-                    ${past ? "text-gray-300 cursor-not-allowed" : "hover:bg-[#F5C518]/20 hover:text-[#1B2A4A] cursor-pointer"}
-                    ${selected ? "bg-[#F5C518] text-[#1B2A4A] font-extrabold hover:bg-[#F5C518]" : ""}
-                    ${tod && !selected ? "border-2 border-[#F5C518] text-[#1B2A4A] font-bold" : ""}
-                    ${!past && !selected && !tod ? "text-[#1B2A4A]" : ""}
+                    ${past ? "text-gray-300 cursor-not-allowed" : "hover:bg-[#FFC531]/20 hover:text-[#050505] cursor-pointer"}
+                    ${selected ? "bg-[#FFC531] text-[#050505] font-extrabold hover:bg-[#FFC531]" : ""}
+                    ${tod && !selected ? "border-2 border-[#FFC531] text-[#050505] font-bold" : ""}
+                    ${!past && !selected && !tod ? "text-[#050505]" : ""}
                   `}
                 >
                   {day}
@@ -193,7 +193,7 @@ export default function DatePicker({ value, onChange, placeholder = "Select date
                 onChange(toISODate(today));
                 setOpen(false);
               }}
-              className="text-xs text-[#F5C518] font-bold hover:underline"
+              className="text-xs text-[#FFC531] font-bold hover:underline"
             >
               Today
             </button>

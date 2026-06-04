@@ -364,11 +364,11 @@ function PersonAvatar({ inverted }: { inverted?: boolean }) {
       xmlns="http://www.w3.org/2000/svg"
       className="w-10 h-10"
     >
-      <circle cx="20" cy="20" r="20" fill={inverted ? "#000" : "#F5C518"} />
-      <circle cx="20" cy="15" r="6" fill={inverted ? "#F5C518" : "#1B2A4A"} />
+      <circle cx="20" cy="20" r="20" fill={inverted ? "#000" : "#FFC531"} />
+      <circle cx="20" cy="15" r="6" fill={inverted ? "#FFC531" : "#050505"} />
       <path
         d="M8 34c0-6.627 5.373-12 12-12s12 5.373 12 12"
-        stroke={inverted ? "#F5C518" : "#1B2A4A"}
+        stroke={inverted ? "#FFC531" : "#050505"}
         strokeWidth="2.5"
         strokeLinecap="round"
       />
@@ -378,7 +378,7 @@ function PersonAvatar({ inverted }: { inverted?: boolean }) {
 
 function StarRating({ count }: { count: number }) {
   return (
-    <div className="flex gap-0.5 text-[#F5C518]">
+    <div className="flex gap-0.5 text-[#FFC531]">
       {Array.from({ length: count }).map((_, i) => (
         <span key={i}>★</span>
       ))}
@@ -562,7 +562,7 @@ export default function HomeContent() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-[100dvh] flex items-center overflow-x-hidden bg-[#1B2A4A]">
+      <section className="relative min-h-[100dvh] flex items-center overflow-x-hidden bg-[#050505]">
         {HERO_SLIDES.map((slide, i) => (
           <div
             key={slide.src}
@@ -580,8 +580,8 @@ export default function HomeContent() {
               className="object-cover object-center"
               sizes="100vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1B2A4A]/85 via-[#1B2A4A]/50 to-[#1B2A4A]/10" />
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#1B2A4A]/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/85 via-[#050505]/50 to-[#050505]/10" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050505]/60 to-transparent" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
           </div>
         ))}
@@ -601,7 +601,7 @@ export default function HomeContent() {
                 aria-label={`Slide ${i + 1}`}
                 className={`rounded-full transition-all duration-500 ${
                   i === current
-                    ? "bg-[#F5C518] w-3 h-3"
+                    ? "bg-[#FFC531] w-3 h-3"
                     : "bg-white/50 w-2 h-2 hover:bg-white/80"
                 }`}
               />
@@ -609,18 +609,18 @@ export default function HomeContent() {
           </div>
         </div>
 
-        <div className="absolute top-0 left-0 h-1 w-full bg-[#F5C518] z-20" />
+        <div className="absolute top-0 left-0 h-1 w-full bg-[#FFC531] z-20" />
 
         <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 lg:pb-32">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#F5C518]/10 border border-[#F5C518]/30 text-[#F5C518] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 animate-slide-up">
+              <div className="inline-flex items-center gap-2 bg-[#FFC531]/10 border border-[#FFC531]/30 text-[#FFC531] text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6 animate-slide-up">
                 {t.hero.badge}
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
                 {t.hero.title1}{" "}
-                <span className="text-[#F5C518]">{t.hero.title2}</span>
+                <span className="text-[#FFC531]">{t.hero.title2}</span>
                 <br />
                 {t.hero.title3}
               </h1>
@@ -639,7 +639,7 @@ export default function HomeContent() {
                     key={s.label}
                     className={`pr-6 sm:pr-8 ${i < arr.length - 1 ? "mr-6 sm:mr-8 border-r border-white/20" : ""}`}
                   >
-                    <div className="text-2xl font-extrabold text-[#F5C518]">{s.value}</div>
+                    <div className="text-2xl font-extrabold text-[#FFC531]">{s.value}</div>
                     <div className="text-white/50 text-xs mt-0.5">{s.label}</div>
                   </div>
                 ))}
@@ -657,7 +657,7 @@ export default function HomeContent() {
                 </a>
                 <Link
                   href="/services"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white/40 text-white px-6 py-3 rounded-full font-bold hover:border-[#F5C518] hover:text-[#F5C518] transition-colors group"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-white/40 text-white px-6 py-3 rounded-full font-bold hover:border-[#FFC531] hover:text-[#FFC531] transition-colors group"
                 >
                   {t.hero.servicesBtn}
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -665,7 +665,7 @@ export default function HomeContent() {
               </div>
             </div>
 
-            <div className="relative z-30 bg-[#1B2A4A]/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-6 lg:p-8 text-white">
+            <div className="relative z-30 bg-[#050505]/80 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-6 lg:p-8 text-white">
               <h2 className="text-xl font-extrabold mb-1">{t.booking.title}</h2>
               <p className="text-white/60 text-sm mb-6">{t.booking.subtitle}</p>
 
@@ -677,7 +677,7 @@ export default function HomeContent() {
                   <select
                     value={bookingService}
                     onChange={(e) => handleBookingServiceChange(Number(e.target.value))}
-                    className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#F5C518] focus:border-transparent"
+                    className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#FFC531] focus:border-transparent"
                   >
                     <option value={0} className="text-black">{t.booking.service1}</option>
                     <option value={1} className="text-black">{t.booking.service2}</option>
@@ -693,7 +693,7 @@ export default function HomeContent() {
                   <select
                     value={selectedBookingVehicle}
                     onChange={(e) => handleBookingVehicleChange(e.target.value)}
-                    className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#F5C518] focus:border-transparent"
+                    className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#FFC531] focus:border-transparent"
                   >
                     <option value={t.booking.vehicle1} className="text-black">{t.booking.vehicle1}</option>
                     <option value={t.booking.vehicle2} className="text-black">{t.booking.vehicle2}</option>
@@ -792,7 +792,7 @@ export default function HomeContent() {
                 <button
                   type="button"
                   onClick={handleBookingSubmit}
-                  className="w-full bg-[#F5C518] text-black py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-yellow-400 transition-colors"
+                  className="w-full bg-[#FFC531] text-black py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-yellow-400 transition-colors"
                 >
                   <WhatsAppIcon />
                   {t.booking.sendBtn}
@@ -808,12 +808,12 @@ export default function HomeContent() {
       </section>
 
       {/* ── TRUST BAR ── */}
-      <section className="relative z-[-1] bg-[#F5C518] py-4">
+      <section className="relative z-[-1] bg-[#FFC531] py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-black text-sm font-bold">
             {t.trust.map((item) => (
               <span key={item} className="flex items-center gap-1.5">
-                <IconCheck className="w-4 h-4 text-[#1B2A4A] shrink-0" />
+                <IconCheck className="w-4 h-4 text-[#050505] shrink-0" />
                 {item}
               </span>
             ))}
@@ -822,10 +822,10 @@ export default function HomeContent() {
       </section>
 
       {/* ── FLEET ── */}
-      <section id="vehicle-options" className="py-24 bg-amber-50 scroll-mt-24">
+      <section id="vehicle-options" className="py-24 bg-[#FAE7B8] scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
               {pageCopy.fleetEyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">
@@ -837,7 +837,7 @@ export default function HomeContent() {
           </div>
 
           <ScrollReveal className="grid items-start gap-8 lg:grid-cols-[1.35fr_1fr]">
-            <div className="self-start overflow-hidden rounded-[2rem] border border-[#F5C518]/30 bg-white/95 shadow-[0_24px_70px_rgba(16,32,60,0.12)]">
+            <div className="self-start overflow-hidden rounded-[2rem] border border-[#FFC531]/30 bg-white/95 shadow-[0_24px_70px_rgba(16,32,60,0.12)]">
               <div className="relative aspect-[6/5] min-h-[320px] sm:min-h-[360px]">
                 <Image
                   src={HERO_SLIDES[0].src}
@@ -847,10 +847,10 @@ export default function HomeContent() {
                   sizes="(max-width: 1024px) 100vw, 55vw"
                   style={{ objectPosition: HERO_SLIDES[0].imagePosition }}
                 />
-                <div className="absolute left-5 top-5 rounded-full bg-[#F5C518] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-black">
+                <div className="absolute left-5 top-5 rounded-full bg-[#FFC531] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-black">
                   {pageCopy.featuredLabel}
                 </div>
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1B2A4A]/88 via-[#1B2A4A]/52 to-transparent p-5 sm:p-7">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#050505]/88 via-[#050505]/52 to-transparent p-5 sm:p-7">
                   <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-white/70">
                     {primaryVehicle.tag}
                   </p>
@@ -859,7 +859,7 @@ export default function HomeContent() {
                       <h3 className="text-3xl font-extrabold text-white sm:text-[2rem]">
                         {primaryVehicle.name}
                       </h3>
-                      <p className="mt-2 text-sm font-semibold text-[#F5C518]">
+                      <p className="mt-2 text-sm font-semibold text-[#FFC531]">
                         {pageCopy.featuredCapacity}
                       </p>
                     </div>
@@ -867,7 +867,7 @@ export default function HomeContent() {
                       href={buildWaLink("fleet", language)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#1B2A4A] transition-colors hover:bg-[#F5C518]"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#050505] transition-colors hover:bg-[#FFC531]"
                     >
                       <WhatsAppIcon />
                       {pageCopy.fleetCta}
@@ -876,7 +876,7 @@ export default function HomeContent() {
                 </div>
               </div>
 
-              <div className="border-t border-[#1B2A4A]/8 bg-[#FFF8E3] px-6 py-5 sm:px-8">
+              <div className="border-t border-[#050505]/8 bg-[#FFF8E3] px-6 py-5 sm:px-8">
                 <p className="max-w-2xl text-sm leading-relaxed text-gray-700">
                   {pageCopy.featuredDescription}
                 </p>
@@ -885,21 +885,21 @@ export default function HomeContent() {
                   {pageCopy.featuredPoints.map((point) => (
                     <div
                       key={point}
-                      className="rounded-2xl border border-[#F5C518]/20 bg-white px-4 py-3 text-sm text-gray-700"
+                      className="rounded-2xl border border-[#FFC531]/20 bg-white px-4 py-3 text-sm text-gray-700"
                     >
                       {point}
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 border-t border-[#F5C518]/20 pt-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1B2A4A]/40 mb-3">
+                <div className="mt-5 border-t border-[#FFC531]/20 pt-5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#050505]/40 mb-3">
                     {pageCopy.insideLabel}
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                     {pageCopy.alphardHighlights.map((item) => (
                       <div key={item} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="text-[#F5C518] font-bold shrink-0">✓</span>
+                        <span className="text-[#FFC531] font-bold shrink-0">✓</span>
                         {item}
                       </div>
                     ))}
@@ -908,11 +908,11 @@ export default function HomeContent() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-[#1B2A4A]/10 bg-white p-6 shadow-lg">
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#1B2A4A]/50">
+            <div className="rounded-[2rem] border border-[#050505]/10 bg-white p-6 shadow-lg">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#050505]/50">
                 {pageCopy.alternativesLabel}
               </p>
-              <h3 className="mt-3 text-2xl font-extrabold text-[#1B2A4A]">
+              <h3 className="mt-3 text-2xl font-extrabold text-[#050505]">
                 {pageCopy.alternativesTitle}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -923,7 +923,7 @@ export default function HomeContent() {
                 {alternativeVehicles.map((vehicle, i) => (
                   <div
                     key={vehicle.name}
-                    className="group overflow-hidden rounded-2xl border border-gray-100 bg-amber-50/40 transition-all duration-300 hover:-translate-y-1 hover:border-[#F5C518] hover:shadow-md"
+                    className="group overflow-hidden rounded-2xl border border-gray-100 bg-[#FAE7B8]/40 transition-all duration-300 hover:-translate-y-1 hover:border-[#FFC531] hover:shadow-md"
                   >
                     <div className="relative h-40">
                       <Image
@@ -933,15 +933,15 @@ export default function HomeContent() {
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 1024px) 50vw, 30vw"
                       />
-                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#1B2A4A]">
+                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#050505]">
                         {vehicle.tag}
                       </span>
                     </div>
 
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-3">
-                        <h4 className="text-base font-extrabold text-[#1B2A4A]">{vehicle.name}</h4>
-                        <span className="rounded-full bg-[#F5C518]/15 px-2.5 py-1 text-[11px] font-bold text-[#9D7400]">
+                        <h4 className="text-base font-extrabold text-[#050505]">{vehicle.name}</h4>
+                        <span className="rounded-full bg-[#FFC531]/15 px-2.5 py-1 text-[11px] font-bold text-[#9D7400]">
                           {vehicle.capacity}
                         </span>
                       </div>
@@ -956,10 +956,10 @@ export default function HomeContent() {
       </section>
 
       {/* ── SERVICES ── */}
-      <section className="py-24 bg-[#1B2A4A]">
+      <section className="py-24 bg-[#050505]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
               {t.services.eyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
@@ -976,18 +976,18 @@ export default function HomeContent() {
               return (
               <div
                 key={s.title}
-                className="group relative border border-white/10 bg-white/5 rounded-2xl p-8 hover:shadow-xl hover:border-[#F5C518] transition-all duration-300 overflow-hidden"
+                className="group relative border border-white/10 bg-white/5 rounded-2xl p-8 hover:shadow-xl hover:border-[#FFC531] transition-all duration-300 overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#F5C518]/5 rounded-bl-full group-hover:bg-[#F5C518]/10 transition-colors" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFC531]/5 rounded-bl-full group-hover:bg-[#FFC531]/10 transition-colors" />
 
-                <div className="w-12 h-12 rounded-xl bg-[#F5C518]/15 flex items-center justify-center mb-5 group-hover:bg-[#F5C518]/25 transition-colors">
-                  <ServiceIcon className="w-6 h-6 text-[#F5C518]" />
+                <div className="w-12 h-12 rounded-xl bg-[#FFC531]/15 flex items-center justify-center mb-5 group-hover:bg-[#FFC531]/25 transition-colors">
+                  <ServiceIcon className="w-6 h-6 text-[#FFC531]" />
                 </div>
                 <h3 className="text-xl font-extrabold text-white mb-3">{s.title}</h3>
                 <p className="text-white/60 text-sm leading-relaxed mb-6">{s.desc}</p>
                 <Link
                   href="/services"
-                  className="inline-flex items-center gap-1 text-sm font-bold text-[#F5C518] group-hover:gap-2 transition-all"
+                  className="inline-flex items-center gap-1 text-sm font-bold text-[#FFC531] group-hover:gap-2 transition-all"
                 >
                   <span>{t.services.moreBtn}</span>
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -1000,7 +1000,7 @@ export default function HomeContent() {
           <div className="text-center mt-12">
             <Link
               href="/services"
-              className="inline-block bg-[#F5C518] text-black px-8 py-3.5 rounded-full font-bold hover:bg-white hover:text-black transition-colors"
+              className="inline-block bg-[#FFC531] text-black px-8 py-3.5 rounded-full font-bold hover:bg-white hover:text-black transition-colors"
             >
               {t.services.allBtn}
             </Link>
@@ -1013,7 +1013,7 @@ export default function HomeContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
+              <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
                 {t.whyUs.eyebrow}
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2 mb-4">
@@ -1040,10 +1040,10 @@ export default function HomeContent() {
                 return (
                 <div
                   key={r.title}
-                  className="bg-white border border-gray-100 rounded-2xl p-5 hover:border-[#F5C518] hover:shadow-md transition-all"
+                  className="bg-white border border-gray-100 rounded-2xl p-5 hover:border-[#FFC531] hover:shadow-md transition-all"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[#1B2A4A]/5 flex items-center justify-center mb-3">
-                    <ReasonIcon className="w-4 h-4 text-[#1B2A4A]" />
+                  <div className="w-8 h-8 rounded-lg bg-[#050505]/5 flex items-center justify-center mb-3">
+                    <ReasonIcon className="w-4 h-4 text-[#050505]" />
                   </div>
                   <h3 className="text-black font-bold text-sm mb-1">{r.title}</h3>
                   <p className="text-gray-500 text-xs leading-relaxed">{r.desc}</p>
@@ -1056,10 +1056,10 @@ export default function HomeContent() {
       </section>
 
       {/* ── VALUE STACK ── */}
-      <section className="py-24 bg-[#1B2A4A]">
+      <section className="py-24 bg-[#050505]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
               {t.valueStack.eyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
@@ -1075,22 +1075,22 @@ export default function HomeContent() {
               {t.valueStack.items.map((item) => (
                 <div key={item.name} className="flex items-center justify-between px-6 sm:px-8 py-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-[#F5C518] font-extrabold text-lg shrink-0">✓</span>
+                    <span className="text-[#FFC531] font-extrabold text-lg shrink-0">✓</span>
                     <span className="text-white text-sm">{item.name}</span>
                   </div>
                   <span className="text-white/40 text-sm line-through shrink-0 ml-4">{item.value}</span>
                 </div>
               ))}
             </div>
-            <div className="bg-[#F5C518]/10 border-t border-[#F5C518]/30 px-6 sm:px-8 py-6">
+            <div className="bg-[#FFC531]/10 border-t border-[#FFC531]/30 px-6 sm:px-8 py-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-white/50 text-xs uppercase tracking-widest mb-1">{t.valueStack.totalLabel}</div>
                   <div className="text-white/40 line-through text-xl font-bold">{t.valueStack.totalValue}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[#F5C518] text-xs uppercase tracking-widest font-bold mb-1">{t.valueStack.payLabel}</div>
-                  <div className="text-[#F5C518] text-3xl font-extrabold">{t.valueStack.payValue}</div>
+                  <div className="text-[#FFC531] text-xs uppercase tracking-widest font-bold mb-1">{t.valueStack.payLabel}</div>
+                  <div className="text-[#FFC531] text-3xl font-extrabold">{t.valueStack.payValue}</div>
                 </div>
               </div>
             </div>
@@ -1114,7 +1114,7 @@ export default function HomeContent() {
       <section className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 bg-[#F5C518] text-black text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#FFC531] text-black text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
               🛡️ {t.guarantee.badge}
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">
@@ -1129,7 +1129,7 @@ export default function HomeContent() {
             {t.guarantee.items.map((item) => (
               <div
                 key={item.title}
-                className="bg-gray-50 border-2 border-gray-100 rounded-2xl p-6 hover:border-[#F5C518] hover:shadow-md transition-all"
+                className="bg-gray-50 border-2 border-gray-100 rounded-2xl p-6 hover:border-[#FFC531] hover:shadow-md transition-all"
               >
                 <div className="text-3xl mb-3">{item.icon}</div>
                 <h3 className="font-extrabold text-black text-lg mb-2">{item.title}</h3>
@@ -1141,10 +1141,10 @@ export default function HomeContent() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-24 bg-amber-50">
+      <section className="py-24 bg-[#FAE7B8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
+            <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
               {t.testimonials.eyebrow}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mt-2">
@@ -1162,7 +1162,7 @@ export default function HomeContent() {
                 key={testimonial.name}
                 className={`rounded-2xl p-8 border ${
                   i === 1
-                    ? "bg-[#F5C518] border-[#F5C518] shadow-xl md:scale-105"
+                    ? "bg-[#FFC531] border-[#FFC531] shadow-xl md:scale-105"
                     : "bg-white border-gray-100 shadow-sm"
                 }`}
               >
@@ -1192,11 +1192,11 @@ export default function HomeContent() {
             {t.moreTestimonialItems.map((testimonial) => (
               <div
                 key={testimonial.name + testimonial.city}
-                className="bg-white rounded-xl p-5 border border-gray-100 hover:border-[#F5C518] hover:shadow-sm transition-all"
+                className="bg-white rounded-xl p-5 border border-gray-100 hover:border-[#FFC531] hover:shadow-sm transition-all"
               >
                 <div className="flex items-center justify-between mb-2">
                   <StarRating count={testimonial.stars} />
-                  <span className="text-xs text-[#F5C518] font-bold bg-[#F5C518]/10 px-2 py-0.5 rounded-full">
+                  <span className="text-xs text-[#FFC531] font-bold bg-[#FFC531]/10 px-2 py-0.5 rounded-full">
                     {testimonial.service}
                   </span>
                 </div>
@@ -1204,7 +1204,7 @@ export default function HomeContent() {
                   &ldquo;{testimonial.text}&rdquo;
                 </p>
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-[#1B2A4A]/10 flex items-center justify-center text-[#1B2A4A] text-xs font-extrabold shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-[#050505]/10 flex items-center justify-center text-[#050505] text-xs font-extrabold shrink-0">
                     {testimonial.name.charAt(0)}
                   </div>
                   <div>
@@ -1219,12 +1219,12 @@ export default function HomeContent() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative py-24 bg-[#1B2A4A] overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-72 h-72 bg-[#F5C518]/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-[#F5C518]/10 rounded-full blur-3xl" />
+      <section className="relative py-24 bg-[#050505] overflow-hidden">
+        <div className="absolute -top-20 -left-20 w-72 h-72 bg-[#FFC531]/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-[#FFC531]/10 rounded-full blur-3xl" />
 
         <div className="relative z-10 max-w-3xl mx-auto px-4 text-center">
-          <span className="text-[#F5C518] font-bold text-xs uppercase tracking-widest">
+          <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
             {t.cta.eyebrow}
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2 mb-4">
@@ -1245,7 +1245,7 @@ export default function HomeContent() {
             </a>
             <Link
               href="/services"
-              className="inline-flex items-center justify-center gap-2 bg-[#F5C518] text-black px-6 py-3 rounded-full font-bold hover:bg-yellow-400 transition-colors group"
+              className="inline-flex items-center justify-center gap-2 bg-[#FFC531] text-black px-6 py-3 rounded-full font-bold hover:bg-yellow-400 transition-colors group"
             >
               {pageCopy.ctaSecondary}
               <span className="transition-transform group-hover:translate-x-0.5">→</span>

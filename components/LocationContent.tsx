@@ -18,10 +18,10 @@ export default function LocationContent() {
       {/* Hero */}
       <section
         className="py-20 relative"
-        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
+          <p className="text-[#FFC531] font-bold text-sm uppercase tracking-widest mb-4">
             {loc.header.eyebrow}
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
@@ -37,7 +37,7 @@ export default function LocationContent() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-3">
+            <p className="text-[#FFC531] font-bold text-sm uppercase tracking-widest mb-3">
               {loc.cities.eyebrow}
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
@@ -48,9 +48,9 @@ export default function LocationContent() {
             {loc.cities.items.map((city, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#F5C518] hover:shadow-md transition-all"
+                className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#FFC531] hover:shadow-md transition-all"
               >
-                <div className="bg-[#F5C518]/10 rounded-xl p-3 w-fit mb-4">
+                <div className="bg-[#FFC531]/10 rounded-xl p-3 w-fit mb-4">
                   <div className="text-4xl">{city.emoji}</div>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -66,11 +66,11 @@ export default function LocationContent() {
       </section>
 
       {/* Note Box */}
-      <section className="bg-amber-50 py-20">
+      <section className="bg-[#FAE7B8] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
             className="max-w-2xl mx-auto rounded-2xl p-8 text-center shadow-lg"
-            style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+            style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
           >
             <h3 className="text-2xl font-bold text-white mb-3">
               {loc.note.title}
@@ -89,7 +89,7 @@ export default function LocationContent() {
       {/* CTA */}
       <section
         className="py-20"
-        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">

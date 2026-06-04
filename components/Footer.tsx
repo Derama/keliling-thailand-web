@@ -53,22 +53,22 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="text-center md:text-left">
-            <h3 className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
+            <h3 className="text-[#FFC531] font-bold text-sm uppercase tracking-widest mb-4">
               {footerCopy.nav}
             </h3>
             <ul className="space-y-2 text-sm text-white">
               <li>
-                <Link href="/" className="hover:text-[#F5C518] transition-colors">
+                <Link href="/" className="hover:text-[#FFC531] transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-[#F5C518] transition-colors">
+                <Link href="/services" className="hover:text-[#FFC531] transition-colors">
                   {footerCopy.services}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-[#F5C518] transition-colors">
+                <Link href="/contact" className="hover:text-[#FFC531] transition-colors">
                   {footerCopy.book}
                 </Link>
               </li>
@@ -77,13 +77,13 @@ export default function Footer() {
 
           {/* Contact */}
           <div className="text-center md:text-left">
-            <h3 className="text-[#F5C518] font-bold text-sm uppercase tracking-widest mb-4">
+            <h3 className="text-[#FFC531] font-bold text-sm uppercase tracking-widest mb-4">
               {footerCopy.contact}
             </h3>
             <ul className="space-y-2 text-sm text-white">
               <li className="flex items-center justify-center md:justify-start gap-2">
                 <span>📱</span>
-                <a href="https://wa.me/6285750923934" className="hover:text-[#F5C518] transition-colors">
+                <a href="https://wa.me/6285750923934" className="hover:text-[#FFC531] transition-colors">
                   WhatsApp
                 </a>
               </li>
@@ -93,7 +93,7 @@ export default function Footer() {
                   href="https://instagram.com/kelilingthailand"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#F5C518] transition-colors"
+                  className="hover:text-[#FFC531] transition-colors"
                 >
                   @kelilingthailand
                 </a>

@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
-  --yellow: #F5C518;
+  --background: #F4F4F4;
+  --foreground: #050505;
+  --yellow: #FFC531;
+  --cream: #FAE7B8;
+  --offwhite: #F4F4F4;
+  --ink: #050505;
+  --accent: #F5D582;
   --font-geist-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-geist-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 
@@ -17,9 +21,24 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-yellow: var(--yellow);
+  --color-cream: var(--cream);
+  --color-offwhite: var(--offwhite);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+
+/* ── Outlined card with offset accent shadow (brand signature) ── */
+.outline-card {
+  border: 2px solid #050505;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 6px 6px 0 #F5D582;
+  transition: transform 0.15s var(--ease-out-quart), box-shadow 0.15s var(--ease-out-quart);
+}
+.outline-card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 #F5D582; }
+.outline-card.is-active { box-shadow: 6px 6px 0 #FFC531; background: #FAE7B8; }
 
 body {
   background: var(--background);

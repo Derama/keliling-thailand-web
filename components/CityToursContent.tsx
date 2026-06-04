@@ -17,11 +17,11 @@ export default function CityToursContent() {
     <main className="min-h-[100dvh] bg-white pt-20">
       {/* Hero */}
       <section
-        style={{ background: "linear-gradient(135deg, #1B2A4A 0%, #253d6b 100%)" }}
+        style={{ background: "linear-gradient(135deg, #050505 0%, #2a2a2a 100%)" }}
         className="relative py-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-4">
+          <p className="text-[#FFC531] font-bold text-xs uppercase tracking-widest mb-4">
             {ct.header.eyebrow}
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
@@ -37,7 +37,7 @@ export default function CityToursContent() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
+            <p className="text-[#FFC531] font-bold text-xs uppercase tracking-widest mb-3">
               {ct.tours.eyebrow}
             </p>
             <h2 className="font-extrabold text-3xl sm:text-4xl text-gray-900">
@@ -48,7 +48,7 @@ export default function CityToursContent() {
             {ct.tours.items.map((tour, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#F5C518] hover:shadow-md transition-all flex flex-col"
+                className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#FFC531] hover:shadow-md transition-all flex flex-col"
               >
                 <div className="text-4xl mb-4">{tour.emoji}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -65,8 +65,8 @@ export default function CityToursContent() {
                     <span>{tour.duration}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-[#F5C518] font-bold shrink-0">฿</span>
-                    <span className="text-[#F5C518] font-bold">{tour.from}</span>
+                    <span className="text-[#FFC531] font-bold shrink-0">฿</span>
+                    <span className="text-[#FFC531] font-bold">{tour.from}</span>
                   </div>
                 </div>
               </div>
@@ -76,10 +76,10 @@ export default function CityToursContent() {
       </section>
 
       {/* What's Included */}
-      <section className="bg-amber-50 py-20">
+      <section className="bg-[#FAE7B8] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
+            <p className="text-[#FFC531] font-bold text-xs uppercase tracking-widest mb-3">
               {ct.includes.eyebrow}
             </p>
             <h2 className="font-extrabold text-3xl sm:text-4xl text-gray-900">
@@ -90,7 +90,7 @@ export default function CityToursContent() {
             <ul className="space-y-3">
               {ct.includes.items.map((item, i) => (
                 <li key={i} className="flex items-center gap-3 bg-white rounded-xl px-5 py-4 shadow-sm border border-gray-100">
-                  <span className="text-[#F5C518] text-lg font-bold flex-shrink-0">✓</span>
+                  <span className="text-[#FFC531] text-lg font-bold flex-shrink-0">✓</span>
                   <span className="text-gray-700 text-base">{item}</span>
                 </li>
               ))}
@@ -102,7 +102,7 @@ export default function CityToursContent() {
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-3">
+            <p className="text-[#FFC531] font-bold text-xs uppercase tracking-widest mb-3">
               {ct.notIncluded.eyebrow}
             </p>
             <h2 className="font-extrabold text-3xl sm:text-4xl text-gray-900">
@@ -112,8 +112,8 @@ export default function CityToursContent() {
           <div className="max-w-3xl mx-auto">
             <ul className="space-y-3">
               {ct.notIncluded.items.map((item, i) => (
-                <li key={i} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-amber-50/50 px-5 py-4">
-                  <span className="mt-0.5 text-[#1B2A4A] font-bold flex-shrink-0">•</span>
+                <li key={i} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-[#FAE7B8]/50 px-5 py-4">
+                  <span className="mt-0.5 text-[#050505] font-bold flex-shrink-0">•</span>
                   <span className="text-gray-700 text-base">{item}</span>
                 </li>
               ))}
@@ -123,9 +123,9 @@ export default function CityToursContent() {
       </section>
 
       {/* Navy CTA */}
-      <section className="bg-[#1B2A4A] py-20">
+      <section className="bg-[#050505] py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-[#F5C518] font-bold text-xs uppercase tracking-widest mb-4">
+          <p className="text-[#FFC531] font-bold text-xs uppercase tracking-widest mb-4">
             {ct.header.eyebrow}
           </p>
           <h2 className="font-extrabold text-3xl sm:text-4xl text-white mb-4">
