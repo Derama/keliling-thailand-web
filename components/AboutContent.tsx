@@ -35,8 +35,8 @@ export default function AboutContent() {
       <section className="relative overflow-hidden bg-[#050505] pt-24 pb-20">
         <div className="absolute inset-x-0 top-0 h-1 bg-[#FFC531]" />
         <Image
-          src="/toyotaalphard1.jpg"
-          alt="Premium Alphard Fleet"
+          src="/Altis.webp"
+          alt="Keliling Thailand vehicle fleet"
           fill
           priority
           className="object-cover object-center opacity-30"

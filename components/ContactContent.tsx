@@ -18,12 +18,7 @@ const CONTACT_WA = {
 export default function ContactContent() {
   const { t, language } = useLanguage();
   const c = t.contact;
-  const alphardVehicle = c.vehicles.find((vehicle) =>
-    vehicle.toLowerCase().includes("alphard")
-  );
-  const vehicleOptions = alphardVehicle
-    ? [alphardVehicle, ...c.vehicles.filter((vehicle) => vehicle !== alphardVehicle)]
-    : c.vehicles;
+  const vehicleOptions = c.vehicles;
 
   const [form, setForm] = useState({
     name: "",
@@ -38,7 +33,7 @@ export default function ContactContent() {
   });
 
   const [submitted, setSubmitted] = useState(false);
-  const selectedVehicle = form.vehicle || alphardVehicle || "";
+  const selectedVehicle = form.vehicle || "";
 
   function handleChange(
     e: React.ChangeEvent<
@@ -262,9 +257,7 @@ export default function ContactContent() {
                             onChange={handleChange}
                             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-[#FCFBF6] focus:outline-none focus:border-[#FFC531] focus:ring-2 focus:ring-[#FFC531]/20 transition-colors"
                           >
-                            {!alphardVehicle && (
-                              <option value="">{c.vehiclePlaceholder}</option>
-                            )}
+                            <option value="">{c.vehiclePlaceholder}</option>
                             {vehicleOptions.map((v) => (
                               <option key={v} value={v}>
                                 {v}

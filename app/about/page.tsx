@@ -4,7 +4,7 @@ import AboutContent from "@/components/AboutContent";
 export const metadata: Metadata = {
   title: "Tentang Kami — Keliling Thailand",
   description:
-    "Kenali tim Keliling Thailand: pengemudi profesional berbahasa Indonesia, Inggris, dan Thai, serta armada Toyota Alphard, Vellfire, Fortuner, dan Altis untuk perjalanan premium di Bangkok, Pattaya, Phuket, dan Krabi.",
+    "Kenali tim Keliling Thailand: pengemudi profesional berbahasa Indonesia, Inggris, dan Thai, serta pilihan Altis, SUV, Van, dan Mini Bus untuk city tour dan transfer di seluruh Thailand.",
   alternates: { canonical: "/about" },
   openGraph: {
     title: "Tentang Kami — Keliling Thailand",

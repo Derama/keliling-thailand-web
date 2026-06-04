@@ -4,14 +4,14 @@ import HomeContent from "@/components/HomeContent";
 const sharePreviewImage = "/Group 10.png?v=20260420b";
 
 export const metadata: Metadata = {
-  title: "Keliling Thailand | Premium Alphard, Airport Transfer & Private Tours",
+  title: "Keliling Thailand | Private City Tours, Airport Transfer & Day Trips",
   description:
-    "Private transport in Thailand with Toyota Alphard and premium vehicles for airport transfers, Bangkok city rides, private tours, corporate travel, weddings, and VIP itineraries. Fast WhatsApp booking with Indonesian, English, and Thai-speaking support.",
+    "Private city tours across Thailand — pick a city and attractions, then ride in an Altis, SUV, Van, or Mini Bus. Airport transfers, day trips, and intercity routes with fast WhatsApp booking and Indonesian, English, and Thai-speaking support.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "Keliling Thailand | Premium Private Transport Across Thailand",
     description:
-      "Book Alphard airport transfers, Bangkok city rides, private tours, corporate transport, and VIP travel in Thailand with fast WhatsApp confirmation.",
+      "Book private city tours, airport transfers, day trips, and intercity travel in Thailand with fast WhatsApp confirmation.",
     url: "/",
     type: "website",
     siteName: "Keliling Thailand",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
         url: sharePreviewImage,
         width: 1945,
         height: 958,
-        alt: "Keliling Thailand premium Toyota Alphard preview",
+        alt: "Keliling Thailand private city tours preview",
       },
     ],
   },
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Keliling Thailand | Premium Private Transport Across Thailand",
     description:
-      "Alphard airport transfers, Bangkok city rides, private tours, and VIP transport in Thailand with fast WhatsApp booking.",
+      "Private city tours, airport transfers, day trips, and intercity transport in Thailand with fast WhatsApp booking.",
     images: [sharePreviewImage],
   },
 };

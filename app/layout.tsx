@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     shortcut: "/icon.png",
   },
   title: {
-    default: "Alphard Experience — Premium Private Transport in Thailand",
+    default: "Private City Tours — Premium Transport in Thailand",
     template: "%s | Keliling Thailand",
   },
   description:
     "Premium private transport in Thailand for Indonesian, Singaporean, Chinese, Middle Eastern, Western, and Thai travelers. Ideal for corporate trips, weddings, birthdays, influencer itineraries, and Bangkok stays.",
   keywords:
-    "alphard experience, thailand private transport, bangkok premium chauffeur, thailand airport transfer, wedding transport bangkok, corporate travel thailand",
+    "private city tours thailand, thailand private transport, bangkok premium chauffeur, thailand airport transfer, wedding transport bangkok, corporate travel thailand",
   alternates: {
     canonical: "/",
     languages: {
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Alphard Experience — Premium Private Transport in Thailand",
+    title: "Private City Tours — Premium Transport in Thailand",
     description:
       "Premium private transport in Thailand for business, celebrations, and high-comfort travel.",
     type: "website",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alphard Experience — Premium Private Transport in Thailand",
+    title: "Private City Tours — Premium Transport in Thailand",
     description:
       "Premium private transport in Thailand for business, celebrations, and high-comfort travel.",
   },
@@ -81,12 +81,12 @@ const organizationLd = {
   "@type": "LocalBusiness",
   "@id": `${siteUrl}/#organization`,
   name: "Keliling Thailand",
-  alternateName: "Alphard Experience",
+  alternateName: "Keliling Thailand Tours",
   url: siteUrl,
   logo: `${siteUrl}/newlog.png`,
   image: `${siteUrl}/newlog.png`,
   description:
-    "Premium private transport in Thailand with Toyota Alphard, Vellfire, Fortuner, and Altis. Airport transfers, city tours, corporate, and wedding transportation.",
+    "Premium private transport in Thailand with Altis, SUV, Van, and Mini Bus. Airport transfers, city tours, corporate, and wedding transportation.",
   telephone: "+62-857-5092-3934",
   priceRange: "$$",
   areaServed: [

@@ -4,7 +4,7 @@ import ServicesContent from "@/components/ServicesContent";
 export const metadata: Metadata = {
   title: "Layanan — SUV Charter, Airport Transfer & Day Tour",
   description:
-    "SUV Charter, Airport Transfer, dan Day Tour di Thailand untuk berbagai kebutuhan perjalanan. Armada premium Toyota Alphard, Vellfire, Fortuner, dan Altis dengan harga transparan.",
+    "SUV Charter, Airport Transfer, dan Day Tour di Thailand untuk berbagai kebutuhan perjalanan. Pilihan Altis, SUV, Van, dan Mini Bus dengan harga transparan.",
   alternates: { canonical: "/services" },
   openGraph: {
     title: "Layanan — Keliling Thailand",

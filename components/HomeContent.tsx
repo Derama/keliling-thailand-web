@@ -14,25 +14,25 @@ const WA_NUMBER = "6285750923934";
 
 const WA_MESSAGES = {
   id: {
-    hero: "Halo Keliling Thailand! Saya tertarik dengan Alphard Experience dan ingin konsultasi. [dari: Hero Section]",
+    hero: "Halo Keliling Thailand! Saya tertarik dengan City Tour privat dan ingin konsultasi. [dari: Hero Section]",
     fleet: "Halo Keliling Thailand! Saya butuh bantuan memilih kendaraan yang tepat. [dari: Fleet Section]",
     whyUs: "Halo Keliling Thailand! Saya ingin konsultasi gratis tentang layanan transportasi. [dari: Konsultasi Gratis]",
-    valueStack: "Halo Keliling Thailand! Saya ingin klaim penawaran charter 10 jam Alphard. [dari: Grand Slam Offer]",
-    cta: "Halo Keliling Thailand! Saya ingin cek ketersediaan Alphard. [dari: CTA Section]",
+    valueStack: "Halo Keliling Thailand! Saya ingin memesan City Tour privat seharian. [dari: Grand Slam Offer]",
+    cta: "Halo Keliling Thailand! Saya ingin cek ketersediaan City Tour. [dari: CTA Section]",
   },
   en: {
-    hero: "Hello Keliling Thailand! I'm interested in the Alphard Experience and would like a consultation. [from: Hero Section]",
+    hero: "Hello Keliling Thailand! I'm interested in a private city tour and would like a consultation. [from: Hero Section]",
     fleet: "Hello Keliling Thailand! I need help choosing the right vehicle. [from: Fleet Section]",
     whyUs: "Hello Keliling Thailand! I'd like a free consultation about your transport services. [from: Free Consultation]",
-    valueStack: "Hello Keliling Thailand! I'd like to claim the 10-hour Alphard charter offer. [from: Grand Slam Offer]",
-    cta: "Hello Keliling Thailand! I'd like to check Alphard availability. [from: CTA Section]",
+    valueStack: "Hello Keliling Thailand! I'd like to book a full-day private city tour. [from: Grand Slam Offer]",
+    cta: "Hello Keliling Thailand! I'd like to check city tour availability. [from: CTA Section]",
   },
   th: {
-    hero: "สวัสดี Keliling Thailand! ฉันสนใจ Alphard Experience และต้องการปรึกษา [จาก: Hero Section]",
+    hero: "สวัสดี Keliling Thailand! ฉันสนใจทัวร์เมืองส่วนตัวและต้องการปรึกษา [จาก: Hero Section]",
     fleet: "สวัสดี Keliling Thailand! ฉันต้องการความช่วยเหลือในการเลือกรถ [จาก: Fleet Section]",
     whyUs: "สวัสดี Keliling Thailand! ฉันต้องการปรึกษาฟรีเกี่ยวกับบริการรถ [จาก: ปรึกษาฟรี]",
-    valueStack: "สวัสดี Keliling Thailand! ฉันต้องการใช้ข้อเสนอเช่า Alphard 10 ชั่วโมง [จาก: Grand Slam Offer]",
-    cta: "สวัสดี Keliling Thailand! ฉันต้องการเช็กคิว Alphard [จาก: CTA Section]",
+    valueStack: "สวัสดี Keliling Thailand! ฉันต้องการจองทัวร์เมืองส่วนตัวแบบเต็มวัน [จาก: Grand Slam Offer]",
+    cta: "สวัสดี Keliling Thailand! ฉันต้องการเช็กคิวทัวร์เมือง [จาก: CTA Section]",
   },
 } as const;
 
@@ -41,91 +41,69 @@ function buildWaLink(section: keyof typeof WA_MESSAGES.id, lang: "id" | "en" | "
 }
 
 const HERO_SLIDES = [
-  {
-    src: "/Toyota_Alphard_Vellfire_001.jpg",
-    label: "Toyota Alphard & Vellfire",
-    tag: "Full-Day Alphard Charter",
-    altKey: "slide1" as const,
-    imagePosition: "72% center",
-    mobileImagePosition: "68% center",
-  },
-  {
-    src: "/toyotaalphard.jpg",
-    label: "Toyota Alphard",
-    tag: "Airport Transfer Premium",
-    altKey: "slide2" as const,
-    imagePosition: "70% center",
-    mobileImagePosition: "62% center",
-  },
-  {
-    src: "/toyotaalphard1.jpg",
-    label: "Toyota Alphard Lineup",
-    tag: "City Tour & Intercity",
-    altKey: "slide3" as const,
-    imagePosition: "60% center",
-    mobileImagePosition: "58% center",
-  },
+  { tag: "Bangkok City Tour" },
+  { tag: "Pattaya & Hua Hin Day Trips" },
+  { tag: "Airport Transfer & Intercity" },
 ];
 
 const FLEET_VEHICLE_SRCS = [
-  { src: "/Alphard.webp", altKey: "fleet1" as const },
-  { src: "/Fortuner.webp", altKey: "fleet2" as const },
   { src: "/Altis.webp", altKey: "fleet3" as const },
+  { src: "/Fortuner.webp", altKey: "fleet2" as const },
   { src: "/luxury van .webp", altKey: "fleet4" as const },
   { src: "/bus.png", altKey: "fleet5" as const },
 ];
 
 const HOMEPAGE_COPY = {
   id: {
-    heroLabel: "Signature Offer",
-    heroTitle: "Standar baru perjalanan privat premium di Thailand",
-    heroAccent: "The Alphard Experience",
+    heroLabel: "City Tours",
+    heroTitle: "Cara baru menjelajahi Thailand: city tour privat sesuai keinginan Anda",
+    heroAccent: "Rancang Itinerary Anda",
     heroSubtitle:
-      "Pilihan utama untuk airport transfer, city ride, dan full-day charter dengan kenyamanan yang lebih eksklusif. Fortuner, Sedan, Van, dan Bus tetap tersedia sebagai alternatif sesuai kebutuhan perjalanan Anda.",
+      "Pilih kota, pilih tempat wisata, dan kami antar dengan Altis, SUV, Van, atau Mini Bus. Tersedia juga airport transfer dan rute antar kota.",
     heroHighlights: [
-      "Pilihan utama untuk 1-6 tamu dengan standar VIP",
-      "Ideal untuk airport pickup, city ride, dan charter seharian",
+      "Pilih sendiri kota dan tempat wisata",
+      "Altis, SUV, Van, hingga Mini Bus",
       "Driver profesional, harga transparan, konfirmasi cepat via WhatsApp",
     ],
-    primaryCta: "Pesan Alphard via WhatsApp",
+    primaryCta: "Pesan City Tour via WhatsApp",
     secondaryCta: "Lihat opsi kendaraan",
     bookingBadge: "Direkomendasikan",
     bookingTitle: "Reservasi Cepat",
     bookingSubtitle:
-      "Default ke Alphard. Ubah bila perlu.",
+      "Pilih layanan dan kendaraan Anda.",
     fleetEyebrow: "Pilihan Kendaraan",
-    fleetTitle: "Alphard jadi fokus utama. Kendaraan lain tetap tersedia.",
+    fleetTitle: "Pilih kendaraan sesuai ukuran grup Anda.",
     fleetSubtitle:
-      "Pilih Alphard untuk pengalaman premium. Fortuner, Sedan, Van, dan Bus tetap siap untuk kebutuhan kapasitas dan budget yang berbeda.",
-    featuredLabel: "Primary Offer",
-    featuredCapacity: "Ideal untuk 1-6 tamu premium",
+      "Altis, SUV, Van, dan Mini Bus siap untuk city tour, day trip, dan airport transfer di seluruh Thailand.",
+    featuredLabel: "Paling Populer",
+    featuredCapacity: "Ideal untuk 1-3 tamu",
     featuredDescription:
-      "Pilih Alphard saat Anda menginginkan kabin yang lebih lega, arrival yang lebih rapi, dan perjalanan privat yang terasa lebih eksklusif sepanjang trip.",
+      "Sedan Altis nyaman dan hemat untuk pasangan atau grup kecil yang ingin city tour atau airport transfer di Bangkok.",
     featuredPoints: [
-      "Airport transfer premium tanpa repot",
-      "Nyaman untuk keluarga, eksekutif, dan honeymoon",
+      "Airport transfer cepat dan nyaman",
+      "Pas untuk pasangan dan grup kecil",
       "Cocok untuk rute Bangkok maupun antar kota",
     ],
     alternativesLabel: "Pilihan Kendaraan Lainnya",
     alternativesTitle: "Perlu setup perjalanan yang berbeda?",
     alternativesSubtitle:
-      "Gunakan pilihan di bawah jika prioritas Anda adalah kapasitas grup yang lebih besar, bentuk kendaraan tertentu, atau kebutuhan operasional khusus.",
+      "Gunakan pilihan di bawah jika prioritas Anda adalah kapasitas grup yang lebih besar atau kebutuhan operasional khusus.",
     fleetCta: "Konsultasikan kendaraan yang tepat",
     servicesSubtitle:
-      "Setiap layanan kami dapat dimulai dari Alphard sebagai opsi premium, lalu disesuaikan ke Fortuner, Sedan, Van, atau Bus saat rute, jumlah tamu, atau budget menuntut format yang berbeda.",
+      "Setiap layanan bisa memakai Altis, SUV, Van, atau Mini Bus sesuai rute, jumlah tamu, dan budget Anda.",
     whyUsSubtitle:
-      "Alphard Experience bukan sekadar upgrade kendaraan. Ini adalah standar layanan privat kami untuk memastikan perjalanan Anda terasa halus, tepat waktu, dan premium dari awal sampai selesai.",
-    ctaTitle: "Jadikan Alphard standar perjalanan Anda di Thailand.",
+      "City tour privat kami dirancang agar perjalanan Anda terasa halus, tepat waktu, dan menyenangkan dari awal sampai selesai.",
+    ctaTitle: "Rancang city tour Anda di Thailand sekarang.",
     ctaSubtitle:
-      "Kirim rute, tanggal, dan jumlah tamu Anda. Kami prioritaskan Alphard terlebih dahulu, lalu sarankan Fortuner, Sedan, Van, atau Bus bila itu lebih cocok untuk trip Anda.",
+      "Kirim kota, tempat wisata, tanggal, dan jumlah tamu Anda. Kami sarankan Altis, SUV, Van, atau Mini Bus yang paling pas untuk trip Anda.",
     insideLabel: "Yang Anda Dapatkan",
-    ctaPrimary: "Cek Ketersediaan Alphard",
+    ctaPrimary: "Cek Ketersediaan City Tour",
     ctaSecondary: "Lihat Semua Layanan",
-    alphardHighlights: [
-      "Captain chair dengan sandaran individual",
-      "Dual-zone climate control",
-      "Tirai privasi & kabin senyap",
-      "USB & wireless charging",
+    serviceHighlights: [
+      "Driver profesional berbahasa Indonesia & Inggris",
+      "Jemput & antar langsung di hotel",
+      "Air mineral & WiFi di kendaraan",
+      "Harga all-in tanpa biaya tersembunyi",
     ],
     errorDate: "Silakan pilih tanggal terlebih dahulu.",
     errorPickup: "Silakan isi lokasi penjemputan.",
@@ -147,55 +125,55 @@ const HOMEPAGE_COPY = {
     waPax: "Jumlah orang",
   },
   en: {
-    heroLabel: "Signature Offer",
-    heroTitle: "A new standard for premium private travel in Thailand",
-    heroAccent: "The Alphard Experience",
+    heroLabel: "City Tours",
+    heroTitle: "A new way to explore Thailand: private city tours built your way",
+    heroAccent: "Build Your Itinerary",
     heroSubtitle:
-      "Our lead option for airport transfers, city rides, and full-day charters with a more polished private travel experience. Fortuner, Sedan, Van, and Bus remain available when a different setup fits better.",
+      "Pick a city, choose your attractions, and we drive you in an Altis, SUV, Van, or Mini Bus. Airport transfers and intercity routes available too.",
     heroHighlights: [
-      "Primary choice for 1-6 guests seeking a VIP standard",
-      "Ideal for airport pickups, city rides, and full-day charters",
+      "Choose your own city and attractions",
+      "Altis, SUV, Van, up to Mini Bus",
       "Professional driver, transparent pricing, fast WhatsApp confirmation",
     ],
-    primaryCta: "Reserve Alphard on WhatsApp",
+    primaryCta: "Book a City Tour on WhatsApp",
     secondaryCta: "See vehicle options",
     bookingBadge: "Recommended",
     bookingTitle: "Quick Reservation",
     bookingSubtitle:
-      "Defaulted to Alphard. Change it if needed.",
+      "Choose your service and vehicle.",
     fleetEyebrow: "Vehicle Options",
-    fleetTitle: "Alphard leads. The rest of the fleet stays available.",
+    fleetTitle: "Pick the vehicle that fits your group size.",
     fleetSubtitle:
-      "Choose Alphard for the most premium ride. Fortuner, Sedan, Van, and Bus are still ready for different group sizes and budgets.",
-    featuredLabel: "Primary Offer",
-    featuredCapacity: "Ideal for 1-6 premium guests",
+      "Altis, SUV, Van, and Mini Bus are ready for city tours, day trips, and airport transfers across Thailand.",
+    featuredLabel: "Most Popular",
+    featuredCapacity: "Ideal for 1-3 guests",
     featuredDescription:
-      "Choose Alphard when you want more cabin space, a more polished arrival, and a private ride that feels more refined throughout the trip.",
+      "The Altis sedan is comfortable and affordable for couples or small groups wanting a city tour or airport transfer in Bangkok.",
     featuredPoints: [
-      "Premium airport transfers with less friction",
-      "Comfortable for families, executives, and honeymoon trips",
+      "Fast, comfortable airport transfers",
+      "Great for couples and small groups",
       "Strong fit for Bangkok itineraries and intercity rides",
     ],
     alternativesLabel: "Other Vehicle Choices",
     alternativesTitle: "Need a different travel setup?",
     alternativesSubtitle:
-      "Use the options below when larger group capacity, a different vehicle format, or operational needs matter more than the Alphard cabin experience.",
+      "Use the options below when larger group capacity or specific operational needs matter more.",
     fleetCta: "Get help choosing the right vehicle",
     servicesSubtitle:
-      "Each service can begin with Alphard as the premium default, then shift to Fortuner, Sedan, Van, or Bus when route shape, guest count, or budget makes more sense.",
+      "Each service can use an Altis, SUV, Van, or Mini Bus to match your route, guest count, and budget.",
     whyUsSubtitle:
-      "Alphard Experience is not just a vehicle upgrade. It is our clearest premium standard for keeping your private trip smooth, punctual, and polished from arrival to drop-off.",
-    ctaTitle: "Make Alphard your travel standard in Thailand.",
+      "Our private city tours are built to keep your trip smooth, punctual, and enjoyable from start to finish.",
+    ctaTitle: "Build your city tour in Thailand today.",
     ctaSubtitle:
-      "Send your route, date, and guest count. We prioritise Alphard first, then recommend Fortuner, Sedan, Van, or Bus when it is the better fit for your trip.",
+      "Send your city, attractions, date, and guest count. We'll recommend the Altis, SUV, Van, or Mini Bus that fits your trip best.",
     insideLabel: "What You Get",
-    ctaPrimary: "Check Alphard Availability",
+    ctaPrimary: "Check City Tour Availability",
     ctaSecondary: "Explore All Services",
-    alphardHighlights: [
-      "Captain chairs with individual recline",
-      "Dual-zone climate control",
-      "Privacy curtains & quiet cabin",
-      "USB & wireless charging",
+    serviceHighlights: [
+      "Professional English & Indonesian-speaking driver",
+      "Direct hotel pickup & drop-off",
+      "Bottled water & WiFi on board",
+      "All-in pricing with no hidden fees",
     ],
     errorDate: "Please select a date.",
     errorPickup: "Please enter a pickup location.",
@@ -217,55 +195,55 @@ const HOMEPAGE_COPY = {
     waPax: "Passengers",
   },
   th: {
-    heroLabel: "ข้อเสนอหลัก",
-    heroTitle: "การเดินทางส่วนตัวระดับพรีเมียมในไทยกับ",
-    heroAccent: "Alphard Experience",
+    heroLabel: "ทัวร์เมือง",
+    heroTitle: "วิธีใหม่ในการเที่ยวไทย: ทัวร์เมืองส่วนตัวในแบบของคุณ",
+    heroAccent: "ออกแบบทริปของคุณ",
     heroSubtitle:
-      "ตัวเลือกหลักสำหรับรับส่งสนามบิน เดินทางในเมือง และเหมาส่วนตัวทั้งวัน ส่วน Fortuner, Sedan, Van และ Bus ยังพร้อมเป็นตัวเลือกทางเลือก",
+      "เลือกเมือง เลือกสถานที่ท่องเที่ยว แล้วเราพาไปด้วย Altis, SUV, Van หรือ Mini Bus มีบริการรับส่งสนามบินและเส้นทางข้ามเมืองด้วย",
     heroHighlights: [
-      "ตัวเลือกหลักสำหรับกลุ่มพรีเมียม 1-6 ท่าน",
-      "เหมาะกับรับส่งสนามบิน เดินทางในเมือง และเหมาทั้งวัน",
+      "เลือกเมืองและสถานที่ท่องเที่ยวได้เอง",
+      "มีทั้ง Altis, SUV, Van จนถึง Mini Bus",
       "คนขับมืออาชีพ ราคาชัดเจน ตอบ WhatsApp รวดเร็ว",
     ],
-    primaryCta: "จอง Alphard ทาง WhatsApp",
+    primaryCta: "จองทัวร์เมืองทาง WhatsApp",
     secondaryCta: "ดูตัวเลือกยานพาหนะ",
     bookingBadge: "แนะนำ",
     bookingTitle: "จองแบบรวดเร็ว",
     bookingSubtitle:
-      "ตั้งต้นเป็น Alphard และเปลี่ยนได้หากจำเป็น",
+      "เลือกบริการและรถของคุณ",
     fleetEyebrow: "ตัวเลือกยานพาหนะ",
-    fleetTitle: "ให้ Alphard เป็นตัวเลือกหลัก และรถอื่นยังพร้อมใช้งาน",
+    fleetTitle: "เลือกรถให้เหมาะกับขนาดกลุ่มของคุณ",
     fleetSubtitle:
-      "เลือก Alphard เมื่ออยากได้ประสบการณ์พรีเมียมที่สุด ส่วน Fortuner, Sedan, Van และ Bus ยังพร้อมสำหรับจำนวนผู้โดยสารและงบประมาณที่ต่างกัน",
-    featuredLabel: "ข้อเสนอหลัก",
-    featuredCapacity: "เหมาะสำหรับแขกระดับพรีเมียม 1-6 ท่าน",
+      "Altis, SUV, Van และ Mini Bus พร้อมสำหรับทัวร์เมือง ทริปรายวัน และรับส่งสนามบินทั่วประเทศไทย",
+    featuredLabel: "ยอดนิยม",
+    featuredCapacity: "เหมาะสำหรับ 1-3 ท่าน",
     featuredDescription:
-      "เลือก Alphard เมื่อต้องการพื้นที่ห้องโดยสารมากขึ้น ภาพลักษณ์การเดินทางที่ดูดีขึ้น และประสบการณ์รถส่วนตัวที่พรีเมียมตลอดทริป",
+      "รถเก๋ง Altis สะดวกสบายและประหยัด เหมาะสำหรับคู่รักหรือกลุ่มเล็กที่ต้องการทัวร์เมืองหรือรับส่งสนามบินในกรุงเทพ",
     featuredPoints: [
-      "รับส่งสนามบินแบบพรีเมียมที่ลื่นไหลกว่า",
-      "สบายสำหรับครอบครัว ผู้บริหาร และฮันนีมูน",
+      "รับส่งสนามบินรวดเร็วและสบาย",
+      "เหมาะสำหรับคู่รักและกลุ่มเล็ก",
       "เหมาะกับเส้นทางในกรุงเทพและข้ามเมือง",
     ],
     alternativesLabel: "ตัวเลือกรถเพิ่มเติม",
     alternativesTitle: "ต้องการรูปแบบการเดินทางแบบอื่น?",
     alternativesSubtitle:
-      "ใช้ตัวเลือกด้านล่างเมื่อจำนวนผู้โดยสารมากขึ้น ต้องการรูปแบบรถที่ต่างออกไป หรือมีข้อกำหนดการใช้งานเฉพาะมากกว่าประสบการณ์ห้องโดยสารของ Alphard",
+      "ใช้ตัวเลือกด้านล่างเมื่อต้องการรองรับผู้โดยสารมากขึ้นหรือมีข้อกำหนดการใช้งานเฉพาะ",
     fleetCta: "ให้เราช่วยเลือกรถที่เหมาะ",
     servicesSubtitle:
-      "ทุกบริการของเราสามารถเริ่มต้นด้วย Alphard ในฐานะตัวเลือกระดับพรีเมียม แล้วค่อยเปลี่ยนเป็น Fortuner, Sedan, Van หรือ Bus เมื่อเส้นทาง จำนวนผู้โดยสาร หรือ งบประมาณเหมาะสมกว่า",
+      "ทุกบริการสามารถใช้ Altis, SUV, Van หรือ Mini Bus ให้เหมาะกับเส้นทาง จำนวนผู้โดยสาร และงบประมาณของคุณ",
     whyUsSubtitle:
-      "Alphard Experience ไม่ใช่แค่การอัปเกรดยานพาหนะ แต่เป็นมาตรฐานบริการพรีเมียมของเราที่ทำให้ทริปส่วนตัวของคุณราบรื่น ตรงเวลา และดูดีตั้งแต่ต้นจนจบ",
-    ctaTitle: "ให้ Alphard เป็นมาตรฐานการเดินทางของคุณในไทย",
+      "ทัวร์เมืองส่วนตัวของเราออกแบบมาเพื่อให้ทริปของคุณราบรื่น ตรงเวลา และสนุกตั้งแต่ต้นจนจบ",
+    ctaTitle: "ออกแบบทัวร์เมืองของคุณในไทยวันนี้",
     ctaSubtitle:
-      "ส่งเส้นทาง วันที่ และจำนวนผู้โดยสารมาให้เรา เราจะให้ Alphard มาก่อน แล้วค่อยแนะนำ Fortuner, Sedan, Van หรือ Bus หากเหมาะกับทริปมากกว่า",
+      "ส่งเมือง สถานที่ท่องเที่ยว วันที่ และจำนวนผู้โดยสารมาให้เรา เราจะแนะนำ Altis, SUV, Van หรือ Mini Bus ที่เหมาะกับทริปของคุณที่สุด",
     insideLabel: "สิ่งที่คุณจะได้รับ",
-    ctaPrimary: "เช็กคิว Alphard",
+    ctaPrimary: "เช็กคิวทัวร์เมือง",
     ctaSecondary: "ดูบริการทั้งหมด",
-    alphardHighlights: [
-      "เบาะ captain chair ปรับเอนได้",
-      "ระบบแอร์ dual-zone",
-      "ม่านบังตา & ห้องโดยสารเงียบ",
-      "USB & wireless charging",
+    serviceHighlights: [
+      "คนขับมืออาชีพพูดภาษาอังกฤษและอินโดนีเซีย",
+      "รับส่งถึงโรงแรมโดยตรง",
+      "น้ำดื่มและ WiFi ในรถ",
+      "ราคารวมทุกอย่าง ไม่มีค่าใช้จ่ายแอบแฝง",
     ],
     errorDate: "กรุณาเลือกวันที่",
     errorPickup: "กรุณากรอกจุดรับ",
@@ -392,8 +370,6 @@ export default function HomeContent() {
   const alts = extendedTranslations[language].alts;
   const pageCopy = HOMEPAGE_COPY[language];
   const [current, setCurrent] = useState(0);
-  const [prev, setPrev] = useState<number | null>(null);
-  const [transitioning, setTransitioning] = useState(false);
   const [bookingService, setBookingService] = useState(0); // 0=airport, 1=city tour, 2=intercity
   const [bookingVehicle, setBookingVehicle] = useState(t.booking.vehicle1);
   // Airport Transfer
@@ -535,57 +511,23 @@ export default function HomeContent() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrent((c) => {
-        const next = (c + 1) % HERO_SLIDES.length;
-        setPrev(c);
-        setTransitioning(true);
-        setTimeout(() => {
-          setPrev(null);
-          setTransitioning(false);
-        }, 1000);
-        return next;
-      });
-    }, 8000);
+      setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
   function goTo(idx: number) {
-    if (idx === current || transitioning) return;
-    setPrev(current);
-    setTransitioning(true);
     setCurrent(idx);
-    setTimeout(() => {
-      setPrev(null);
-      setTransitioning(false);
-    }, 1000);
   }
 
   return (
     <>
       {/* ── HERO ── */}
       <section className="relative min-h-[100dvh] flex items-center overflow-x-hidden bg-[#050505]">
-        {HERO_SLIDES.map((slide, i) => (
-          <div
-            key={slide.src}
-            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-            style={{
-              opacity: i === current ? 1 : i === prev ? 0 : 0,
-              zIndex: i === current ? 1 : i === prev ? 2 : 0,
-            }}
-          >
-            <Image
-              src={slide.src}
-              alt={alts[slide.altKey]}
-              fill
-              priority={i === 0}
-              className="object-cover object-center"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/85 via-[#050505]/50 to-[#050505]/10" />
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050505]/60 to-transparent" />
-            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
-          </div>
-        ))}
+        {/* Brand background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#050505] via-[#1a1a1a] to-[#050505]" />
+        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[#FFC531]/20 blur-3xl" />
+        <div className="absolute bottom-0 -left-24 h-80 w-80 rounded-full bg-[#F5D582]/10 blur-3xl" />
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 w-full max-w-[90vw]">
           <div
@@ -844,12 +786,11 @@ export default function HomeContent() {
             <div className="self-start overflow-hidden rounded-[2rem] border border-[#FFC531]/30 bg-white/95 shadow-[0_24px_70px_rgba(16,32,60,0.12)]">
               <div className="relative aspect-[6/5] min-h-[320px] sm:min-h-[360px]">
                 <Image
-                  src={HERO_SLIDES[0].src}
-                  alt={alts[HERO_SLIDES[0].altKey]}
+                  src={FLEET_VEHICLE_SRCS[0].src}
+                  alt={alts[FLEET_VEHICLE_SRCS[0].altKey]}
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 55vw"
-                  style={{ objectPosition: HERO_SLIDES[0].imagePosition }}
                 />
                 <div className="absolute left-5 top-5 rounded-full bg-[#FFC531] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-black">
                   {pageCopy.featuredLabel}
@@ -901,7 +842,7 @@ export default function HomeContent() {
                     {pageCopy.insideLabel}
                   </p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                    {pageCopy.alphardHighlights.map((item) => (
+                    {pageCopy.serviceHighlights.map((item) => (
                       <div key={item} className="flex items-center gap-2 text-sm text-gray-600">
                         <span className="text-[#FFC531] font-bold shrink-0">✓</span>
                         {item}

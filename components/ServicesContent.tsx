@@ -8,17 +8,17 @@ const WA_NUMBER = "6285750923934";
 
 const SVC_WA_MESSAGES = {
   id: [
-    "Halo Keliling Thailand! Saya ingin memesan Alphard Experience. [dari: Services - Alphard]",
+    "Halo Keliling Thailand! Saya ingin memesan City Tour Privat. [dari: Services - City Tour]",
     "Halo Keliling Thailand! Saya ingin memesan Airport Transfer. [dari: Services - Airport Transfer]",
     "Halo Keliling Thailand! Saya ingin bertanya tentang kendaraan lain. [dari: Services - Other Vehicles]",
   ],
   en: [
-    "Hello Keliling Thailand! I'd like to book the Alphard Experience. [from: Services - Alphard]",
+    "Hello Keliling Thailand! I'd like to book a Private City Tour. [from: Services - City Tour]",
     "Hello Keliling Thailand! I'd like to book an Airport Transfer. [from: Services - Airport Transfer]",
     "Hello Keliling Thailand! I'd like to ask about other vehicles. [from: Services - Other Vehicles]",
   ],
   th: [
-    "สวัสดี Keliling Thailand! ฉันต้องการจอง Alphard Experience [จาก: Services - Alphard]",
+    "สวัสดี Keliling Thailand! ฉันต้องการจองทัวร์เมืองส่วนตัว [จาก: Services - City Tour]",
     "สวัสดี Keliling Thailand! ฉันต้องการจองรับส่งสนามบิน [จาก: Services - Airport Transfer]",
     "สวัสดี Keliling Thailand! ฉันต้องการสอบถามเกี่ยวกับรถอื่น [จาก: Services - Other Vehicles]",
   ],
@@ -96,7 +96,7 @@ export default function ServicesContent() {
 
                   <div className="border-t border-gray-100 pt-6">
                     {svc.highlight ? (
-                      /* Dual-price display for Alphard */
+                      /* Dual-price display for featured service */
                       <div className="grid grid-cols-2 gap-3 mb-4">
                         <div className="bg-[#050505] rounded-xl py-5 px-3 text-center">
                           <div className="text-white/50 text-[10px] font-bold uppercase tracking-widest mb-2">5 jam</div>
