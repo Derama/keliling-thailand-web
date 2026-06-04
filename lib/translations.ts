@@ -1699,6 +1699,15 @@ export const itineraryTranslations = {
       waDuration: "Durasi",
       waPrice: "Estimasi harga",
       waFrom: "[dari: Itinerary Builder]",
+      aiHeading: "Biarkan AI merancang untuk Anda",
+      aiPlaceholder:
+        "Ceritakan perjalanan Anda — mis. keluarga dengan 2 anak, suka kuil & kuliner, santai",
+      aiButton: "Sarankan dengan AI",
+      aiLoading: "AI sedang merancang…",
+      aiApply: "Gunakan saran ini",
+      aiError: "AI sedang tidak tersedia. Silakan pilih tempat secara manual.",
+      aiNoSuggestion:
+        "Tidak dapat membuat saran. Silakan pilih tempat secara manual.",
     },
     cities: {
       bangkok: { name: "Bangkok", tagline: "Tur kota 10 jam" },
@@ -1767,6 +1776,15 @@ export const itineraryTranslations = {
       waDuration: "Duration",
       waPrice: "Estimated price",
       waFrom: "[from: Itinerary Builder]",
+      aiHeading: "Let AI plan it for you",
+      aiPlaceholder:
+        "Describe your trip — e.g. family with 2 kids, love temples & food, relaxed pace",
+      aiButton: "Suggest with AI",
+      aiLoading: "AI is planning…",
+      aiApply: "Use this suggestion",
+      aiError: "AI is unavailable right now. Please pick attractions manually.",
+      aiNoSuggestion:
+        "Couldn't make a suggestion. Please pick attractions manually.",
     },
     cities: {
       bangkok: { name: "Bangkok", tagline: "10-hour city tour" },
@@ -1835,6 +1853,14 @@ export const itineraryTranslations = {
       waDuration: "ระยะเวลา",
       waPrice: "ราคาโดยประมาณ",
       waFrom: "[จาก: Itinerary Builder]",
+      aiHeading: "ให้ AI วางแผนให้คุณ",
+      aiPlaceholder:
+        "เล่าเกี่ยวกับทริปของคุณ — เช่น ครอบครัวมีเด็ก 2 คน ชอบวัดและอาหาร แบบสบาย ๆ",
+      aiButton: "แนะนำด้วย AI",
+      aiLoading: "AI กำลังวางแผน…",
+      aiApply: "ใช้คำแนะนำนี้",
+      aiError: "ขณะนี้ AI ไม่พร้อมใช้งาน กรุณาเลือกสถานที่ด้วยตนเอง",
+      aiNoSuggestion: "ไม่สามารถแนะนำได้ กรุณาเลือกสถานที่ด้วยตนเอง",
     },
     cities: {
       bangkok: { name: "กรุงเทพฯ", tagline: "ทัวร์เมือง 10 ชม." },
