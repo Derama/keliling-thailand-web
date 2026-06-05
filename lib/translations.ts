@@ -1898,3 +1898,115 @@ export const itineraryTranslations = {
     },
   },
 } as const;
+
+// ── Front-page useful sections (How it works / Popular / Area / FAQ) ──
+export const homeSections = {
+  id: {
+    how: {
+      eyebrow: "Cara Kerja",
+      title: "Pesan dalam 3 langkah",
+      steps: [
+        { title: "Pilih kota & tempat wisata", desc: "Pilih satu kota dan tempat yang ingin Anda kunjungi." },
+        { title: "Pilih kendaraan & lihat harga", desc: "Altis, SUV, Van, atau Mini Bus — harga langsung tampil." },
+        { title: "Pesan via WhatsApp", desc: "Kirim itinerary Anda ke kami, konfirmasi cepat tanpa ribet." },
+      ],
+    },
+    popular: {
+      eyebrow: "Tur Populer",
+      title: "Pilihan city tour favorit",
+      from: "Mulai dari",
+      cta: "Rancang tur",
+    },
+    area: {
+      eyebrow: "Area Layanan",
+      title: "Kota & bandara yang kami layani",
+      subtitle: "Berbasis di Bangkok, melayani city tour dan transfer di seluruh Thailand tengah.",
+      citiesLabel: "Kota",
+      airportsLabel: "Bandara",
+      airports: ["Don Mueang (DMK)", "Suvarnabhumi (BKK)"],
+    },
+    faq: {
+      eyebrow: "FAQ",
+      title: "Pertanyaan yang sering diajukan",
+      items: [
+        { q: "Apa saja yang termasuk dalam harga?", a: "Kendaraan, driver profesional, BBM, tol, parkir, serta jemput & antar di hotel. Harga all-in tanpa biaya tersembunyi." },
+        { q: "Bagaimana cara membayar?", a: "Setelah itinerary dikonfirmasi via WhatsApp, kami akan mengarahkan metode pembayaran yang mudah dan aman." },
+        { q: "Driver berbahasa apa?", a: "Tersedia driver berbahasa Indonesia, Inggris, dan Thai." },
+        { q: "Bisakah saya menyesuaikan itinerary?", a: "Tentu. Pilih tempat wisata sesuai keinginan Anda, dan kami sesuaikan rutenya." },
+        { q: "Apakah tersedia airport transfer?", a: "Ya, kami melayani transfer dari Don Mueang (DMK) dan Suvarnabhumi (BKK) dengan harga tetap." },
+      ],
+    },
+  },
+  en: {
+    how: {
+      eyebrow: "How It Works",
+      title: "Book in 3 steps",
+      steps: [
+        { title: "Pick your city & attractions", desc: "Choose one city and the places you want to visit." },
+        { title: "Choose a vehicle & see the price", desc: "Altis, SUV, Van, or Mini Bus — the price shows instantly." },
+        { title: "Book on WhatsApp", desc: "Send us your itinerary and get a fast, hassle-free confirmation." },
+      ],
+    },
+    popular: {
+      eyebrow: "Popular Tours",
+      title: "Favourite city tours",
+      from: "From",
+      cta: "Build tour",
+    },
+    area: {
+      eyebrow: "Service Area",
+      title: "Cities & airports we cover",
+      subtitle: "Based in Bangkok, serving city tours and transfers across central Thailand.",
+      citiesLabel: "Cities",
+      airportsLabel: "Airports",
+      airports: ["Don Mueang (DMK)", "Suvarnabhumi (BKK)"],
+    },
+    faq: {
+      eyebrow: "FAQ",
+      title: "Frequently asked questions",
+      items: [
+        { q: "What's included in the price?", a: "Vehicle, professional driver, fuel, tolls, parking, and hotel pickup & drop-off. All-in pricing with no hidden fees." },
+        { q: "How do I pay?", a: "Once your itinerary is confirmed on WhatsApp, we'll guide you through an easy, secure payment method." },
+        { q: "What languages do drivers speak?", a: "Indonesian, English, and Thai-speaking drivers are available." },
+        { q: "Can I customise the itinerary?", a: "Absolutely. Pick any attractions you like and we'll arrange the route." },
+        { q: "Do you offer airport transfers?", a: "Yes, we serve transfers from Don Mueang (DMK) and Suvarnabhumi (BKK) at fixed prices." },
+      ],
+    },
+  },
+  th: {
+    how: {
+      eyebrow: "วิธีใช้งาน",
+      title: "จองใน 3 ขั้นตอน",
+      steps: [
+        { title: "เลือกเมืองและสถานที่ท่องเที่ยว", desc: "เลือกหนึ่งเมืองและสถานที่ที่คุณอยากไป" },
+        { title: "เลือกรถและดูราคา", desc: "Altis, SUV, Van หรือ Mini Bus — ราคาแสดงทันที" },
+        { title: "จองผ่าน WhatsApp", desc: "ส่งแผนการเดินทางมาให้เรา ยืนยันเร็ว ไม่ยุ่งยาก" },
+      ],
+    },
+    popular: {
+      eyebrow: "ทัวร์ยอดนิยม",
+      title: "ทัวร์เมืองยอดนิยม",
+      from: "เริ่มต้น",
+      cta: "ออกแบบทัวร์",
+    },
+    area: {
+      eyebrow: "พื้นที่ให้บริการ",
+      title: "เมืองและสนามบินที่เราให้บริการ",
+      subtitle: "ฐานอยู่ที่กรุงเทพฯ ให้บริการทัวร์เมืองและรับส่งทั่วภาคกลางของไทย",
+      citiesLabel: "เมือง",
+      airportsLabel: "สนามบิน",
+      airports: ["ดอนเมือง (DMK)", "สุวรรณภูมิ (BKK)"],
+    },
+    faq: {
+      eyebrow: "คำถามที่พบบ่อย",
+      title: "คำถามที่พบบ่อย",
+      items: [
+        { q: "ราคารวมอะไรบ้าง?", a: "รถ คนขับมืออาชีพ น้ำมัน ค่าทางด่วน ที่จอดรถ และรับส่งที่โรงแรม ราคารวมทุกอย่างไม่มีค่าใช้จ่ายแอบแฝง" },
+        { q: "ชำระเงินอย่างไร?", a: "เมื่อยืนยันแผนการเดินทางทาง WhatsApp แล้ว เราจะแนะนำวิธีชำระเงินที่ง่ายและปลอดภัย" },
+        { q: "คนขับพูดภาษาอะไร?", a: "มีคนขับที่พูดภาษาอินโดนีเซีย อังกฤษ และไทย" },
+        { q: "ปรับแผนการเดินทางได้ไหม?", a: "ได้แน่นอน เลือกสถานที่ที่คุณต้องการ แล้วเราจัดเส้นทางให้" },
+        { q: "มีบริการรับส่งสนามบินไหม?", a: "มี เราให้บริการรับส่งจากดอนเมือง (DMK) และสุวรรณภูมิ (BKK) ในราคาคงที่" },
+      ],
+    },
+  },
+} as const;

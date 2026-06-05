@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
-import { extendedTranslations, itineraryTranslations } from "@/lib/translations";
+import { extendedTranslations, itineraryTranslations, homeSections } from "@/lib/translations";
+import { cities as itineraryCities } from "@/lib/itinerary";
 import { useEffect, useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroCityPicker from "@/components/HeroCityPicker";
@@ -372,6 +373,14 @@ export default function HomeContent() {
   const primaryVehicle = t.fleetItems[0];
   const alternativeVehicles = t.fleetItems.slice(1);
   const itinUi = itineraryTranslations[language].ui;
+  const itinCities = itineraryTranslations[language].cities;
+  const hs = homeSections[language];
+  const CITY_EMOJI: Record<string, string> = {
+    bangkok: "🏙️", pattaya: "🏖️", ayutthaya: "🏛️",
+    kanchanaburi: "🌉", huahin: "🌅", khaoyai: "⛰️",
+  };
+  const fromPrice = (prices: Record<string, number | undefined>) =>
+    Math.min(...Object.values(prices).filter((v): v is number => v != null));
 
   // Hero city picker -> opens the step-by-step itinerary wizard.
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -521,6 +530,64 @@ export default function HomeContent() {
           >
             {itinUi.step1} →
           </button>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/60">{hs.how.eyebrow}</p>
+            <h2 className="mt-2 text-3xl font-extrabold text-[#050505] sm:text-4xl">{hs.how.title}</h2>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {hs.how.steps.map((s, i) => (
+              <div key={s.title} className="outline-card p-6">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#050505] bg-[#FFC531] text-base font-extrabold text-[#050505]">
+                  {i + 1}
+                </span>
+                <h3 className="mt-4 text-lg font-bold text-[#050505]">{s.title}</h3>
+                <p className="mt-2 text-sm text-[#050505]/70">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── POPULAR TOURS + PRICES ── */}
+      <section className="bg-[#F4F4F4] py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/60">{hs.popular.eyebrow}</p>
+            <h2 className="mt-2 text-3xl font-extrabold text-[#050505] sm:text-4xl">{hs.popular.title}</h2>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {itineraryCities.map((c) => {
+              const ct = itinCities[c.id as keyof typeof itinCities];
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => handlePickCity(c.id)}
+                  className="city-tile group relative aspect-[16/10] overflow-hidden rounded-2xl border-2 border-[#050505] text-left"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#050505]" />
+                  <div className="city-tile-img absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${c.image})` }} />
+                  <span className="absolute left-3 top-2.5 text-2xl drop-shadow-md">{CITY_EMOJI[c.id]}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4">
+                    <div>
+                      <span className="block text-lg font-extrabold text-white">{ct.name}</span>
+                      <span className="block text-[11px] text-white/70">{ct.tagline}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-[10px] uppercase tracking-widest text-white/60">{hs.popular.from}</span>
+                      <span className="block text-base font-extrabold text-[#FFC531]">฿{fromPrice(c.prices).toLocaleString("en-US")}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -757,61 +824,6 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ── VALUE STACK ── */}
-      <section className="py-24 bg-[#050505]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-[#FFC531] font-bold text-xs uppercase tracking-widest">
-              {t.valueStack.eyebrow}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
-              {t.valueStack.title}
-            </h2>
-            <p className="text-white/60 mt-3 max-w-xl mx-auto text-sm">
-              {t.valueStack.subtitle}
-            </p>
-          </div>
-
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-            <div className="divide-y divide-white/10">
-              {t.valueStack.items.map((item) => (
-                <div key={item.name} className="flex items-center justify-between px-6 sm:px-8 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#FFC531] font-extrabold text-lg shrink-0">✓</span>
-                    <span className="text-white text-sm">{item.name}</span>
-                  </div>
-                  <span className="text-white/40 text-sm line-through shrink-0 ml-4">{item.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="bg-[#FFC531]/10 border-t border-[#FFC531]/30 px-6 sm:px-8 py-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-white/50 text-xs uppercase tracking-widest mb-1">{t.valueStack.totalLabel}</div>
-                  <div className="text-white/40 line-through text-xl font-bold">{t.valueStack.totalValue}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[#FFC531] text-xs uppercase tracking-widest font-bold mb-1">{t.valueStack.payLabel}</div>
-                  <div className="text-[#FFC531] text-3xl font-extrabold">{t.valueStack.payValue}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <a
-              href={buildWaLink("valueStack", language)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="whatsapp-btn text-base shadow-lg"
-            >
-              <WhatsAppIcon />
-              {t.valueStack.ctaBtn}
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* ── GUARANTEE ── */}
       <section className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -839,6 +851,59 @@ export default function HomeContent() {
               </div>
             ))}
           </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ── SERVICE AREA ── */}
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/60">{hs.area.eyebrow}</p>
+          <h2 className="mt-2 text-3xl font-extrabold text-[#050505] sm:text-4xl">{hs.area.title}</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-[#050505]/70">{hs.area.subtitle}</p>
+          <div className="mt-8">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/50">{hs.area.citiesLabel}</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {itineraryCities.map((c) => {
+                const ct = itinCities[c.id as keyof typeof itinCities];
+                return (
+                  <span key={c.id} className="rounded-full border-2 border-[#050505] bg-[#FAE7B8] px-4 py-1.5 text-sm font-semibold text-[#050505]">
+                    {CITY_EMOJI[c.id]} {ct.name}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-6">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/50">{hs.area.airportsLabel}</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {hs.area.airports.map((a) => (
+                <span key={a} className="rounded-full border-2 border-[#050505] bg-white px-4 py-1.5 text-sm font-semibold text-[#050505]">
+                  ✈️ {a}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section className="bg-[#F4F4F4] py-20">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#050505]/60">{hs.faq.eyebrow}</p>
+            <h2 className="mt-2 text-3xl font-extrabold text-[#050505] sm:text-4xl">{hs.faq.title}</h2>
+          </div>
+          <div className="space-y-3">
+            {hs.faq.items.map((item) => (
+              <details key={item.q} className="group rounded-xl border-2 border-[#050505] bg-white px-5 py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-[#050505]">
+                  {item.q}
+                  <span className="shrink-0 text-xl transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-[#050505]/70">{item.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
