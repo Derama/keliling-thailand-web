@@ -24,7 +24,7 @@ export default function HomeContent() {
     <main>
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-center">
-        <Image src={HERO_IMAGE} alt="Thailand" fill className="object-cover" priority sizes="100vw" />
+        <Image src={HERO_IMAGE} alt={t.home.heroTitle} fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-[#1B2A4A]/60" />
         <div className="relative max-w-6xl mx-auto px-4 py-32 text-center text-white">
           <h1 className="text-4xl sm:text-5xl font-extrabold max-w-3xl mx-auto leading-tight">
@@ -54,7 +54,7 @@ export default function HomeContent() {
           <h2 className="text-3xl font-extrabold text-[#1B2A4A] text-center">{t.home.howTitle}</h2>
           <div className="grid sm:grid-cols-3 gap-6 mt-10">
             {steps.map((s, i) => (
-              <div key={s.title} className="text-center px-4">
+              <div key={i} className="text-center px-4">
                 <div className="w-12 h-12 mx-auto rounded-full bg-[#F5C518] text-[#1B2A4A] font-extrabold flex items-center justify-center text-xl">
                   {i + 1}
                 </div>
@@ -94,7 +94,7 @@ export default function HomeContent() {
                 className="rounded-xl border border-gray-200 p-4 text-center hover:border-[#F5C518] transition-colors"
               >
                 <div className="relative h-24 mb-3">
-                  <Image src={v.image} alt={t.vehicleNames[v.id]} fill className="object-contain" sizes="25vw" />
+                  <Image src={v.image} alt={t.vehicleNames[v.id]} fill className="object-contain" sizes="(max-width: 1024px) 50vw, 25vw" />
                 </div>
                 <p className="font-bold text-[#1B2A4A] text-sm">{t.vehicleNames[v.id]}</p>
                 <p className="text-xs text-gray-500">
@@ -117,8 +117,8 @@ export default function HomeContent() {
           <ScrollReveal>
             <h2 className="text-3xl font-extrabold text-[#1B2A4A]">{t.home.trustTitle}</h2>
             <div className="grid sm:grid-cols-3 gap-6 mt-8">
-              {t.testimony.items.slice(0, 3).map((item) => (
-                <figure key={item.name} className="bg-white rounded-2xl p-5 shadow-sm">
+              {t.testimony.items.slice(0, 3).map((item, i) => (
+                <figure key={i} className="bg-white rounded-2xl p-5 shadow-sm">
                   <p className="text-[#F5C518]">{"★".repeat(item.stars)}</p>
                   <blockquote className="mt-2 text-sm text-gray-700">{item.text}</blockquote>
                   <figcaption className="mt-3 text-sm font-bold text-[#1B2A4A]">

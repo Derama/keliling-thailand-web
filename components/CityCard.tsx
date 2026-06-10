@@ -9,6 +9,7 @@ import { cityNames } from "@/lib/translations";
 export default function CityCard({ city }: { city: City }) {
   const { t } = useLanguage();
   const price = cheapestPrice(city.id);
+  const name = cityNames[city.id] ?? city.id;
 
   return (
     <Link
@@ -18,14 +19,14 @@ export default function CityCard({ city }: { city: City }) {
       <div className="relative h-48">
         <Image
           src={city.image}
-          alt={cityNames[city.id]}
+          alt={name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, 33vw"
         />
       </div>
       <div className="p-4">
-        <h3 className="font-bold text-[#1B2A4A] text-lg">{cityNames[city.id]}</h3>
+        <h3 className="font-bold text-[#1B2A4A] text-lg">{name}</h3>
         <p className="text-sm text-gray-500">
           {city.durationHours} {t.common.hours} · {city.attractions.length}{" "}
           {t.tours.attractions}
