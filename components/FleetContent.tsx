@@ -26,9 +26,9 @@ export default function FleetContent() {
               <div className="relative h-52 bg-gray-100">
                 <Image
                   src={v.image}
-                  alt={info.name}
+                  alt=""
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 640px) 100vw, 50vw"
                 />
               </div>
@@ -45,6 +45,7 @@ export default function FleetContent() {
                   href={waLink(msg)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`${t.common.whatsapp} – ${info.name}`}
                   className="whatsapp-btn inline-flex mt-4"
                 >
                   {t.common.whatsapp}
