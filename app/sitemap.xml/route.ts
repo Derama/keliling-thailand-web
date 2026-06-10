@@ -1,3 +1,5 @@
+import { cities } from "@/lib/tours";
+
 const productionUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   process.env.VERCEL_PROJECT_PRODUCTION_URL ??
@@ -9,14 +11,17 @@ const baseUrl = productionUrl.startsWith("http")
 
 const routes = [
   { path: "", changeFrequency: "weekly", priority: 1 },
-  { path: "services", changeFrequency: "monthly", priority: 0.9 },
-  { path: "airport-transfer", changeFrequency: "monthly", priority: 0.9 },
-  { path: "city-tours", changeFrequency: "monthly", priority: 0.9 },
-  { path: "location", changeFrequency: "monthly", priority: 0.7 },
+  { path: "tours", changeFrequency: "weekly", priority: 0.9 },
+  ...cities.map((c) => ({
+    path: `tours/${c.id}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  })),
+  { path: "fleet", changeFrequency: "monthly", priority: 0.9 },
   { path: "about", changeFrequency: "monthly", priority: 0.6 },
   { path: "testimony", changeFrequency: "monthly", priority: 0.6 },
   { path: "contact", changeFrequency: "monthly", priority: 0.6 },
-] as const;
+];
 
 export function GET() {
   const lastModified = new Date().toISOString();
@@ -33,12 +38,9 @@ ${routes
   </url>`;
   })
   .join("\n")}
-</urlset>
-`;
+</urlset>`;
 
   return new Response(body, {
-    headers: {
-      "Content-Type": "application/xml; charset=utf-8",
-    },
+    headers: { "Content-Type": "application/xml" },
   });
 }

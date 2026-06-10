@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     shortcut: "/icon.png",
   },
   title: {
-    default: "Private City Tours — Premium Transport in Thailand",
+    default: "Tur Privat Keliling Thailand — Sewa Mobil + Sopir untuk Rombongan",
     template: "%s | Keliling Thailand",
   },
   description:
-    "Premium private transport in Thailand for Indonesian, Singaporean, Chinese, Middle Eastern, Western, and Thai travelers. Ideal for corporate trips, weddings, birthdays, influencer itineraries, and Bangkok stays.",
+    "Tur privat di Thailand untuk rombongan Indonesia: sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, itinerary bisa disesuaikan. Bangkok, Pattaya, Ayutthaya, dan lainnya.",
   keywords:
-    "private city tours thailand, thailand private transport, bangkok premium chauffeur, thailand airport transfer, wedding transport bangkok, corporate travel thailand",
+    "tur privat thailand, sewa mobil thailand, sewa van bangkok, private tour thailand, sewa mini bus thailand, airport transfer bangkok",
   alternates: {
     canonical: "/",
     languages: {
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Private City Tours — Premium Transport in Thailand",
+    title: "Tur Privat Keliling Thailand untuk Rombongan Anda",
     description:
-      "Premium private transport in Thailand for business, celebrations, and high-comfort travel.",
+      "Sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, bukan per orang.",
     type: "website",
     url: "/",
     siteName: "Keliling Thailand",
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Private City Tours — Premium Transport in Thailand",
+    title: "Tur Privat Keliling Thailand untuk Rombongan Anda",
     description:
-      "Premium private transport in Thailand for business, celebrations, and high-comfort travel.",
+      "Sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, bukan per orang.",
   },
   robots: {
     index: true,
@@ -86,14 +86,16 @@ const organizationLd = {
   logo: `${siteUrl}/newlog.png`,
   image: `${siteUrl}/newlog.png`,
   description:
-    "Premium private transport in Thailand with Altis, SUV, Van, and Mini Bus. Airport transfers, city tours, corporate, and wedding transportation.",
+    "Private group tours in Thailand with sedan, SUV, van, and mini bus. Whole-vehicle bookings with driver for city tours, day trips, and airport transfers.",
   telephone: "+62-857-5092-3934",
   priceRange: "$$",
   areaServed: [
     { "@type": "City", name: "Bangkok" },
     { "@type": "City", name: "Pattaya" },
-    { "@type": "City", name: "Phuket" },
-    { "@type": "City", name: "Krabi" },
+    { "@type": "City", name: "Ayutthaya" },
+    { "@type": "City", name: "Kanchanaburi" },
+    { "@type": "City", name: "Hua Hin" },
+    { "@type": "City", name: "Khao Yai" },
     { "@type": "Country", name: "Thailand" },
   ],
   address: {
@@ -116,7 +118,7 @@ const websiteLd = {
 const serviceLd = {
   "@context": "https://schema.org",
   "@type": "Service",
-  serviceType: "Private chauffeur transportation",
+  serviceType: "Private group tours and vehicle charter with driver",
   provider: { "@id": `${siteUrl}/#organization` },
   areaServed: { "@type": "Country", name: "Thailand" },
   hasOfferCatalog: {
@@ -127,24 +129,16 @@ const serviceLd = {
         "@type": "Offer",
         itemOffered: {
           "@type": "Service",
-          name: "Airport Transfer",
-          url: `${siteUrl}/airport-transfer`,
+          name: "Private City Tours",
+          url: `${siteUrl}/tours`,
         },
       },
       {
         "@type": "Offer",
         itemOffered: {
           "@type": "Service",
-          name: "City Tours",
-          url: `${siteUrl}/city-tours`,
-        },
-      },
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "SUV Charter",
-          url: `${siteUrl}/services`,
+          name: "Vehicle Charter (Sedan, SUV, Van, Mini Bus)",
+          url: `${siteUrl}/fleet`,
         },
       },
     ],
