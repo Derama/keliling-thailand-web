@@ -156,7 +156,7 @@ export default function RootLayout({
         <JsonLd data={[organizationLd, websiteLd, serviceLd]} />
         <LanguageProvider>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <div className="flex-1">{children}</div>
           <Footer />
           <FloatingWhatsApp />
         </LanguageProvider>

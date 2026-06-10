@@ -9,7 +9,11 @@ const baseUrl = productionUrl.startsWith("http")
   ? productionUrl
   : `https://${productionUrl}`;
 
-const routes = [
+const routes: {
+  path: string;
+  changeFrequency: "weekly" | "monthly";
+  priority: number;
+}[] = [
   { path: "", changeFrequency: "weekly", priority: 1 },
   { path: "tours", changeFrequency: "weekly", priority: 0.9 },
   ...cities.map((c) => ({
@@ -41,6 +45,6 @@ ${routes
 </urlset>`;
 
   return new Response(body, {
-    headers: { "Content-Type": "application/xml" },
+    headers: { "Content-Type": "application/xml; charset=utf-8" },
   });
 }
