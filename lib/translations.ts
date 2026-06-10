@@ -361,7 +361,7 @@ export const translations = {
     },
     about: {
       title: "About Keliling Thailand",
-      p1: "Keliling Thailand is a private tour service for Indonesian travelers in Thailand. We provide chauffeured vehicles for city tours, day trips, and airport transfers.",
+      p1: "Keliling Thailand is a private tour service for Indonesian travelers in Thailand. We provide private vehicles with drivers for city tours, day trips, and airport transfers.",
       p2: "Every tour is private: one vehicle dedicated to your group — family, office, or community — with an itinerary you can adjust.",
       whyTitle: "Why Us",
       why: [
