@@ -11,7 +11,11 @@ export default function TourDetailContent({ cityId }: { cityId: string }) {
   const { t } = useLanguage();
   const city = getCity(cityId)!; // page calls notFound() for unknown cities
   const vehicleOptions = availableVehicles(cityId);
-  const [selected, setSelected] = useState<VehicleId>(vehicleOptions[0].id);
+  const [selected, setSelected] = useState<VehicleId | undefined>(
+    vehicleOptions[0]?.id
+  );
+
+  if (!selected || vehicleOptions.length === 0) return null;
 
   const waMessage = fillTemplate(t.tourDetail.waMessage, {
     city: cityNames[cityId],
@@ -82,29 +86,33 @@ export default function TourDetailContent({ cityId }: { cityId: string }) {
         <aside className="lg:sticky lg:top-24 h-fit rounded-2xl border border-gray-200 p-5 shadow-sm">
           <h2 className="font-bold text-[#1B2A4A] mb-3">{t.tourDetail.chooseVehicle}</h2>
           <div className="space-y-2">
-            {vehicleOptions.map((v) => (
-              <button
-                key={v.id}
-                onClick={() => setSelected(v.id)}
-                className={`w-full flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-colors ${
-                  selected === v.id
-                    ? "border-[#F5C518] bg-[#F5C518]/10"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <span>
-                  <span className="block font-semibold text-[#1B2A4A]">
-                    {t.vehicleNames[v.id]}
+            {vehicleOptions.map((v) => {
+              const price = city.prices[v.id];
+              if (price == null) return null;
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => setSelected(v.id)}
+                  className={`w-full flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-colors ${
+                    selected === v.id
+                      ? "border-[#F5C518] bg-[#F5C518]/10"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <span>
+                    <span className="block font-semibold text-[#1B2A4A]">
+                      {t.vehicleNames[v.id]}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {v.pax} {t.common.pax}
+                    </span>
                   </span>
-                  <span className="text-xs text-gray-500">
-                    {v.pax} {t.common.pax}
+                  <span className="font-bold text-[#1B2A4A]">
+                    {price.toLocaleString()} {t.common.thb}
                   </span>
-                </span>
-                <span className="font-bold text-[#1B2A4A]">
-                  {city.prices[v.id]!.toLocaleString()} {t.common.thb}
-                </span>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
           <p className="text-xs text-gray-500 mt-3">{t.tourDetail.priceNote}</p>
           <a
