@@ -46,3 +46,8 @@ next-env.d.ts
 .swarm/
 .mcp.json
 .superpowers/
+
+# agent workspace artifacts
+.agents/
+outputs/
+skills-lock.json

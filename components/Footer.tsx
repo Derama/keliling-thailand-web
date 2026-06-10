@@ -1,114 +1,53 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
+import { waLink, WA_NUMBER } from "@/lib/site";
 
 export default function Footer() {
-  const { language } = useLanguage();
-  const footerCopy = {
-    id: {
-      description:
-        "Solusi transportasi terpercaya untuk semua wisatawan di Thailand. Nyaman, aman, dan berkesan.",
-      nav: "Navigasi",
-      services: "Layanan Kami",
-      book: "Pesan Sekarang",
-      contact: "Hubungi Kami",
-    },
-    en: {
-      description:
-        "Trusted transport solutions for all travellers in Thailand. Comfortable, safe, and memorable.",
-      nav: "Navigation",
-      services: "Our Services",
-      book: "Book Now",
-      contact: "Contact Us",
-    },
-    th: {
-      description:
-        "โซลูชันการเดินทางที่ไว้วางใจได้สำหรับนักท่องเที่ยวทุกคนในประเทศไทย สะดวกสบาย ปลอดภัย และน่าประทับใจ",
-      nav: "เมนู",
-      services: "บริการของเรา",
-      book: "จองตอนนี้",
-      contact: "ติดต่อเรา",
-    },
-  }[language];
+  const { t } = useLanguage();
+
+  const links = [
+    { href: "/tours", label: t.nav.tours },
+    { href: "/fleet", label: t.nav.fleet },
+    { href: "/about", label: t.nav.about },
+    { href: "/testimony", label: t.nav.testimony },
+    { href: "/contact", label: t.nav.contact },
+  ];
 
   return (
-    <footer className="bg-black text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Brand */}
-          <div className="flex flex-col items-center gap-4 text-center">
-            <Image
-              src="/Full logo.png"
-              alt="Keliling Thailand"
-              width={480}
-              height={144}
-              className="h-16 md:h-28 w-auto object-contain"
-            />
-            <p className="text-white text-sm leading-relaxed max-w-xs text-center">
-              {footerCopy.description}
-            </p>
-          </div>
-
-          {/* Quick Links */}
-          <div className="text-center md:text-left">
-            <h3 className="text-[#FFC531] font-bold text-sm uppercase tracking-widest mb-4">
-              {footerCopy.nav}
-            </h3>
-            <ul className="space-y-2 text-sm text-white">
-              <li>
-                <Link href="/" className="hover:text-[#FFC531] transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-[#FFC531] transition-colors">
-                  {footerCopy.services}
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-[#FFC531] transition-colors">
-                  {footerCopy.book}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div className="text-center md:text-left">
-            <h3 className="text-[#FFC531] font-bold text-sm uppercase tracking-widest mb-4">
-              {footerCopy.contact}
-            </h3>
-            <ul className="space-y-2 text-sm text-white">
-              <li className="flex items-center justify-center md:justify-start gap-2">
-                <span>📱</span>
-                <a href="https://wa.me/6285750923934" className="hover:text-[#FFC531] transition-colors">
-                  WhatsApp
-                </a>
-              </li>
-              <li className="flex items-center justify-center md:justify-start gap-2">
-                <span>📸</span>
-                <a
-                  href="https://instagram.com/kelilingthailand"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#FFC531] transition-colors"
-                >
-                  @kelilingthailand
-                </a>
-              </li>
-              <li className="flex items-center justify-center md:justify-start gap-2">
-                <span>📍</span>
-                <span>Bangkok, Thailand</span>
-              </li>
-            </ul>
-          </div>
+    <footer className="bg-[#1B2A4A] text-white mt-auto">
+      <div className="max-w-6xl mx-auto px-4 py-12 grid gap-8 md:grid-cols-3">
+        <div>
+          <p className="font-bold text-lg mb-2">Keliling Thailand</p>
+          <p className="text-sm text-white/70">{t.footer.tagline}</p>
         </div>
-
-        <div className="border-t border-gray-800 mt-10 pt-6 text-center text-xs text-white">
-          © {new Date().getFullYear()} Keliling Thailand. All rights reserved.
+        <div>
+          <p className="font-bold mb-3">{t.footer.linksTitle}</p>
+          <ul className="space-y-2 text-sm text-white/70">
+            {links.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="hover:text-[#F5C518]">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
+        <div>
+          <p className="font-bold mb-3">{t.footer.contactTitle}</p>
+          <a
+            href={waLink(t.home.waMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-white/70 hover:text-[#25D366]"
+          >
+            WhatsApp +{WA_NUMBER}
+          </a>
+        </div>
+      </div>
+      <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
+        © {new Date().getFullYear()} Keliling Thailand. {t.footer.rights}
       </div>
     </footer>
   );

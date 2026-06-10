@@ -1,8 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/components/LanguageContext";
-
-const WA_NUMBER = "6285750923934";
+import { WA_NUMBER } from "@/lib/site";
 
 const FLOATING_WA = {
   id: {
