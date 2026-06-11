@@ -3,129 +3,18 @@
 :root {
   --background: #F4F4F4;
   --foreground: #050505;
-  --yellow: #FFC531;
-  --cream: #FAE7B8;
-  --offwhite: #F4F4F4;
-  --ink: #050505;
-  --accent: #F5D582;
   --font-geist-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-geist-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 
   /* Impeccable easing — natural deceleration, never bounce/elastic */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-yellow: var(--yellow);
-  --color-cream: var(--cream);
-  --color-offwhite: var(--offwhite);
-  --color-ink: var(--ink);
-  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-/* ── Outlined card with offset accent shadow (brand signature) ── */
-.outline-card {
-  border: 2px solid #050505;
-  border-radius: 1rem;
-  background: #ffffff;
-  box-shadow: 6px 6px 0 #F5D582;
-  transition: transform 0.15s var(--ease-out-quart), box-shadow 0.15s var(--ease-out-quart);
-}
-.outline-card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 #F5D582; }
-.outline-card.is-active { box-shadow: 6px 6px 0 #FFC531; background: #FAE7B8; }
-
-/* ── Hero city picker: image tiles ── */
-:root { --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1); }
-
-.city-tile {
-  transition: transform 200ms var(--ease-out-strong), box-shadow 200ms var(--ease-out-strong);
-  will-change: transform;
-}
-.city-tile:active { transform: scale(0.97); transition-duration: 110ms; }
-
-.city-tile-img {
-  transition: transform 360ms var(--ease-out-strong);
-  transform: scale(1);
-}
-
-/* Arrow affordance: hidden until hover (subtle slide, never from nothing) */
-.city-tile-arrow {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.9);
-  transition: opacity 180ms var(--ease-out-strong), transform 180ms var(--ease-out-strong);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .city-tile:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px -10px rgba(255, 197, 49, 0.45);
-  }
-  .city-tile:hover .city-tile-img { transform: scale(1.07); }
-  .city-tile:hover .city-tile-arrow { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* Staggered entrance for the tile grid */
-.city-picker-grid > * {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: tile-in 380ms var(--ease-out-strong) forwards;
-}
-.city-picker-grid > *:nth-child(1) { animation-delay: 60ms; }
-.city-picker-grid > *:nth-child(2) { animation-delay: 110ms; }
-.city-picker-grid > *:nth-child(3) { animation-delay: 160ms; }
-.city-picker-grid > *:nth-child(4) { animation-delay: 210ms; }
-.city-picker-grid > *:nth-child(5) { animation-delay: 260ms; }
-.city-picker-grid > *:nth-child(6) { animation-delay: 310ms; }
-
-@keyframes tile-in {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .city-tile, .city-tile-img, .city-tile-arrow { transition: opacity 0.2s ease; }
-  .city-tile-arrow { opacity: 1; transform: none; }
-  .city-picker-grid > * { animation: none; opacity: 1; transform: none; }
-}
-
-/* ── Itinerary modal ── */
-.modal-overlay { animation: overlay-in 200ms var(--ease-out-strong) both; }
-.modal-card {
-  /* Modals stay centered (not anchored to a trigger) */
-  transform-origin: center;
-  animation: modal-in 240ms var(--ease-out-strong) both;
-}
-
-@keyframes overlay-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes modal-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .modal-overlay { animation: overlay-in 150ms ease both; }
-  .modal-card { animation: overlay-in 150ms ease both; }
-}
-
-/* ── Itinerary wizard (fullscreen) ── */
-.wizard-overlay { animation: overlay-in 200ms var(--ease-out-strong) both; }
-.wizard-step { animation: wizard-step-in 320ms var(--ease-out-strong) both; }
-
-@keyframes wizard-step-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wizard-overlay, .wizard-step { animation: overlay-in 150ms ease both; }
 }
 
 body {
@@ -187,26 +76,6 @@ a, button {
 .whatsapp-btn:active {
   transform: scale(0.97);
   transition-duration: 0.08s;
-}
-
-/* ── Hero slide tag fade ── */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.45s var(--ease-out-quart) both;
-}
-
-/* ── Hero content entrance (above the fold, no observer needed) ── */
-@keyframes slide-up-fade {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.animate-slide-up {
-  animation: slide-up-fade 0.7s var(--ease-out-quint) both;
 }
 
 /* ── Scroll-reveal: single element ── */

@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     ".agents/**",
     ".claude/**",
+    // Untracked local tooling, not part of the site build.
+    "scripts/**",
   ]),
 ]);
 
