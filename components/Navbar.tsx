@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/components/LanguageContext";
+import { usePlanBuilder } from "@/components/PlanBuilderContext";
 import { Language } from "@/lib/translations";
 
 const LANGS: { code: Language; label: string }[] = [
@@ -15,6 +15,7 @@ const LANGS: { code: Language; label: string }[] = [
 
 export default function Navbar() {
   const { t, language, setLanguage } = useLanguage();
+  const { openPlanner } = usePlanBuilder();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -33,12 +34,16 @@ export default function Navbar() {
     setOpen(false);
   }
 
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+
   const links = [
     { href: "/", label: t.nav.home },
     { href: "/tours", label: t.nav.tours },
     { href: "/fleet", label: t.nav.fleet },
     { href: "/about", label: t.nav.about },
     { href: "/testimony", label: t.nav.testimony },
+    { href: "/blog", label: t.nav.blog },
     { href: "/contact", label: t.nav.contact },
   ];
 
@@ -50,7 +55,9 @@ export default function Navbar() {
     >
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 h-16">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/Logo.png" alt="Keliling Thailand" width={36} height={36} />
+          <span className="brand-mark" aria-hidden="true">
+            <span className="brand-mark-car" />
+          </span>
           <span className="text-white font-bold">Keliling Thailand</span>
         </Link>
 
@@ -60,13 +67,19 @@ export default function Navbar() {
               key={l.href}
               href={l.href}
               className={`text-sm font-medium transition-colors ${
-                pathname === l.href ? "text-[#F5C518]" : "text-white hover:text-[#F5C518]"
+                isActive(l.href) ? "text-[#F5C518]" : "text-white hover:text-[#F5C518]"
               }`}
             >
               {l.label}
             </Link>
           ))}
-          <div className="flex gap-1 ml-2">
+          <button
+            onClick={openPlanner}
+            className="bg-[#F5C518] text-[#1B2A4A] text-sm font-bold px-4 py-1.5 rounded-full hover:brightness-95 transition"
+          >
+            {t.planner.openButton}
+          </button>
+          <div className="flex gap-1">
             {LANGS.map((l) => (
               <button
                 key={l.code}
@@ -86,7 +99,9 @@ export default function Navbar() {
         <button
           className="md:hidden text-white p-2"
           onClick={() => setOpen(!open)}
-          aria-label="Menu"
+          aria-label={t.nav.menu}
+          aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {open ? (
@@ -99,7 +114,7 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="md:hidden bg-[#1B2A4A] border-t border-white/10 px-4 pb-4">
+        <div id="mobile-menu" className="md:hidden bg-[#1B2A4A] border-t border-white/10 px-4 pb-4">
           {links.map((l) => (
             <Link
               key={l.href}
@@ -109,6 +124,15 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <button
+            onClick={() => {
+              setOpen(false);
+              openPlanner();
+            }}
+            className="w-full mt-3 bg-[#F5C518] text-[#1B2A4A] font-bold py-2.5 rounded-full"
+          >
+            {t.planner.openButton}
+          </button>
           <div className="flex gap-2 pt-3">
             {LANGS.map((l) => (
               <button

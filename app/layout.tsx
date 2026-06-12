@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import JsonLd from "@/components/JsonLd";
 import { LanguageProvider } from "@/components/LanguageContext";
+import { PlanBuilderProvider } from "@/components/PlanBuilderContext";
 
 const productionUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -155,10 +156,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-black">
         <JsonLd data={[organizationLd, websiteLd, serviceLd]} />
         <LanguageProvider>
-          <Navbar />
-          <div className="flex-1">{children}</div>
-          <Footer />
-          <FloatingWhatsApp />
+          <PlanBuilderProvider>
+            <Navbar />
+            <div className="flex-1">{children}</div>
+            <Footer />
+            <FloatingWhatsApp />
+          </PlanBuilderProvider>
         </LanguageProvider>
       </body>
     </html>

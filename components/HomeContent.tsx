@@ -1,18 +1,32 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
-import { cities, vehicles } from "@/lib/tours";
+import { usePlanBuilder } from "@/components/PlanBuilderContext";
+import { cities, City, vehicles } from "@/lib/tours";
 import { waLink } from "@/lib/site";
 import CityCard from "@/components/CityCard";
+import DestinationPreviewModal from "@/components/DestinationPreviewModal";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=1600&q=80&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1704390529135-742324e6b8f1?w=1600&q=80&auto=format&fit=crop";
 
 export default function HomeContent() {
   const { t } = useLanguage();
+  const { openPlanner } = usePlanBuilder();
+  const [destinationPreview, setDestinationPreview] = useState<{
+    city: City;
+    trigger: HTMLButtonElement;
+  } | null>(null);
+
+  const closeDestinationPreview = useCallback(() => {
+    const trigger = destinationPreview?.trigger;
+    setDestinationPreview(null);
+    window.requestAnimationFrame(() => trigger?.focus());
+  }, [destinationPreview]);
 
   const steps = [
     { title: t.home.how1Title, desc: t.home.how1Desc },
@@ -31,19 +45,13 @@ export default function HomeContent() {
             {t.home.heroTitle}
           </h1>
           <p className="mt-4 text-lg text-white/85 max-w-2xl mx-auto">{t.home.heroSubtitle}</p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/tours"
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={openPlanner}
               className="bg-[#F5C518] text-[#1B2A4A] font-bold px-8 py-3 rounded-full hover:brightness-95 transition"
             >
-              {t.home.ctaTours}
-            </Link>
-            <Link
-              href="/fleet"
-              className="border-2 border-white font-bold px-8 py-3 rounded-full hover:bg-white hover:text-[#1B2A4A] transition"
-            >
-              {t.home.ctaFleet}
-            </Link>
+              {t.planner.openButton}
+            </button>
           </div>
         </div>
       </section>
@@ -67,14 +75,18 @@ export default function HomeContent() {
       </section>
 
       {/* Destinations */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-cream py-16">
         <div className="max-w-6xl mx-auto px-4">
           <ScrollReveal>
             <h2 className="text-3xl font-extrabold text-[#1B2A4A]">{t.home.destinationsTitle}</h2>
             <p className="text-gray-600 mt-1">{t.home.destinationsSubtitle}</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
               {cities.map((c) => (
-                <CityCard key={c.id} city={c} />
+                <CityCard
+                  key={c.id}
+                  city={c}
+                  onSelect={(city, trigger) => setDestinationPreview({ city, trigger })}
+                />
               ))}
             </div>
           </ScrollReveal>
@@ -112,7 +124,7 @@ export default function HomeContent() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-cream py-16">
         <div className="max-w-6xl mx-auto px-4">
           <ScrollReveal>
             <h2 className="text-3xl font-extrabold text-[#1B2A4A]">{t.home.trustTitle}</h2>
@@ -149,6 +161,13 @@ export default function HomeContent() {
           {t.common.whatsapp}
         </a>
       </section>
+
+      {destinationPreview && (
+        <DestinationPreviewModal
+          city={destinationPreview.city}
+          onClose={closeDestinationPreview}
+        />
+      )}
     </main>
   );
 }

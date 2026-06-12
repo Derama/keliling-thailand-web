@@ -12,6 +12,7 @@ export default function Footer() {
     { href: "/fleet", label: t.nav.fleet },
     { href: "/about", label: t.nav.about },
     { href: "/testimony", label: t.nav.testimony },
+    { href: "/blog", label: t.nav.blog },
     { href: "/contact", label: t.nav.contact },
   ];
 

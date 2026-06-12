@@ -6,16 +6,18 @@ import { useLanguage } from "@/components/LanguageContext";
 import { City, cheapestPrice } from "@/lib/tours";
 import { cityNames } from "@/lib/translations";
 
-export default function CityCard({ city }: { city: City }) {
+interface CityCardProps {
+  city: City;
+  onSelect?: (city: City, trigger: HTMLButtonElement) => void;
+}
+
+export default function CityCard({ city, onSelect }: CityCardProps) {
   const { t } = useLanguage();
   const price = cheapestPrice(city.id);
   const name = cityNames[city.id] ?? city.id;
 
-  return (
-    <Link
-      href={`/tours/${city.id}`}
-      className="group rounded-2xl overflow-hidden bg-white shadow hover:shadow-xl transition-shadow"
-    >
+  const content = (
+    <>
       <div className="relative h-48">
         <Image
           src={city.image}
@@ -37,6 +39,28 @@ export default function CityCard({ city }: { city: City }) {
           </p>
         )}
       </div>
+    </>
+  );
+
+  const className =
+    "group block w-full rounded-2xl overflow-hidden bg-white text-left shadow hover:shadow-xl transition-shadow focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/70";
+
+  if (onSelect) {
+    return (
+      <button
+        type="button"
+        className={className}
+        onClick={(event) => onSelect(city, event.currentTarget)}
+        aria-haspopup="dialog"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={`/tours/${city.id}`} className={className}>
+      {content}
     </Link>
   );
 }

@@ -1,4 +1,5 @@
 import { cities } from "@/lib/tours";
+import { getAllPosts } from "@/lib/blog";
 
 const productionUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -24,19 +25,29 @@ const routes: {
   { path: "fleet", changeFrequency: "monthly", priority: 0.9 },
   { path: "about", changeFrequency: "monthly", priority: 0.6 },
   { path: "testimony", changeFrequency: "monthly", priority: 0.6 },
+  { path: "blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "contact", changeFrequency: "monthly", priority: 0.6 },
 ];
 
 export function GET() {
   const lastModified = new Date().toISOString();
+  const allRoutes = [
+    ...routes.map((r) => ({ ...r, lastmod: lastModified })),
+    ...getAllPosts().map((p) => ({
+      path: `blog/${p.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+      lastmod: new Date(p.date).toISOString(),
+    })),
+  ];
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${routes
-  .map(({ path, changeFrequency, priority }) => {
+${allRoutes
+  .map(({ path, changeFrequency, priority, lastmod }) => {
     const url = path ? `${baseUrl}/${path}` : baseUrl;
     return `  <url>
     <loc>${url}</loc>
-    <lastmod>${lastModified}</lastmod>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>${changeFrequency}</changefreq>
     <priority>${priority}</priority>
   </url>`;

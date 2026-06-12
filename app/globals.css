@@ -13,6 +13,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Warm cream from the Instagram visual identity */
+  --color-cream: #fef9ec;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -34,6 +36,44 @@ html {
 /* iOS Safari: prevent tap highlight flash on interactive elements */
 a, button {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Compact navbar logo: the existing car silhouette on a high-contrast brand badge. */
+.brand-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #F5C518;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 28%);
+}
+
+.brand-mark-car {
+  width: 1.75rem;
+  height: 1.375rem;
+  background: #1B2A4A;
+  -webkit-mask: url("/Logo.png") center / contain no-repeat;
+  mask: url("/Logo.png") center / contain no-repeat;
+}
+
+@keyframes destination-preview-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes destination-preview-panel-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.destination-preview-overlay {
+  animation: destination-preview-overlay-in 180ms ease-out both;
+}
+
+.destination-preview-panel {
+  animation: destination-preview-panel-in 320ms var(--ease-out-quart) both;
 }
 
 /* Improve text rendering on mobile */
@@ -88,6 +128,127 @@ a, button {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* ── Plan builder modal ── */
+@keyframes planner-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes planner-panel-in {
+  from { opacity: 0; transform: translateY(28px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes planner-step-fwd {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes planner-step-back {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes planner-pop {
+  0%   { transform: scale(0); }
+  75%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.planner-overlay { animation: planner-overlay-in 0.25s ease-out both; }
+.planner-panel   { animation: planner-panel-in 0.4s var(--ease-out-quart) both; }
+.planner-step-fwd  { animation: planner-step-fwd 0.35s var(--ease-out-quart) both; }
+.planner-step-back { animation: planner-step-back 0.35s var(--ease-out-quart) both; }
+.planner-pop { animation: planner-pop 0.3s var(--ease-out-quart) both; }
+
+@keyframes planner-card-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Staggered card reveal inside a step (delay set inline via --i) */
+.planner-stagger > * {
+  animation: planner-card-in 0.4s var(--ease-out-quart) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+/* ── Blog article body (rendered from markdown) ── */
+.blog-prose {
+  color: #4b5563;
+  line-height: 1.75;
+}
+
+.blog-prose h2 {
+  color: #1B2A4A;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2rem 0 0.75rem;
+}
+
+.blog-prose h3 {
+  color: #1B2A4A;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.blog-prose p {
+  margin-bottom: 1rem;
+}
+
+.blog-prose ul,
+.blog-prose ol {
+  margin: 0 0 1rem 1.5rem;
+}
+
+.blog-prose ul { list-style: disc; }
+.blog-prose ol { list-style: decimal; }
+.blog-prose li { margin-bottom: 0.35rem; }
+
+.blog-prose a {
+  color: #1B2A4A;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #F5C518;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.blog-prose a:hover { color: #F5C518; }
+
+.blog-prose blockquote {
+  border-left: 3px solid #F5C518;
+  padding-left: 1rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.blog-prose strong { color: #1B2A4A; }
+
+.blog-prose img {
+  border-radius: 1rem;
+  margin: 1.5rem 0;
+}
+
+.blog-prose table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.blog-prose th,
+.blog-prose td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.blog-prose th {
+  background: #f9fafb;
+  color: #1B2A4A;
 }
 
 /* ── Scroll-reveal: staggered children ── */

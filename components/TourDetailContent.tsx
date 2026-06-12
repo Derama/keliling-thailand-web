@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
+import DestinationGuide from "@/components/DestinationGuide";
 import { getCity, availableVehicles, VehicleId } from "@/lib/tours";
 import { cityNames, attractionNames } from "@/lib/translations";
 import { waLink, fillTemplate } from "@/lib/site";
@@ -125,6 +126,8 @@ export default function TourDetailContent({ cityId }: { cityId: string }) {
           </a>
         </aside>
       </section>
+
+      <DestinationGuide cityId={cityId} />
     </main>
   );
 }

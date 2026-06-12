@@ -58,7 +58,9 @@ export const translations = {
       fleet: "Armada & Harga",
       about: "Tentang Kami",
       testimony: "Testimoni",
+      blog: "Tips & Itinerary",
       contact: "Kontak",
+      menu: "Menu",
     },
     common: {
       whatsapp: "Chat WhatsApp",
@@ -77,17 +79,20 @@ export const translations = {
       heroTitle: "Tur privat keliling Thailand untuk rombongan Anda",
       heroSubtitle:
         "Kendaraan pribadi, sopir berpengalaman, dan itinerary sesuai keinginan. Sedan, SUV, van, hingga mini bus untuk 1–20 orang.",
-      ctaTours: "Pilih Destinasi",
-      ctaFleet: "Lihat Armada",
       howTitle: "Cara Pesan",
-      how1Title: "Pilih kota",
-      how1Desc: "Bangkok, Pattaya, Ayutthaya, dan lainnya — itinerary sudah kami siapkan.",
+      how1Title: "Buat rencana",
+      how1Desc: "Tentukan jumlah hari, kota, dan tempat wisata yang ingin dikunjungi.",
       how2Title: "Pilih kendaraan",
       how2Desc: "Sesuaikan dengan jumlah rombongan: sedan sampai mini bus.",
-      how3Title: "Chat WhatsApp",
-      how3Desc: "Konfirmasi tanggal dan detail langsung dengan tim kami.",
+      how3Title: "Kirim via WhatsApp",
+      how3Desc: "Rencana terkirim otomatis — tim kami konfirmasi tanggal dan detailnya.",
       destinationsTitle: "Destinasi Populer",
       destinationsSubtitle: "Tur privat sehari penuh dengan kendaraan dan sopir pribadi.",
+      destinationPreview: {
+        highlights: "Tempat populer",
+        viewDetails: "Lihat detail lengkap",
+        close: "Tutup",
+      },
       fleetTitle: "Armada Kami",
       fleetSubtitle: "Dari pasangan berdua sampai rombongan kantor 20 orang.",
       fleetSeeAll: "Lihat Semua Armada",
@@ -116,6 +121,88 @@ export const translations = {
       waButton: "Booking via WhatsApp",
       waMessage:
         "Halo Keliling Thailand! Saya mau booking tur privat {city} ({duration} jam) dengan {vehicle}. Mohon info ketersediaan.",
+    },
+    destinationGuide: {
+      aboutTitle: "Tentang Tur {city}",
+      intros: {
+        bangkok: [
+          "Bangkok adalah pintu masuk utama wisatawan Indonesia ke Thailand sekaligus kota dengan daya tarik paling lengkap: istana megah, kuil bersejarah, pasar tradisional, dan mal modern di tepi Sungai Chao Phraya. Dalam tur privat sehari penuh Anda bisa mengunjungi Grand Palace, Wat Pho, dan Wat Arun, lalu lanjut belanja di Chatuchak atau ICONSIAM tanpa repot mencari transportasi.",
+          "Kendaraan dan sopir khusus untuk rombongan Anda: menjemput di hotel, menemani sepanjang hari, dan mengantar kembali setelah selesai. Urutan tempat wisata bebas disesuaikan — cocok untuk keluarga dengan anak, lansia, maupun rombongan kantor.",
+        ],
+        pattaya: [
+          "Pattaya adalah destinasi pantai paling populer dari Bangkok. Dalam satu hari Anda bisa mengagumi Sanctuary of Truth, berkeliling taman tropis Nong Nooch, hingga menyeberang ke Coral Island (Koh Larn) untuk bermain pantai dan watersport.",
+          "Dengan tur privat, kendaraan dan sopir menunggu Anda di setiap lokasi — tidak perlu antre transportasi umum atau ikut jadwal rombongan lain. Van dan mini bus tersedia untuk keluarga besar maupun rombongan kantor.",
+        ],
+        ayutthaya: [
+          "Ayutthaya adalah bekas ibu kota kerajaan Siam dan situs warisan dunia UNESCO. Di sini Anda bisa melihat kepala Buddha di akar pohon Wat Mahathat, kemegahan Wat Chaiwatthanaram di tepi sungai, dan keindahan Istana Bang Pa-In.",
+          "Karena jaraknya dekat dari Bangkok, Ayutthaya pas untuk day trip santai: berangkat pagi dari hotel, keliling situs bersejarah dengan kendaraan privat, dan kembali ke Bangkok sore harinya.",
+        ],
+        kanchanaburi: [
+          "Kanchanaburi terkenal dengan Jembatan Sungai Kwai dan jejak sejarah Perang Dunia II — termasuk Death Railway dan Hellfire Pass. Di luar sejarahnya, Air Terjun Erawan tujuh tingkat dengan kolam biru kehijauan jadi favorit pengunjung.",
+          "Perjalanan menembus pedesaan Thailand bagian barat ini paling nyaman dengan kendaraan privat: berhenti kapan saja untuk foto, atur sendiri lama kunjungan di tiap lokasi, dan sopir yang sudah hafal rutenya.",
+        ],
+        huahin: [
+          "Hua Hin adalah kota pantai favorit keluarga kerajaan Thailand — suasananya lebih tenang dari Pattaya, dengan pasar malam Cicada yang artistik, Santorini Park bergaya Yunani, dan stasiun kereta klasik yang ikonik.",
+          "Tur privat Hua Hin cocok untuk keluarga yang ingin liburan pantai santai: kendaraan khusus rombongan Anda dari Bangkok, mampir ke kebun anggur Monsoon Valley, dan kembali tanpa terburu-buru.",
+        ],
+        khaoyai: [
+          "Khao Yai menawarkan sisi lain Thailand: udara pegunungan sejuk, taman nasional warisan dunia UNESCO, kebun anggur, dan farm serta kafe bergaya Eropa seperti Primo Piazza dan Farm Chokchai.",
+          "Destinasi ini sulit dijangkau tanpa kendaraan pribadi karena lokasinya tersebar — dengan tur privat, rombongan Anda bebas menjelajah dari satu spot foto ke spot berikutnya tanpa batasan jadwal.",
+        ],
+      },
+      factsTitle: "Info Perjalanan",
+      factDistance: "Jarak dari Bangkok",
+      factDriveTime: "Waktu tempuh",
+      factDuration: "Durasi tur",
+      factPickup: "Penjemputan",
+      factPickupValue: "Hotel Anda (atau sesuai kesepakatan)",
+      priceTitle: "Harga Tur Privat {city}",
+      priceVehicle: "Kendaraan",
+      priceCapacity: "Kapasitas",
+      pricePerDay: "Harga / hari",
+      priceFootnote:
+        "Harga per kendaraan per hari, sudah termasuk sopir, BBM, tol, dan parkir. Belum termasuk tiket masuk wisata dan makan.",
+      faqTitle: "Pertanyaan Umum",
+      faqs: [
+        {
+          q: "Berapa harga tur privat {city}?",
+          a: "Mulai {minPrice} THB per kendaraan per hari untuk tur {duration} jam. Harga berlaku per mobil, bukan per orang, dan sudah termasuk sopir, BBM, tol, serta parkir.",
+        },
+        {
+          q: "Apakah harganya per orang atau per kendaraan?",
+          a: "Per kendaraan. Satu harga untuk satu mobil beserta sopir — makin banyak anggota rombongan, makin hemat per orang.",
+        },
+        {
+          q: "Apa saja yang sudah termasuk dalam harga?",
+          a: "Kendaraan privat dengan sopir, BBM, tol, dan parkir. Tiket masuk tempat wisata, makan, dan pengeluaran pribadi belum termasuk.",
+        },
+        {
+          q: "Apakah itinerary {city} bisa disesuaikan?",
+          a: "Bisa. Semua tur bersifat privat, jadi urutan dan pilihan tempat wisata bebas diatur sesuai keinginan rombongan Anda. Sampaikan saja saat konfirmasi via WhatsApp.",
+        },
+        {
+          q: "Dari mana penjemputan dimulai?",
+          a: "Sopir menjemput di hotel Anda di Bangkok atau lokasi lain sesuai kesepakatan. Kami juga melayani airport transfer dari Suvarnabhumi (BKK) dan Don Mueang (DMK).",
+        },
+        {
+          q: "Bagaimana cara booking tur {city}?",
+          a: "Pilih kendaraan di halaman ini lalu klik tombol Booking via WhatsApp — rincian tur terkirim otomatis dan tim kami akan konfirmasi tanggal serta ketersediaan.",
+        },
+      ],
+    },
+    blog: {
+      title: "Tips & Itinerary",
+      subtitle:
+        "Panduan, itinerary, dan tips liburan Thailand — ditulis dari pengalaman tim kami di lapangan.",
+      readMore: "Baca selengkapnya",
+      back: "Semua artikel",
+      empty: "Artikel pertama segera hadir.",
+      relatedTours: "Tur terkait artikel ini",
+      ctaTitle: "Mau itinerary ini jadi kenyataan?",
+      ctaSubtitle:
+        "Kendaraan privat + sopir untuk rombongan Anda — konsultasi gratis via WhatsApp.",
+      waMessage:
+        'Halo Keliling Thailand! Saya baru baca artikel "{title}" dan mau tanya-tanya.',
     },
     fleet: {
       title: "Armada & Harga",
@@ -253,6 +340,31 @@ export const translations = {
       hoursTitle: "Jam Operasional",
       hoursDesc: "Setiap hari, 08.00–20.00 (waktu Bangkok)",
     },
+    planner: {
+      openButton: "Buat Rencana",
+      title: "Buat Rencana Perjalanan",
+      daysTitle: "Berapa hari perjalanan Anda?",
+      day: "Hari",
+      daysUnit: "hari",
+      citiesTitle: "Pilih kota untuk setiap hari",
+      attractionsTitle: "Pilih tempat wisata",
+      hoursBudget: "{used} dari {max} jam",
+      overLimit: "Melebihi batas {max} jam — itinerary mungkin perlu disesuaikan.",
+      paxTitle: "Berapa orang yang ikut?",
+      vehicleTitle: "Pilih kendaraan",
+      vehicleUnavailable: "Tidak tersedia untuk {city}",
+      paxWarning: "Jumlah penumpang melebihi kapasitas kendaraan ini.",
+      summaryTitle: "Ringkasan Perjalanan",
+      totalLabel: "Total",
+      priceNote:
+        "Harga per kendaraan, bukan per orang. Sudah termasuk sopir, BBM, tol, dan parkir.",
+      back: "Kembali",
+      next: "Lanjut",
+      waButton: "Booking via WhatsApp",
+      waMessage:
+        "Halo Keliling Thailand! Saya mau booking tur privat {days} hari untuk {pax} orang dengan {vehicle}.\n{plan}Total: {total} THB. Mohon info ketersediaan.",
+      waDayLine: "Hari {day}: {city} — {attractions}",
+    },
     footer: {
       tagline: "Tur privat keliling Thailand — kendaraan, sopir, dan itinerary untuk rombongan Anda.",
       linksTitle: "Halaman",
@@ -267,7 +379,9 @@ export const translations = {
       fleet: "Fleet & Prices",
       about: "About Us",
       testimony: "Testimonials",
+      blog: "Tips & Itinerary",
       contact: "Contact",
+      menu: "Menu",
     },
     common: {
       whatsapp: "Chat on WhatsApp",
@@ -286,17 +400,20 @@ export const translations = {
       heroTitle: "Private tours around Thailand for your group",
       heroSubtitle:
         "Your own vehicle, an experienced driver, and an itinerary that fits you. Sedan, SUV, van, or mini bus for 1–20 people.",
-      ctaTours: "Pick a Destination",
-      ctaFleet: "See the Fleet",
       howTitle: "How It Works",
-      how1Title: "Pick a city",
-      how1Desc: "Bangkok, Pattaya, Ayutthaya and more — itineraries are ready.",
+      how1Title: "Build your plan",
+      how1Desc: "Choose how many days, which cities, and the attractions you want to visit.",
       how2Title: "Pick a vehicle",
       how2Desc: "Match your group size: sedan up to mini bus.",
-      how3Title: "Chat on WhatsApp",
-      how3Desc: "Confirm dates and details directly with our team.",
+      how3Title: "Send via WhatsApp",
+      how3Desc: "Your plan is sent automatically — our team confirms dates and details.",
       destinationsTitle: "Popular Destinations",
       destinationsSubtitle: "Full-day private tours with your own vehicle and driver.",
+      destinationPreview: {
+        highlights: "Popular stops",
+        viewDetails: "View full details",
+        close: "Close",
+      },
       fleetTitle: "Our Fleet",
       fleetSubtitle: "From a couple to an office group of 20.",
       fleetSeeAll: "See All Vehicles",
@@ -325,6 +442,88 @@ export const translations = {
       waButton: "Book via WhatsApp",
       waMessage:
         "Hello Keliling Thailand! I'd like to book a private {city} tour ({duration} hours) with a {vehicle}. Please share availability.",
+    },
+    destinationGuide: {
+      aboutTitle: "About the {city} Tour",
+      intros: {
+        bangkok: [
+          "Bangkok is Thailand's main gateway and its most varied destination: grand palaces, historic temples, traditional markets, and modern malls along the Chao Phraya River. On a full-day private tour you can visit the Grand Palace, Wat Pho, and Wat Arun, then shop at Chatuchak or ICONSIAM without ever hunting for transport.",
+          "A dedicated vehicle and driver serve only your group: hotel pickup, all-day standby, and drop-off when you're done. The order of stops is fully flexible — great for families with kids, seniors, or office groups.",
+        ],
+        pattaya: [
+          "Pattaya is the most popular beach getaway from Bangkok. In a single day you can admire the Sanctuary of Truth, wander the Nong Nooch tropical gardens, and hop over to Coral Island (Koh Larn) for beach time and watersports.",
+          "With a private tour, your vehicle and driver wait at every stop — no public transport queues and no group schedules. Vans and mini buses are available for big families and office trips.",
+        ],
+        ayutthaya: [
+          "Ayutthaya is the former capital of the Siamese kingdom and a UNESCO World Heritage Site. See the Buddha head entwined in tree roots at Wat Mahathat, the riverside grandeur of Wat Chaiwatthanaram, and the elegant Bang Pa-In Palace.",
+          "Close to Bangkok, Ayutthaya makes a relaxed day trip: leave your hotel in the morning, explore the historic sites by private vehicle, and be back in Bangkok by evening.",
+        ],
+        kanchanaburi: [
+          "Kanchanaburi is known for the Bridge over the River Kwai and its World War II history, including the Death Railway and Hellfire Pass. Beyond the history, the seven-tiered Erawan Waterfalls with their emerald pools are a visitor favorite.",
+          "This journey through western Thailand's countryside is best done with a private vehicle: stop for photos anytime, set your own pace at each site, and rely on a driver who knows the route.",
+        ],
+        huahin: [
+          "Hua Hin is the seaside retreat of the Thai royal family — calmer than Pattaya, with the artistic Cicada night market, the Greek-style Santorini Park, and an iconic vintage railway station.",
+          "A private Hua Hin tour suits families after a relaxed beach day: a dedicated vehicle from Bangkok, a stop at the Monsoon Valley vineyard, and a return trip with no rush.",
+        ],
+        khaoyai: [
+          "Khao Yai shows another side of Thailand: cool mountain air, a UNESCO-listed national park, vineyards, and European-style farms and cafés like Primo Piazza and Farm Chokchai.",
+          "The area is hard to explore without your own transport since attractions are spread out — with a private tour, your group roams freely from one photo spot to the next on your own schedule.",
+        ],
+      },
+      factsTitle: "Trip Facts",
+      factDistance: "Distance from Bangkok",
+      factDriveTime: "Drive time",
+      factDuration: "Tour duration",
+      factPickup: "Pickup",
+      factPickupValue: "Your hotel (or as arranged)",
+      priceTitle: "Private {city} Tour Prices",
+      priceVehicle: "Vehicle",
+      priceCapacity: "Capacity",
+      pricePerDay: "Price / day",
+      priceFootnote:
+        "Prices are per vehicle per day, including driver, fuel, tolls, and parking. Attraction tickets and meals are not included.",
+      faqTitle: "Frequently Asked Questions",
+      faqs: [
+        {
+          q: "How much does a private {city} tour cost?",
+          a: "From {minPrice} THB per vehicle per day for a {duration}-hour tour. The price is per vehicle, not per person, and includes the driver, fuel, tolls, and parking.",
+        },
+        {
+          q: "Is the price per person or per vehicle?",
+          a: "Per vehicle. One price covers the whole car and driver — the bigger your group, the cheaper it gets per person.",
+        },
+        {
+          q: "What is included in the price?",
+          a: "A private vehicle with driver, fuel, tolls, and parking. Attraction tickets, meals, and personal expenses are not included.",
+        },
+        {
+          q: "Can the {city} itinerary be customized?",
+          a: "Yes. Every tour is private, so the order and choice of attractions are entirely up to your group. Just let us know when confirming on WhatsApp.",
+        },
+        {
+          q: "Where does pickup start?",
+          a: "Your driver picks you up at your Bangkok hotel or another agreed location. We also offer airport transfers from Suvarnabhumi (BKK) and Don Mueang (DMK).",
+        },
+        {
+          q: "How do I book a {city} tour?",
+          a: "Pick a vehicle on this page and tap Book via WhatsApp — the tour details are sent automatically and our team confirms dates and availability.",
+        },
+      ],
+    },
+    blog: {
+      title: "Tips & Itineraries",
+      subtitle:
+        "Thailand travel guides, itineraries, and tips — written from our team's first-hand experience.",
+      readMore: "Read more",
+      back: "All articles",
+      empty: "Our first article is coming soon.",
+      relatedTours: "Tours related to this article",
+      ctaTitle: "Want to turn this itinerary into reality?",
+      ctaSubtitle:
+        "A private vehicle and driver for your group — free consultation on WhatsApp.",
+      waMessage:
+        'Hello Keliling Thailand! I just read "{title}" and have some questions.',
     },
     fleet: {
       title: "Fleet & Prices",
@@ -461,6 +660,31 @@ export const translations = {
       hoursTitle: "Operating Hours",
       hoursDesc: "Every day, 08:00–20:00 (Bangkok time)",
     },
+    planner: {
+      openButton: "Plan Your Trip",
+      title: "Build Your Trip Plan",
+      daysTitle: "How many days is your trip?",
+      day: "Day",
+      daysUnit: "days",
+      citiesTitle: "Pick a city for each day",
+      attractionsTitle: "Pick attractions",
+      hoursBudget: "{used} of {max} hours",
+      overLimit: "Over the {max}-hour limit — the itinerary may need adjusting.",
+      paxTitle: "How many people are coming?",
+      vehicleTitle: "Choose a vehicle",
+      vehicleUnavailable: "Not available for {city}",
+      paxWarning: "Passenger count exceeds this vehicle's capacity.",
+      summaryTitle: "Trip Summary",
+      totalLabel: "Total",
+      priceNote:
+        "Price per vehicle, not per person. Includes driver, fuel, tolls, and parking.",
+      back: "Back",
+      next: "Next",
+      waButton: "Book via WhatsApp",
+      waMessage:
+        "Hello Keliling Thailand! I'd like to book a {days}-day private tour for {pax} people with a {vehicle}.\n{plan}Total: {total} THB. Please confirm availability.",
+      waDayLine: "Day {day}: {city} — {attractions}",
+    },
     footer: {
       tagline: "Private tours around Thailand — vehicle, driver, and itinerary for your group.",
       linksTitle: "Pages",
@@ -475,7 +699,9 @@ export const translations = {
       fleet: "รถและราคา",
       about: "เกี่ยวกับเรา",
       testimony: "รีวิว",
+      blog: "ทิปส์และแผนเที่ยว",
       contact: "ติดต่อ",
+      menu: "เมนู",
     },
     common: {
       whatsapp: "แชท WhatsApp",
@@ -494,17 +720,20 @@ export const translations = {
       heroTitle: "ทัวร์ส่วนตัวทั่วไทยสำหรับกรุ๊ปของคุณ",
       heroSubtitle:
         "รถส่วนตัว คนขับมืออาชีพ และแผนเที่ยวที่ปรับได้ตามใจ มีรถเก๋ง SUV รถตู้ และมินิบัส รองรับ 1–20 คน",
-      ctaTours: "เลือกจุดหมาย",
-      ctaFleet: "ดูรถของเรา",
       howTitle: "วิธีจอง",
-      how1Title: "เลือกเมือง",
-      how1Desc: "กรุงเทพฯ พัทยา อยุธยา และอื่น ๆ — แผนเที่ยวพร้อมแล้ว",
+      how1Title: "สร้างแผนเที่ยว",
+      how1Desc: "เลือกจำนวนวัน เมือง และสถานที่ท่องเที่ยวที่อยากไป",
       how2Title: "เลือกรถ",
       how2Desc: "เลือกตามขนาดกรุ๊ป ตั้งแต่รถเก๋งถึงมินิบัส",
-      how3Title: "แชท WhatsApp",
-      how3Desc: "ยืนยันวันที่และรายละเอียดกับทีมงานโดยตรง",
+      how3Title: "ส่งทาง WhatsApp",
+      how3Desc: "แผนเที่ยวถูกส่งอัตโนมัติ — ทีมงานยืนยันวันที่และรายละเอียด",
       destinationsTitle: "จุดหมายยอดนิยม",
       destinationsSubtitle: "ทัวร์ส่วนตัวเต็มวันพร้อมรถและคนขับส่วนตัว",
+      destinationPreview: {
+        highlights: "สถานที่ยอดนิยม",
+        viewDetails: "ดูรายละเอียดทั้งหมด",
+        close: "ปิด",
+      },
       fleetTitle: "รถของเรา",
       fleetSubtitle: "ตั้งแต่คู่รักจนถึงกรุ๊ปบริษัท 20 คน",
       fleetSeeAll: "ดูรถทั้งหมด",
@@ -532,6 +761,86 @@ export const translations = {
       waButton: "จองผ่าน WhatsApp",
       waMessage:
         "สวัสดีค่ะ/ครับ Keliling Thailand! ต้องการจองทัวร์ส่วนตัว {city} ({duration} ชั่วโมง) ด้วย {vehicle} ขอข้อมูลวันว่างด้วยค่ะ/ครับ",
+    },
+    destinationGuide: {
+      aboutTitle: "เกี่ยวกับทัวร์{city}",
+      intros: {
+        bangkok: [
+          "กรุงเทพฯ คือประตูสู่ประเทศไทยและเมืองที่มีสถานที่ท่องเที่ยวหลากหลายที่สุด ทั้งพระบรมมหาราชวัง วัดเก่าแก่ ตลาดดั้งเดิม และห้างสรรพสินค้าริมแม่น้ำเจ้าพระยา ทัวร์ส่วนตัวเต็มวันพาคุณชมวัดพระแก้ว วัดโพธิ์ วัดอรุณ แล้วต่อด้วยช้อปปิ้งที่จตุจักรหรือไอคอนสยามโดยไม่ต้องกังวลเรื่องการเดินทาง",
+          "รถและคนขับให้บริการเฉพาะกรุ๊ปของคุณ รับจากโรงแรม อยู่ด้วยตลอดวัน และส่งกลับเมื่อจบทริป ลำดับสถานที่ปรับได้อิสระ เหมาะกับครอบครัวที่มีเด็ก ผู้สูงอายุ หรือกรุ๊ปบริษัท",
+        ],
+        pattaya: [
+          "พัทยาคือจุดหมายชายทะเลยอดนิยมจากกรุงเทพฯ ภายในวันเดียวคุณสามารถชมปราสาทสัจธรรม เดินสวนนงนุช และนั่งเรือไปเกาะล้านเพื่อเล่นน้ำทะเลและกีฬาทางน้ำ",
+          "ทัวร์ส่วนตัวหมายถึงรถและคนขับรอคุณทุกจุดแวะ ไม่ต้องต่อคิวรถสาธารณะหรือตามตารางกรุ๊ปอื่น มีรถตู้และมินิบัสสำหรับครอบครัวใหญ่และทริปบริษัท",
+        ],
+        ayutthaya: [
+          "อยุธยาคืออดีตราชธานีของสยามและมรดกโลกยูเนสโก ชมเศียรพระพุทธรูปในรากไม้ที่วัดมหาธาตุ ความงดงามริมน้ำของวัดไชยวัฒนาราม และพระราชวังบางปะอิน",
+          "ด้วยระยะทางใกล้กรุงเทพฯ อยุธยาเหมาะกับเดย์ทริปสบาย ๆ ออกจากโรงแรมตอนเช้า เที่ยวโบราณสถานด้วยรถส่วนตัว และกลับถึงกรุงเทพฯ ตอนเย็น",
+        ],
+        kanchanaburi: [
+          "กาญจนบุรีมีชื่อเสียงจากสะพานข้ามแม่น้ำแควและประวัติศาสตร์สงครามโลกครั้งที่สอง รวมถึงทางรถไฟสายมรณะและช่องเขาขาด นอกจากนี้น้ำตกเอราวัณเจ็ดชั้นกับสระน้ำสีมรกตก็เป็นที่ชื่นชอบของนักท่องเที่ยว",
+          "เส้นทางผ่านชนบทภาคตะวันตกนี้สะดวกที่สุดด้วยรถส่วนตัว จอดถ่ายรูปได้ทุกเมื่อ กำหนดเวลาเที่ยวแต่ละจุดเอง พร้อมคนขับที่ชำนาญเส้นทาง",
+        ],
+        huahin: [
+          "หัวหินคือเมืองตากอากาศของราชวงศ์ไทย บรรยากาศเงียบสงบกว่าพัทยา มีตลาดโต้รุ่ง Cicada สุดอาร์ต สวนสไตล์กรีก Santorini Park และสถานีรถไฟเก่าแก่อันเป็นเอกลักษณ์",
+          "ทัวร์หัวหินส่วนตัวเหมาะกับครอบครัวที่อยากพักผ่อนริมทะเลแบบไม่เร่งรีบ รถเฉพาะกรุ๊ปของคุณจากกรุงเทพฯ แวะไร่องุ่น Monsoon Valley แล้วเดินทางกลับอย่างสบาย",
+        ],
+        khaoyai: [
+          "เขาใหญ่คือไทยอีกมุมหนึ่ง อากาศเย็นสบาย อุทยานแห่งชาติมรดกโลก ไร่องุ่น และฟาร์มกับคาเฟ่สไตล์ยุโรปอย่าง Primo Piazza และฟาร์มโชคชัย",
+          "พื้นที่นี้เที่ยวยากหากไม่มีรถส่วนตัวเพราะสถานที่กระจายตัว ทัวร์ส่วนตัวให้กรุ๊ปของคุณเที่ยวจากจุดหนึ่งไปอีกจุดได้อิสระตามตารางของคุณเอง",
+        ],
+      },
+      factsTitle: "ข้อมูลทริป",
+      factDistance: "ระยะทางจากกรุงเทพฯ",
+      factDriveTime: "เวลาเดินทาง",
+      factDuration: "ระยะเวลาทัวร์",
+      factPickup: "จุดรับ",
+      factPickupValue: "โรงแรมของคุณ (หรือตามตกลง)",
+      priceTitle: "ราคาทัวร์ส่วนตัว{city}",
+      priceVehicle: "รถ",
+      priceCapacity: "จำนวนที่นั่ง",
+      pricePerDay: "ราคา/วัน",
+      priceFootnote:
+        "ราคาต่อคันต่อวัน รวมคนขับ น้ำมัน ทางด่วน และที่จอดรถ ไม่รวมค่าเข้าชมสถานที่และอาหาร",
+      faqTitle: "คำถามที่พบบ่อย",
+      faqs: [
+        {
+          q: "ทัวร์ส่วนตัว{city}ราคาเท่าไหร่?",
+          a: "เริ่มต้น {minPrice} บาทต่อคันต่อวัน สำหรับทัวร์ {duration} ชั่วโมง ราคาคิดต่อคัน ไม่ใช่ต่อคน รวมคนขับ น้ำมัน ทางด่วน และที่จอดรถ",
+        },
+        {
+          q: "ราคาคิดต่อคนหรือต่อคัน?",
+          a: "ต่อคัน ราคาเดียวครอบคลุมทั้งรถและคนขับ ยิ่งกรุ๊ปใหญ่ ค่าใช้จ่ายต่อคนยิ่งถูกลง",
+        },
+        {
+          q: "ราคารวมอะไรบ้าง?",
+          a: "รถส่วนตัวพร้อมคนขับ น้ำมัน ทางด่วน และที่จอดรถ ไม่รวมค่าเข้าชมสถานที่ อาหาร และค่าใช้จ่ายส่วนตัว",
+        },
+        {
+          q: "ปรับแผนเที่ยว{city}ได้ไหม?",
+          a: "ได้ ทุกทัวร์เป็นแบบส่วนตัว ลำดับและสถานที่เที่ยวขึ้นอยู่กับกรุ๊ปของคุณทั้งหมด แจ้งทีมงานตอนยืนยันทาง WhatsApp ได้เลย",
+        },
+        {
+          q: "รับจากที่ไหน?",
+          a: "คนขับรับคุณที่โรงแรมในกรุงเทพฯ หรือจุดอื่นตามตกลง มีบริการรับส่งสนามบินสุวรรณภูมิ (BKK) และดอนเมือง (DMK) ด้วย",
+        },
+        {
+          q: "จองทัวร์{city}อย่างไร?",
+          a: "เลือกรถในหน้านี้แล้วกดปุ่มจองผ่าน WhatsApp รายละเอียดทัวร์จะถูกส่งอัตโนมัติ ทีมงานจะยืนยันวันและคิวว่างให้",
+        },
+      ],
+    },
+    blog: {
+      title: "ทิปส์และแผนเที่ยว",
+      subtitle: "ไกด์ แผนเที่ยว และทิปส์เที่ยวไทย — เขียนจากประสบการณ์จริงของทีมงาน",
+      readMore: "อ่านต่อ",
+      back: "บทความทั้งหมด",
+      empty: "บทความแรกกำลังจะมาเร็ว ๆ นี้",
+      relatedTours: "ทัวร์ที่เกี่ยวกับบทความนี้",
+      ctaTitle: "อยากให้แผนเที่ยวนี้เป็นจริง?",
+      ctaSubtitle: "รถส่วนตัวพร้อมคนขับสำหรับกรุ๊ปของคุณ — ปรึกษาฟรีทาง WhatsApp",
+      waMessage:
+        'สวัสดีค่ะ/ครับ Keliling Thailand! เพิ่งอ่านบทความ "{title}" ขอสอบถามเพิ่มเติมค่ะ/ครับ',
     },
     fleet: {
       title: "รถและราคา",
@@ -667,6 +976,30 @@ export const translations = {
       locationDesc: "กรุงเทพฯ ประเทศไทย",
       hoursTitle: "เวลาทำการ",
       hoursDesc: "ทุกวัน 08.00–20.00 น. (เวลากรุงเทพฯ)",
+    },
+    planner: {
+      openButton: "วางแผนทริป",
+      title: "สร้างแผนการเดินทาง",
+      daysTitle: "เดินทางกี่วัน?",
+      day: "วันที่",
+      daysUnit: "วัน",
+      citiesTitle: "เลือกเมืองสำหรับแต่ละวัน",
+      attractionsTitle: "เลือกสถานที่ท่องเที่ยว",
+      hoursBudget: "{used} จาก {max} ชั่วโมง",
+      overLimit: "เกิน {max} ชั่วโมง — อาจต้องปรับแผนการเดินทาง",
+      paxTitle: "เดินทางกี่คน?",
+      vehicleTitle: "เลือกรถ",
+      vehicleUnavailable: "ไม่มีบริการสำหรับ{city}",
+      paxWarning: "จำนวนผู้โดยสารเกินความจุของรถคันนี้",
+      summaryTitle: "สรุปทริป",
+      totalLabel: "รวม",
+      priceNote: "ราคาต่อคัน ไม่ใช่ต่อคน รวมคนขับ น้ำมัน ทางด่วน และที่จอดรถ",
+      back: "ย้อนกลับ",
+      next: "ถัดไป",
+      waButton: "จองผ่าน WhatsApp",
+      waMessage:
+        "สวัสดี Keliling Thailand! ต้องการจองทัวร์ส่วนตัว {days} วัน สำหรับ {pax} คน ใช้รถ {vehicle}\n{plan}รวม: {total} THB กรุณาแจ้งคิวว่าง",
+      waDayLine: "วันที่ {day}: {city} — {attractions}",
     },
     footer: {
       tagline: "ทัวร์ส่วนตัวทั่วไทย — รถ คนขับ และแผนเที่ยวสำหรับกรุ๊ปของคุณ",

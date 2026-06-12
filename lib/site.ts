@@ -2,6 +2,16 @@
 
 export const WA_NUMBER = "6285750923934";
 
+const productionUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+  "https://kelilingthailand.com";
+
+/** Absolute origin without trailing slash — for JSON-LD and canonical URLs. */
+export const siteUrl = (
+  productionUrl.startsWith("http") ? productionUrl : `https://${productionUrl}`
+).replace(/\/$/, "");
+
 export function waLink(message: string): string {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
 }

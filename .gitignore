@@ -51,3 +51,4 @@ next-env.d.ts
 .agents/
 outputs/
 skills-lock.json
+.gstack/

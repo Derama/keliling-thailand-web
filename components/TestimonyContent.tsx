@@ -13,7 +13,7 @@ export default function TestimonyContent() {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
         {t.testimony.items.map((item) => (
-          <figure key={item.name} className="bg-gray-50 rounded-2xl p-5">
+          <figure key={item.name} className="bg-cream rounded-2xl p-5">
             <p className="text-[#F5C518]">{"★".repeat(item.stars)}</p>
             <blockquote className="mt-2 text-sm text-gray-700">{item.text}</blockquote>
             <figcaption className="mt-3 text-sm font-bold text-[#1B2A4A]">
