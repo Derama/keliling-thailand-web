@@ -270,3 +270,16 @@ a, button {
 .reveal-stagger.is-visible > *:nth-child(10) { transition-delay: 810ms; opacity: 1; transform: none; }
 .reveal-stagger.is-visible > *:nth-child(11) { transition-delay: 900ms; opacity: 1; transform: none; }
 .reveal-stagger.is-visible > *:nth-child(12) { transition-delay: 990ms; opacity: 1; transform: none; }
+
+/* ── Admin print documents ── */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-doc {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
