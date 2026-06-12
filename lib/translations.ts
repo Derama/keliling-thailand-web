@@ -370,6 +370,7 @@ export const translations = {
       linksTitle: "Halaman",
       contactTitle: "Kontak",
       rights: "Hak cipta dilindungi.",
+      admin: "Admin",
     },
   },
   en: {
@@ -690,6 +691,7 @@ export const translations = {
       linksTitle: "Pages",
       contactTitle: "Contact",
       rights: "All rights reserved.",
+      admin: "Admin",
     },
   },
   th: {
@@ -1006,6 +1008,7 @@ export const translations = {
       linksTitle: "หน้าเพจ",
       contactTitle: "ติดต่อ",
       rights: "สงวนลิขสิทธิ์",
+      admin: "แอดมิน",
     },
   },
 } as const;

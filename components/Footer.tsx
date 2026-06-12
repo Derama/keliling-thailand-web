@@ -48,7 +48,11 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
-        © {new Date().getFullYear()} Keliling Thailand. {t.footer.rights}
+        © {new Date().getFullYear()} Keliling Thailand. {t.footer.rights}{" "}
+        <span className="mx-1">·</span>
+        <Link href="/admin" className="hover:text-[#F5C518]">
+          {t.footer.admin}
+        </Link>
       </div>
     </footer>
   );
