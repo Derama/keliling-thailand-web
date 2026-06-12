@@ -11,6 +11,7 @@ export function GET() {
   const body = `User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin/
 
 Sitemap: ${baseUrl}/sitemap.xml
 Host: ${baseUrl}
