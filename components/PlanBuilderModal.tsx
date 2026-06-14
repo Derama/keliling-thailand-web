@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
-import { cities, getCity, vehicles, VehicleId } from "@/lib/tours";
+import { cities, getCity, bookableVehicles, VehicleId } from "@/lib/tours";
 import { cityNames, attractionNames } from "@/lib/translations";
 import { waLink, fillTemplate } from "@/lib/site";
 
@@ -92,6 +92,9 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
       : step === 2
         ? picks.every((p) => p.length > 0)
         : true;
+
+  // Only price-driven vehicles appear in the planner; Alphard/Bus are WhatsApp-only.
+  const plannerVehicles = bookableVehicles();
 
   /** Cities (by day) where a vehicle has no price — empty means bookable. */
   const missingCities = (vehicleId: VehicleId): string[] =>
@@ -334,7 +337,7 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
             <>
               <h3 className="font-bold text-[#1B2A4A] mb-3">{t.planner.vehicleTitle}</h3>
               <div className="planner-stagger space-y-3">
-                {vehicles.map((v, i) => {
+                {plannerVehicles.map((v, i) => {
                   const missing = missingCities(v.id);
                   const unavailable = missing.length > 0;
                   const selected = vehicle === v.id;
@@ -384,7 +387,7 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
                   );
                 })}
               </div>
-              {vehicle && pax > maxVehiclePax(vehicles.find((v) => v.id === vehicle)!.pax) && (
+              {vehicle && pax > maxVehiclePax(plannerVehicles.find((v) => v.id === vehicle)!.pax) && (
                 <p className="text-xs text-amber-600 mt-2">{t.planner.paxWarning}</p>
               )}
 
@@ -395,11 +398,6 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
                     <li key={i}>{line}</li>
                   ))}
                 </ul>
-                {vehicle && (
-                  <p className="font-extrabold text-[#1B2A4A] mt-3">
-                    {t.planner.totalLabel}: {vehicleTotal(vehicle).toLocaleString()} {t.common.thb}
-                  </p>
-                )}
                 <p className="text-xs text-gray-500 mt-2">{t.planner.priceNote}</p>
               </div>
             </>
