@@ -2,12 +2,14 @@
 // per day (supplier base + margin already applied). Display names live in
 // lib/translations.ts (cityNames, attractionNames, t.vehicleNames).
 
-export type VehicleId = "altis" | "suv" | "van" | "minibus";
+export type VehicleId = "altis" | "suv" | "alphard" | "van" | "minibus" | "bus";
 
 export interface Vehicle {
   id: VehicleId;
   pax: string; // e.g. "1-3"
-  image: string;
+  image: string; // primary photo (thumbnail on home/planner)
+  images?: string[]; // optional gallery for the fleet-page slider
+  imageLabels?: string[]; // model names shown over each gallery slide
 }
 
 export interface Attraction {
@@ -29,10 +31,20 @@ export interface City {
 }
 
 export const vehicles: Vehicle[] = [
-  { id: "altis", pax: "1-3", image: "/Altis.webp" },
-  { id: "suv", pax: "1-5", image: "/Fortuner.webp" },
-  { id: "van", pax: "5-10", image: "/van.webp" },
-  { id: "minibus", pax: "10-20", image: "/bus.png" },
+  // Photos live one folder per vehicle under public/vehicles/<id>/. Replace the
+  // file inside each folder to update the picture (keep the same filename).
+  { id: "altis", pax: "1-3", image: "/vehicles/altis/altis.webp" },
+  {
+    id: "suv",
+    pax: "1-5",
+    image: "/vehicles/suv/corolla-cross-grsport-v3.png",
+    images: ["/vehicles/suv/corolla-cross-grsport-v3.png", "/vehicles/suv/fortuner-v2.png"],
+    imageLabels: ["New Corolla Cross GR Sport 2026", "Toyota Fortuner"],
+  },
+  { id: "alphard", pax: "1-6", image: "/vehicles/alphard/alphard-v2.png" },
+  { id: "van", pax: "5-10", image: "/vehicles/van/van-v3.png" },
+  { id: "minibus", pax: "10-20", image: "/vehicles/minibus/minibus.jpeg" },
+  { id: "bus", pax: "20-40", image: "/vehicles/bus/bus.jpeg" },
 ];
 
 const unsplash = (id: string) =>
@@ -92,7 +104,7 @@ export const cities: City[] = [
     durationHours: 10,
     // Death Railway train on the cliffside trestle
     image: unsplash("photo-1702826711635-790dc66f1c41"),
-    prices: { altis: 4400, suv: 4900, van: 5500 },
+    prices: { altis: 4200, suv: 4700, van: 5300 },
     driveFromBangkok: { km: 130, hours: "2.5" },
     attractions: [
       { id: "bridge-river-kwai", hours: 1.5, image: unsplash("photo-1624806296367-33e24d6162ef") },
@@ -109,7 +121,7 @@ export const cities: City[] = [
     // Hua Hin Railway Station royal pavilion.
     // Photo: Khaosaming, Wikimedia Commons, CC BY-SA 4.0
     image: "/huahin-station.jpg",
-    prices: { altis: 4500, suv: 5000, van: 6000 },
+    prices: { altis: 4300, suv: 4800, van: 5500 },
     driveFromBangkok: { km: 200, hours: "3" },
     attractions: [
       { id: "cicada-market", hours: 2, image: unsplash("photo-1541738158050-3f1568a657a5") },
@@ -125,7 +137,7 @@ export const cities: City[] = [
     durationHours: 12,
     // Khao Yai mountain panorama
     image: unsplash("photo-1601225612399-46e1fd6b9e90"),
-    prices: { altis: 4400, suv: 4900, van: 5500, minibus: 11000 },
+    prices: { altis: 4200, suv: 4700, van: 5500, minibus: 11000 },
     driveFromBangkok: { km: 165, hours: "2.5" },
     attractions: [
       { id: "khao-yai-national-park", hours: 4, image: unsplash("photo-1748966006345-ea3c0ca397e9") },
@@ -144,6 +156,15 @@ export function getCity(cityId: string): City | undefined {
 
 export function getPrice(cityId: string, vehicleId: VehicleId): number | undefined {
   return getCity(cityId)?.prices[vehicleId];
+}
+
+/**
+ * Vehicles with a published per-city price. Alphard and Bus are quoted on
+ * request (WhatsApp only), so they're excluded from the price-driven plan
+ * builder but still shown on the home/fleet pages.
+ */
+export function bookableVehicles(): Vehicle[] {
+  return vehicles.filter((v) => cities.some((c) => c.prices[v.id] != null));
 }
 
 /** Vehicles actually offered for a given city (those with a price). */

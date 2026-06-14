@@ -1,190 +1,65 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-import type { OrderWithCustomer, Payment } from "@/lib/admin/types";
-import { STATUS_LABELS, STATUS_COLORS } from "@/lib/admin/types";
-import {
-  formatIDR,
-  formatTHB,
-  formatDate,
-  profitTHB,
-  isoLocal,
-} from "@/lib/admin/utils";
-import { ErrorNote } from "@/components/admin/ui";
+import DashboardView from "@/components/admin/views/DashboardView";
+import OrdersView from "@/components/admin/views/OrdersView";
+import PriceListView from "@/components/admin/views/PriceListView";
+import InvoiceBuilderView from "@/components/admin/views/InvoiceBuilderView";
+import ItineraryBuilderView from "@/components/admin/views/ItineraryBuilderView";
+import CalendarView from "@/components/admin/views/CalendarView";
+import CustomersView from "@/components/admin/views/CustomersView";
 
-const ACTIVE = ["confirmed", "ongoing", "completed"] as const;
+const TABS = [
+  { id: "dashboard", label: "Dashboard", View: DashboardView },
+  { id: "orders", label: "Order", View: OrdersView },
+  { id: "prices", label: "Daftar Harga", View: PriceListView },
+  { id: "invoice", label: "Buat Invoice", View: InvoiceBuilderView },
+  { id: "itinerary", label: "Itinerary", View: ItineraryBuilderView },
+  { id: "calendar", label: "Kalender", View: CalendarView },
+  { id: "customers", label: "Customer", View: CustomersView },
+] as const;
 
-function monthRange(offset: number): [string, string] {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-  const end = new Date(now.getFullYear(), now.getMonth() + offset + 1, 1);
-  return [isoLocal(start), isoLocal(end)];
-}
+type TabId = (typeof TABS)[number]["id"];
 
-function StatCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-[#1B2A4A]">{value}</p>
-      {sub && <p className="mt-1 text-xs text-gray-400">{sub}</p>}
-    </div>
-  );
-}
+const STORAGE_KEY = "admin-tab";
 
-export default function AdminDashboardPage() {
-  const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [error, setError] = useState<string | null>(null);
+export default function AdminPage() {
+  const [active, setActive] = useState<TabId>("dashboard");
 
+  // Restore last-opened tab after mount (avoids hydration mismatch).
   useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("orders")
-      .select("*, customers(*)")
-      .then(({ data, error }) => {
-        if (error) setError(error.message);
-        else setOrders((data as OrderWithCustomer[]) ?? []);
-      });
-    supabase
-      .from("payments")
-      .select("*")
-      .then(({ data }) => setPayments(data ?? []));
+    const saved = localStorage.getItem(STORAGE_KEY) as TabId | null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount localStorage sync, avoids hydration mismatch
+    if (saved && TABS.some((t) => t.id === saved)) setActive(saved);
   }, []);
 
-  const active = orders.filter((o) =>
-    (ACTIVE as readonly string[]).includes(o.status)
-  );
-
-  function monthStats(offset: number) {
-    const [start, end] = monthRange(offset);
-    const inMonth = active.filter(
-      (o) => o.trip_start && o.trip_start >= start && o.trip_start < end
-    );
-    const revenue = inMonth.reduce((s, o) => s + Number(o.price_idr), 0);
-    const profit = inMonth.reduce((s, o) => s + (profitTHB(o) ?? 0), 0);
-    return { trips: inMonth.length, revenue, profit };
+  function select(id: TabId) {
+    setActive(id);
+    localStorage.setItem(STORAGE_KEY, id);
   }
 
-  const thisMonth = monthStats(0);
-  const lastMonth = monthStats(-1);
-
-  const today = isoLocal();
-  const upcoming = active
-    .filter((o) => o.trip_start && o.trip_start >= today)
-    .sort((a, b) => (a.trip_start! < b.trip_start! ? -1 : 1))
-    .slice(0, 8);
-
-  const paidByOrder = new Map<string, number>();
-  for (const p of payments) {
-    paidByOrder.set(
-      p.order_id,
-      (paidByOrder.get(p.order_id) ?? 0) + Number(p.amount_idr)
-    );
-  }
-  const outstanding = active.filter(
-    (o) => Number(o.price_idr) > (paidByOrder.get(o.id) ?? 0)
-  );
+  const ActiveView =
+    TABS.find((t) => t.id === active)?.View ?? DashboardView;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[#1B2A4A]">Dashboard</h1>
-      <ErrorNote message={error} />
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard
-          label="Trip bulan ini"
-          value={String(thisMonth.trips)}
-          sub={`bulan lalu: ${lastMonth.trips}`}
-        />
-        <StatCard
-          label="Omzet bulan ini"
-          value={formatIDR(thisMonth.revenue)}
-          sub={`bulan lalu: ${formatIDR(lastMonth.revenue)}`}
-        />
-        <StatCard
-          label="Profit bulan ini"
-          value={formatTHB(thisMonth.profit)}
-          sub={`bulan lalu: ${formatTHB(lastMonth.profit)}`}
-        />
+      <div className="flex flex-wrap gap-1 border-b border-gray-200">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => select(t.id)}
+            className={`-mb-px rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+              active === t.id
+                ? "border-b-2 border-[#F5C518] text-[#1B2A4A]"
+                : "text-gray-500 hover:text-[#1B2A4A]"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 font-semibold text-[#1B2A4A]">Trip mendatang</h2>
-          <ul className="divide-y divide-gray-100 text-sm">
-            {upcoming.map((o) => (
-              <li
-                key={o.id}
-                className="flex items-center justify-between py-2"
-              >
-                <span>
-                  <Link
-                    href={`/admin/orders/${o.id}`}
-                    className="font-medium text-[#1B2A4A] hover:underline"
-                  >
-                    {o.order_number}
-                  </Link>{" "}
-                  · {o.customers.name}
-                </span>
-                <span className="text-gray-500">
-                  {formatDate(o.trip_start)}
-                  <span
-                    className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[o.status]}`}
-                  >
-                    {STATUS_LABELS[o.status]}
-                  </span>
-                </span>
-              </li>
-            ))}
-            {upcoming.length === 0 && (
-              <li className="py-4 text-gray-400">
-                Tidak ada trip mendatang.
-              </li>
-            )}
-          </ul>
-        </section>
-
-        <section className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 font-semibold text-[#1B2A4A]">Belum lunas</h2>
-          <ul className="divide-y divide-gray-100 text-sm">
-            {outstanding.map((o) => (
-              <li
-                key={o.id}
-                className="flex items-center justify-between py-2"
-              >
-                <span>
-                  <Link
-                    href={`/admin/orders/${o.id}`}
-                    className="font-medium text-[#1B2A4A] hover:underline"
-                  >
-                    {o.order_number}
-                  </Link>{" "}
-                  · {o.customers.name}
-                </span>
-                <span className="font-medium text-red-700">
-                  sisa{" "}
-                  {formatIDR(
-                    Number(o.price_idr) - (paidByOrder.get(o.id) ?? 0)
-                  )}
-                </span>
-              </li>
-            ))}
-            {outstanding.length === 0 && (
-              <li className="py-4 text-gray-400">Semua order lunas. 🎉</li>
-            )}
-          </ul>
-        </section>
-      </div>
+      <ActiveView />
     </div>
   );
 }

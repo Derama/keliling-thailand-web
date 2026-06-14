@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
+import { OPERATOR_DETAILS } from "@/lib/site";
 
 export default function AboutContent() {
   const { t } = useLanguage();
@@ -20,6 +22,31 @@ export default function AboutContent() {
           </div>
         ))}
       </div>
+
+      <section className="mt-14 rounded-2xl bg-[#1B2A4A] p-6 text-[#FEF9EC] sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F5C518]">
+          {t.about.operatorEyebrow}
+        </p>
+        <h2 className="mt-2 max-w-2xl text-2xl font-extrabold sm:text-3xl">
+          {t.about.operatorTitle}
+        </h2>
+        <p className="mt-3 max-w-2xl leading-7 text-[#FEF9EC]/75">
+          {t.about.operatorDesc}
+        </p>
+        <div className="mt-6 flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:gap-3">
+          <strong>{OPERATOR_DETAILS.name}</strong>
+          <span className="hidden text-[#FEF9EC]/35 sm:inline">·</span>
+          <span className="text-[#FEF9EC]/70">
+            {t.contact.tourismLicenseLabel} {OPERATOR_DETAILS.tourismLicense}
+          </span>
+        </div>
+        <Link
+          href="/contact"
+          className="mt-6 inline-flex rounded-full bg-[#F5C518] px-5 py-3 text-sm font-extrabold text-[#1B2A4A] transition hover:-translate-y-0.5 hover:bg-[#FFD83D] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/25"
+        >
+          {t.about.operatorLink}
+        </Link>
+      </section>
     </main>
   );
 }

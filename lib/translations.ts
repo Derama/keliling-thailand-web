@@ -218,7 +218,7 @@ export const translations = {
           desc: "Pas untuk pasangan atau solo traveler. Nyaman dan hemat.",
         },
         suv: {
-          name: "SUV — Fortuner / New Corolla Cross GR Sport 2026",
+          name: "SUV — New Corolla Cross GR Sport 2026 / Fortuner",
           pax: "1–5 penumpang",
           desc: "Toyota Fortuner atau Corolla Cross. Keluarga kecil dengan bagasi besar, kabin tinggi dan lega.",
         },
@@ -639,7 +639,7 @@ export const translations = {
           desc: "Great for couples or solo travelers. Comfortable and economical.",
         },
         suv: {
-          name: "SUV — Fortuner / New Corolla Cross GR Sport 2026",
+          name: "SUV — New Corolla Cross GR Sport 2026 / Fortuner",
           pax: "1–5 passengers",
           desc: "Toyota Fortuner or Corolla Cross. Small families with big luggage; tall, spacious cabin.",
         },
@@ -1058,7 +1058,7 @@ export const translations = {
           desc: "เหมาะกับคู่รักหรือเที่ยวคนเดียว สะดวกและประหยัด",
         },
         suv: {
-          name: "SUV — Fortuner / New Corolla Cross GR Sport 2026",
+          name: "SUV — New Corolla Cross GR Sport 2026 / Fortuner",
           pax: "1–5 ที่นั่ง",
           desc: "Toyota Fortuner หรือ Corolla Cross ครอบครัวเล็กพร้อมสัมภาระเยอะ ห้องโดยสารกว้าง",
         },

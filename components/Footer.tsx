@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
-import { waLink, WA_NUMBER } from "@/lib/site";
+import {
+  CONTACT_WHATSAPP,
+  OPERATOR_DETAILS,
+  SOCIAL_LINKS,
+  waLinkTo,
+} from "@/lib/site";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -18,10 +23,18 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#1B2A4A] text-white mt-auto">
-      <div className="max-w-6xl mx-auto px-4 py-12 grid gap-8 md:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.7fr_1fr_0.8fr]">
         <div>
           <p className="font-bold text-lg mb-2">Keliling Thailand</p>
           <p className="text-sm text-white/70">{t.footer.tagline}</p>
+          <div className="mt-5 text-sm">
+            <p className="text-white/50">{t.footer.operatedBy}</p>
+            <p className="mt-1 font-bold">{OPERATOR_DETAILS.name}</p>
+            <p className="mt-1 text-xs text-white/55">{t.footer.licenseShort}</p>
+            <p className="mt-2 max-w-xs text-xs leading-5 text-white/55">
+              {OPERATOR_DETAILS.address}
+            </p>
+          </div>
         </div>
         <div>
           <p className="font-bold mb-3">{t.footer.linksTitle}</p>
@@ -37,14 +50,44 @@ export default function Footer() {
         </div>
         <div>
           <p className="font-bold mb-3">{t.footer.contactTitle}</p>
-          <a
-            href={waLink(t.home.waMessage)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-white/70 hover:text-[#25D366]"
-          >
-            WhatsApp +{WA_NUMBER}
-          </a>
+          <ul className="space-y-3 text-sm">
+            {CONTACT_WHATSAPP.map((contact) => (
+              <li key={contact.number}>
+                <a
+                  href={waLinkTo(contact.number, t.contact.waMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block"
+                >
+                  <span className="block font-semibold text-white/85 group-hover:text-[#25D366]">
+                    {contact.name}
+                  </span>
+                  <span className="text-white/55">+{contact.number}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="font-bold mb-3">{t.footer.socialTitle}</p>
+          <div className="flex flex-col gap-3 text-sm text-white/70">
+            <a
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#F5C518]"
+            >
+              Instagram · @kelilingthailand
+            </a>
+            <a
+              href={SOCIAL_LINKS.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#F5C518]"
+            >
+              Facebook · Keliling Thailand
+            </a>
+          </div>
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">

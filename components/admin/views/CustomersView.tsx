@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Customer } from "@/lib/admin/types";
 import { inputCls, ErrorNote } from "@/components/admin/ui";
 
-export default function CustomersPage() {
+export default function CustomersView() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);

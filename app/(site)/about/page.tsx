@@ -4,7 +4,7 @@ import AboutContent from "@/components/AboutContent";
 export const metadata: Metadata = {
   title: "Tentang Kami",
   description:
-    "Keliling Thailand — layanan tur privat untuk wisatawan Indonesia di Thailand. Kendaraan dengan sopir untuk tur kota, day trip, dan airport transfer.",
+    "Keliling Thailand adalah layanan tur privat yang dioperasikan oleh Love Bangkok Co., Ltd., perusahaan pariwisata Thailand berlisensi.",
 };
 
 export default function AboutPage() {

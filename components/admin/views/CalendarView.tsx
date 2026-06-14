@@ -15,7 +15,7 @@ const BAR_COLORS: Record<OrderStatus, string> = {
   cancelled: "bg-red-200 text-red-700 line-through",
 };
 
-export default function CalendarPage() {
+export default function CalendarView() {
   const [month, setMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);

@@ -4,7 +4,12 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import JsonLd from "@/components/JsonLd";
 import { LanguageProvider } from "@/components/LanguageContext";
 import { PlanBuilderProvider } from "@/components/PlanBuilderContext";
-import { siteUrl } from "@/lib/site";
+import {
+  CONTACT_WHATSAPP,
+  OPERATOR_DETAILS,
+  SOCIAL_LINKS,
+  siteUrl,
+} from "@/lib/site";
 
 const organizationLd = {
   "@context": "https://schema.org",
@@ -12,12 +17,26 @@ const organizationLd = {
   "@id": `${siteUrl}/#organization`,
   name: "Keliling Thailand",
   alternateName: "Keliling Thailand Tours",
+  legalName: OPERATOR_DETAILS.name,
   url: siteUrl,
   logo: `${siteUrl}/newlog.png`,
   image: `${siteUrl}/newlog.png`,
   description:
     "Private group tours in Thailand with sedan, SUV, van, and mini bus. Whole-vehicle bookings with driver for city tours, day trips, and airport transfers.",
-  telephone: "+62-857-5092-3934",
+  telephone: CONTACT_WHATSAPP.map((contact) => `+${contact.number}`),
+  sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.facebook],
+  identifier: [
+    {
+      "@type": "PropertyValue",
+      name: "Tourism License",
+      value: OPERATOR_DETAILS.tourismLicense,
+    },
+    {
+      "@type": "PropertyValue",
+      name: "Company Registration",
+      value: OPERATOR_DETAILS.companyRegistration,
+    },
+  ],
   priceRange: "$$",
   areaServed: [
     { "@type": "City", name: "Bangkok" },
@@ -30,8 +49,11 @@ const organizationLd = {
   ],
   address: {
     "@type": "PostalAddress",
+    streetAddress: "49/21 Moo 10, Nong Prue",
+    addressLocality: "Bang Lamung",
+    addressRegion: "Chon Buri",
+    postalCode: "20150",
     addressCountry: "TH",
-    addressLocality: "Bangkok",
   },
 };
 

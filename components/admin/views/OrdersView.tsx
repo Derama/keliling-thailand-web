@@ -12,7 +12,7 @@ import {
 import { formatIDR, formatDate } from "@/lib/admin/utils";
 import { inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 
-export default function OrdersPage() {
+export default function OrdersView() {
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
   const [status, setStatus] = useState<OrderStatus | "all">("all");
   const [query, setQuery] = useState("");
