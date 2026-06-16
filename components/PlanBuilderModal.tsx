@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
 import { cities, getCity, bookableVehicles, VehicleId } from "@/lib/tours";
 import { cityNames, attractionNames } from "@/lib/translations";
+import { convertThbToIdr } from "@/lib/currency";
 import { waLink, fillTemplate } from "@/lib/site";
 
 const MAX_DAYS = 5;
 const MAX_PAX = 20;
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 /** Famous attractions pre-checked in itinerary order until the day is full. */
 function defaultPicks(cityId: string): string[] {
@@ -45,7 +46,9 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
   const [days, setDays] = useState(1);
   const [tripCities, setTripCities] = useState<string[]>([""]);
   const [picks, setPicks] = useState<string[][]>([[]]);
+  const [customPlaces, setCustomPlaces] = useState<string[][]>([[]]);
   const [pax, setPax] = useState(2);
+  const [addons, setAddons] = useState({ hotel: false, tickets: false });
   const [vehicle, setVehicle] = useState<VehicleId | null>(null);
 
   const step = nav.step;
@@ -65,11 +68,13 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
     setDays(n);
     setTripCities((prev) => Array.from({ length: n }, (_, i) => prev[i] ?? ""));
     setPicks((prev) => Array.from({ length: n }, (_, i) => prev[i] ?? []));
+    setCustomPlaces((prev) => Array.from({ length: n }, (_, i) => prev[i] ?? []));
   };
 
   const chooseCity = (day: number, cityId: string) => {
     setTripCities((prev) => prev.map((c, i) => (i === day ? cityId : c)));
     setPicks((prev) => prev.map((p, i) => (i === day ? defaultPicks(cityId) : p)));
+    setCustomPlaces((prev) => prev.map((c, i) => (i === day ? [] : c)));
     setVehicle(null);
   };
 
@@ -85,6 +90,19 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
     );
   };
 
+  const addCustomPlace = (day: number, name: string) => {
+    const value = name.trim();
+    if (!value) return;
+    setCustomPlaces((prev) =>
+      prev.map((c, i) => (i === day ? [...c, value] : c))
+    );
+  };
+  const removeCustomPlace = (day: number, idx: number) => {
+    setCustomPlaces((prev) =>
+      prev.map((c, i) => (i === day ? c.filter((_, j) => j !== idx) : c))
+    );
+  };
+
   const chosenCities = tripCities.map((id) => getCity(id));
   const canNext =
     step === 1
@@ -93,7 +111,7 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
         ? picks.every((p) => p.length > 0)
         : true;
 
-  // Only price-driven vehicles appear in the planner; Alphard/Bus are WhatsApp-only.
+  // Only price-driven vehicles appear in the planner; Bus is WhatsApp-only.
   const plannerVehicles = bookableVehicles();
 
   /** Cities (by day) where a vehicle has no price — empty means bookable. */
@@ -107,17 +125,33 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
     fillTemplate(t.planner.waDayLine, {
       day: i + 1,
       city: cityNames[id],
-      attractions: picks[i].map((a) => attractionNames[a]).join(", "),
+      price: vehicle ? (getCity(id)?.prices[vehicle] ?? 0).toLocaleString() : "",
+      attractions: [
+        ...picks[i].map((a) => attractionNames[a]),
+        ...customPlaces[i],
+      ].join(", "),
     })
   );
+
+  const addonItems = [
+    addons.hotel && t.planner.addonHotelItem,
+    addons.tickets && t.planner.addonTicketsItem,
+  ].filter(Boolean) as string[];
+  const addonsLine = addonItems.length
+    ? "\n\n" +
+      fillTemplate(t.planner.waAddonLine, {
+        items: addonItems.join(` ${t.planner.addonJoiner} `),
+      })
+    : "";
 
   const waMessage = vehicle
     ? fillTemplate(t.planner.waMessage, {
         days,
         pax,
         vehicle: t.vehicleNames[vehicle],
-        plan: dayLines.map((l) => `${l}\n`).join(""),
+        plan: dayLines.join("\n\n"),
         total: vehicleTotal(vehicle).toLocaleString(),
+        addons: addonsLine,
       })
     : "";
 
@@ -300,6 +334,13 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
                           {fillTemplate(t.planner.overLimit, { max: city.durationHours })}
                         </p>
                       )}
+                      <CustomPlaces
+                        items={customPlaces[dayIdx]}
+                        onAdd={(name) => addCustomPlace(dayIdx, name)}
+                        onRemove={(idx) => removeCustomPlace(dayIdx, idx)}
+                        label={t.planner.addCustomPlace}
+                        note={t.planner.customPlaceNote}
+                      />
                     </div>
                   );
                 })}
@@ -334,6 +375,42 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
           )}
 
           {step === 4 && (
+            <>
+              <h3 className="font-bold text-[#1B2A4A] mb-1">{t.planner.addonsTitle}</h3>
+              <p className="text-sm text-gray-500 mb-5">{t.planner.addonsSubtitle}</p>
+              <div className="planner-stagger space-y-3">
+                {(
+                  [
+                    { key: "hotel", title: t.planner.addonHotelTitle, desc: t.planner.addonHotelDesc },
+                    { key: "tickets", title: t.planner.addonTicketsTitle, desc: t.planner.addonTicketsDesc },
+                  ] as const
+                ).map((opt, i) => {
+                  const selected = addons[opt.key];
+                  return (
+                    <button
+                      key={opt.key}
+                      style={{ "--i": i } as React.CSSProperties}
+                      onClick={() => setAddons((a) => ({ ...a, [opt.key]: !a[opt.key] }))}
+                      className={`relative w-full flex items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all duration-200 ${
+                        selected
+                          ? "ring-4 ring-[#F5C518] bg-[#F5C518]/10 shadow-lg shadow-[#F5C518]/25"
+                          : "ring-1 ring-gray-200 hover:ring-2 hover:ring-[#F5C518]/60 hover:-translate-y-0.5 active:scale-[0.98]"
+                      }`}
+                    >
+                      <span className="flex-1 min-w-0">
+                        <span className="block font-bold text-[#1B2A4A]">{opt.title}</span>
+                        <span className="text-xs text-gray-500">{opt.desc}</span>
+                      </span>
+                      {selected && <CheckBadge />}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-4 text-xs text-gray-400">{t.planner.addonsSkipHint}</p>
+            </>
+          )}
+
+          {step === 5 && (
             <>
               <h3 className="font-bold text-[#1B2A4A] mb-3">{t.planner.vehicleTitle}</h3>
               <div className="planner-stagger space-y-3">
@@ -393,13 +470,50 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
 
               <div className="mt-6 rounded-2xl bg-cream p-4">
                 <h3 className="font-bold text-[#1B2A4A] mb-2">{t.planner.summaryTitle}</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  {dayLines.map((line, i) => (
-                    <li key={i}>{line}</li>
-                  ))}
+                <ul className="space-y-3">
+                  {tripCities.map((cityId, i) => {
+                    const price = vehicle ? getCity(cityId)?.prices[vehicle] : null;
+                    return (
+                      <li key={i}>
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="text-sm font-semibold text-[#1B2A4A]">
+                            {t.planner.day} {i + 1} · {cityNames[cityId]}
+                          </span>
+                          {price != null && (
+                            <span className="shrink-0 text-sm font-bold text-[#1B2A4A] tabular-nums">
+                              {price.toLocaleString()} {t.common.thb}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-xs leading-5 text-gray-500">
+                          {[
+                            ...picks[i].map((a) => attractionNames[a]),
+                            ...customPlaces[i],
+                          ].join(", ")}
+                        </p>
+                      </li>
+                    );
+                  })}
                 </ul>
-                <p className="text-xs text-gray-500 mt-2">{t.planner.priceNote}</p>
+                {vehicle && (
+                  <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-[#1B2A4A]/10 pt-3">
+                    <span className="font-bold text-[#1B2A4A]">{t.planner.totalLabel}</span>
+                    <span className="text-lg font-extrabold text-[#1B2A4A] tabular-nums">
+                      {vehicleTotal(vehicle).toLocaleString()} {t.common.thb}
+                    </span>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-3">{t.planner.priceNote}</p>
+                {addonItems.length > 0 && (
+                  <p className="mt-2 border-t border-[#1B2A4A]/10 pt-2 text-xs font-medium text-[#1B2A4A]/80">
+                    {fillTemplate(t.planner.addonsSummary, {
+                      items: addonItems.join(`, `),
+                    })}
+                  </p>
+                )}
               </div>
+
+              {vehicle && <PlanConverter totalThb={vehicleTotal(vehicle)} />}
             </>
           )}
         </div>
@@ -433,6 +547,156 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Free-text "add your own place" input + chips for a single day. */
+function CustomPlaces({
+  items,
+  onAdd,
+  onRemove,
+  label,
+  note,
+}: {
+  items: string[];
+  onAdd: (name: string) => void;
+  onRemove: (idx: number) => void;
+  label: string;
+  note: string;
+}) {
+  const [value, setValue] = useState("");
+  const submit = () => {
+    onAdd(value);
+    setValue("");
+  };
+  return (
+    <div className="mt-3">
+      <div className="flex gap-2">
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              submit();
+            }
+          }}
+          placeholder={label}
+          className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-[#1B2A4A] outline-none focus:border-[#F5C518] focus:ring-2 focus:ring-[#F5C518]/20"
+        />
+        <button
+          type="button"
+          onClick={submit}
+          disabled={!value.trim()}
+          aria-label={label}
+          className="shrink-0 w-10 rounded-xl bg-[#F5C518] text-xl font-bold text-[#1B2A4A] hover:brightness-95 active:scale-95 transition-all disabled:opacity-40"
+        >
+          +
+        </button>
+      </div>
+      {items.length > 0 && (
+        <>
+          <div className="planner-stagger mt-2 flex flex-wrap gap-2">
+            {items.map((name, idx) => (
+              <span
+                key={`${name}-${idx}`}
+                style={{ "--i": idx } as React.CSSProperties}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#F5C518]/15 ring-1 ring-[#F5C518] py-1 pl-3 pr-1.5 text-sm font-medium text-[#1B2A4A]"
+              >
+                {name}
+                <button
+                  type="button"
+                  onClick={() => onRemove(idx)}
+                  aria-label="Remove"
+                  className="grid h-5 w-5 place-items-center rounded-full text-[#1B2A4A]/50 hover:bg-[#1B2A4A]/10 hover:text-[#1B2A4A]"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          </div>
+          <p className="mt-1.5 text-[11px] text-gray-400">{note}</p>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Compact THB→IDR converter so customers can eyeball the total in Rupiah. */
+function PlanConverter({ totalThb }: { totalThb: number }) {
+  const { language, t } = useLanguage();
+  const c = t.fleet.converter;
+  const [rate, setRate] = useState("");
+  const [rateStatus, setRateStatus] = useState<"loading" | "ready" | "unavailable">("loading");
+  const rateEdited = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/fx")
+      .then((res) => (res.ok ? res.json() : { rate: null }))
+      .then((data) => {
+        if (!active) return;
+        if (typeof data.rate !== "number") {
+          setRateStatus("unavailable");
+          return;
+        }
+        if (!rateEdited.current) setRate(String(Math.round(data.rate * 100) / 100));
+        setRateStatus("ready");
+      })
+      .catch(() => active && setRateStatus("unavailable"));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const converted = convertThbToIdr(totalThb, Number(rate));
+  const idr =
+    converted === null
+      ? null
+      : new Intl.NumberFormat(language === "id" ? "id-ID" : "en-US", {
+          style: "currency",
+          currency: "IDR",
+          maximumFractionDigits: 0,
+        }).format(converted);
+
+  return (
+    <div className="mt-3 rounded-2xl border border-[#1B2A4A]/10 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor="planner-rate" className="text-sm font-bold text-[#1B2A4A]">
+          {c.rateLabel}
+        </label>
+        <div className="flex w-32 overflow-hidden rounded-xl border border-gray-200 bg-[#FEF9EC] focus-within:border-[#B28716] focus-within:ring-2 focus-within:ring-[#F5C518]/20">
+          <span className="grid place-items-center px-2 text-[11px] font-bold text-[#1B2A4A]">IDR</span>
+          <input
+            id="planner-rate"
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            value={rate}
+            onChange={(e) => {
+              rateEdited.current = true;
+              setRate(e.target.value);
+            }}
+            placeholder={c.ratePlaceholder}
+            className="min-w-0 flex-1 bg-transparent px-1 py-2 text-right text-sm font-semibold text-[#1B2A4A] outline-none"
+          />
+        </div>
+      </div>
+      <div className="mt-3 flex items-baseline justify-between gap-3 rounded-xl bg-[#1B2A4A] px-4 py-3 text-[#FEF9EC]">
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#F5C518]">
+          {c.resultLabel}
+        </span>
+        <output aria-live="polite" className="text-lg font-extrabold tabular-nums">
+          {idr ?? "—"}
+        </output>
+      </div>
+      <p className="mt-2 text-[11px] leading-4 text-gray-500">
+        {rateStatus === "unavailable" ? c.unavailableRate : c.disclaimer}
+      </p>
     </div>
   );
 }
