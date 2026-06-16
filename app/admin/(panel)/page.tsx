@@ -6,45 +6,76 @@ import OrdersView from "@/components/admin/views/OrdersView";
 import PriceListView from "@/components/admin/views/PriceListView";
 import InvoiceBuilderView from "@/components/admin/views/InvoiceBuilderView";
 import ItineraryBuilderView from "@/components/admin/views/ItineraryBuilderView";
+import PlacesView from "@/components/admin/views/PlacesView";
+import JobOrderBuilderView from "@/components/admin/views/JobOrderBuilderView";
 import CalendarView from "@/components/admin/views/CalendarView";
 import CustomersView from "@/components/admin/views/CustomersView";
+import {
+  BlogView,
+  LeadsView,
+  InstagramStudioView,
+} from "@/components/admin/views/marketing/MarketingViews";
+import { useRole } from "@/components/admin/RoleContext";
+import AdminBottomNav from "@/components/admin/AdminBottomNav";
 
-const TABS = [
+// Primary tabs shown directly in the phone bottom bar; the rest go in "Lainnya".
+const PRIMARY_TABS: Record<string, readonly string[]> = {
+  operation: ["dashboard", "orders", "joborder", "invoice"],
+  marketing: ["blog", "leads", "instagram"],
+};
+
+type Tab = {
+  id: string;
+  label: string;
+  View: React.ComponentType;
+};
+
+const OPERATION_TABS: readonly Tab[] = [
   { id: "dashboard", label: "Dashboard", View: DashboardView },
   { id: "orders", label: "Order", View: OrdersView },
   { id: "prices", label: "Daftar Harga", View: PriceListView },
+  { id: "places", label: "Tempat", View: PlacesView },
   { id: "invoice", label: "Buat Invoice", View: InvoiceBuilderView },
   { id: "itinerary", label: "Itinerary", View: ItineraryBuilderView },
+  { id: "joborder", label: "Job Order", View: JobOrderBuilderView },
   { id: "calendar", label: "Kalender", View: CalendarView },
   { id: "customers", label: "Customer", View: CustomersView },
-] as const;
+];
 
-type TabId = (typeof TABS)[number]["id"];
-
-const STORAGE_KEY = "admin-tab";
+const MARKETING_TABS: readonly Tab[] = [
+  { id: "blog", label: "Blog & SEO", View: BlogView },
+  { id: "leads", label: "Leads", View: LeadsView },
+  { id: "instagram", label: "Instagram Studio", View: InstagramStudioView },
+];
 
 export default function AdminPage() {
-  const [active, setActive] = useState<TabId>("dashboard");
+  const role = useRole();
+  const tabs = role === "marketing" ? MARKETING_TABS : OPERATION_TABS;
+  const storageKey = `admin-tab-${role}`;
+
+  const [active, setActive] = useState<string>(tabs[0].id);
 
   // Restore last-opened tab after mount (avoids hydration mismatch).
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as TabId | null;
+    const saved = localStorage.getItem(storageKey);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount localStorage sync, avoids hydration mismatch
-    if (saved && TABS.some((t) => t.id === saved)) setActive(saved);
-  }, []);
+    if (saved && tabs.some((t) => t.id === saved)) setActive(saved);
+  }, [storageKey, tabs]);
 
-  function select(id: TabId) {
+  function select(id: string) {
     setActive(id);
-    localStorage.setItem(STORAGE_KEY, id);
+    localStorage.setItem(storageKey, id);
   }
 
-  const ActiveView =
-    TABS.find((t) => t.id === active)?.View ?? DashboardView;
+  const ActiveView = tabs.find((t) => t.id === active)?.View ?? tabs[0].View;
+
+  const primaryIds =
+    PRIMARY_TABS[role === "marketing" ? "marketing" : "operation"];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-1 border-b border-gray-200">
-        {TABS.map((t) => (
+      <div className="hidden flex-wrap gap-1 border-b border-gray-200 sm:flex">
+        {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => select(t.id)}
@@ -60,6 +91,13 @@ export default function AdminPage() {
       </div>
 
       <ActiveView />
+
+      <AdminBottomNav
+        tabs={tabs}
+        active={active}
+        onSelect={select}
+        primaryIds={primaryIds}
+      />
     </div>
   );
 }

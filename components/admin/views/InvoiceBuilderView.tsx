@@ -240,13 +240,17 @@ export default function InvoiceBuilderView() {
           Tambah minimal satu baris untuk lihat preview invoice.
         </p>
       ) : (
-        <BuiltInvoiceDoc
-          mode={mode}
-          billTo={billTo}
-          invoiceNumber={invoiceNumber}
-          date={date}
-          lines={lines}
-        />
+        <div className="overflow-x-auto print:overflow-visible">
+          <div className="min-w-[700px] sm:min-w-0 print:min-w-0">
+            <BuiltInvoiceDoc
+              mode={mode}
+              billTo={billTo}
+              invoiceNumber={invoiceNumber}
+              date={date}
+              lines={lines}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

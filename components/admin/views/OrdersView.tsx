@@ -66,7 +66,48 @@ export default function OrdersView() {
         />
       </div>
       <ErrorNote message={error} />
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+
+      {/* Phone: card list */}
+      <div className="space-y-2 sm:hidden">
+        {filtered.map((o) => (
+          <Link
+            key={o.id}
+            href={`/admin/orders/${o.id}`}
+            className="block rounded-xl border border-gray-200 bg-white p-4"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-[#1B2A4A]">
+                {o.order_number}
+              </span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[o.status]}`}
+              >
+                {STATUS_LABELS[o.status]}
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-gray-700">{o.customers.name}</p>
+            <div className="mt-2 flex items-center justify-between text-sm text-gray-500">
+              <span>
+                {formatDate(o.trip_start)}
+                {o.trip_end && o.trip_end !== o.trip_start
+                  ? ` – ${formatDate(o.trip_end)}`
+                  : ""}
+              </span>
+              <span className="font-semibold text-[#1B2A4A]">
+                {formatIDR(Number(o.price_idr))}
+              </span>
+            </div>
+          </Link>
+        ))}
+        {filtered.length === 0 && (
+          <p className="rounded-xl border border-gray-200 bg-white px-4 py-8 text-center text-gray-400">
+            Tidak ada order.
+          </p>
+        )}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden overflow-x-auto rounded-xl border border-gray-200 bg-white sm:block">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-gray-500">
             <tr>

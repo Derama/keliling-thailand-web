@@ -12,10 +12,16 @@ const metadataBase = productionUrl.startsWith("http")
 
 export const metadata: Metadata = {
   metadataBase,
+  manifest: "/manifest.json",
   icons: {
     icon: "/icon.png",
     apple: "/icon.png",
     shortcut: "/icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "KT Admin",
   },
   title: {
     default: "Tur Privat Keliling Thailand — Sewa Mobil + Sopir untuk Rombongan",

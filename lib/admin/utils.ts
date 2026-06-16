@@ -1,19 +1,19 @@
 import type { Order } from "./types";
 
+// Deterministic grouping (server === client) — avoids Intl hydration mismatches.
+function group(n: number, sep: string): string {
+  const neg = n < 0;
+  const digits = String(Math.round(Math.abs(n)));
+  const grouped = digits.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+  return neg ? `-${grouped}` : grouped;
+}
+
 export function formatIDR(n: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(n);
+  return `Rp ${group(n, ".")}`;
 }
 
 export function formatTHB(n: number): string {
-  return new Intl.NumberFormat("th-TH", {
-    style: "currency",
-    currency: "THB",
-    maximumFractionDigits: 0,
-  }).format(n);
+  return `฿${group(n, ",")}`;
 }
 
 /** Profit in THB, or null when fx_rate is missing/zero. */

@@ -36,7 +36,46 @@ export default function CustomersView() {
         className={`${inputCls} max-w-sm`}
       />
       <ErrorNote message={error} />
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+
+      {/* Phone: card list */}
+      <div className="space-y-2 sm:hidden">
+        {filtered.map((c) => (
+          <div
+            key={c.id}
+            className="rounded-xl border border-gray-200 bg-white p-4"
+          >
+            <Link
+              href={`/admin/customers/${c.id}`}
+              className="font-semibold text-[#1B2A4A] hover:underline"
+            >
+              {c.name}
+            </Link>
+            <div className="mt-1 flex items-center justify-between gap-2 text-sm text-gray-500">
+              <span>{c.origin_city ?? "—"}</span>
+              {c.phone ? (
+                <a
+                  href={`https://wa.me/${c.phone.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#25D366] hover:underline"
+                >
+                  {c.phone}
+                </a>
+              ) : (
+                <span>—</span>
+              )}
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <p className="rounded-xl border border-gray-200 bg-white px-4 py-8 text-center text-gray-400">
+            Belum ada customer. Customer dibuat dari form order.
+          </p>
+        )}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden overflow-x-auto rounded-xl border border-gray-200 bg-white sm:block">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-gray-500">
             <tr>

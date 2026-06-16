@@ -41,9 +41,12 @@ export default function ItineraryDoc({
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {days.map((d, i) => (
-          <section key={d.id} className="overflow-hidden rounded-lg border border-gray-200">
+          <section
+            key={d.id}
+            className="itin-day overflow-hidden rounded-lg border border-gray-200"
+          >
             <div className="flex items-center justify-between bg-[#1B2A4A] px-4 py-2.5 text-white">
               <span className="font-bold">
                 Hari {i + 1}
@@ -70,6 +73,36 @@ export default function ItineraryDoc({
                 </li>
               )}
             </ul>
+
+            {d.places.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 border-t border-gray-100 p-4">
+                {d.places.map((p) => (
+                  <div
+                    key={p.id}
+                    className="overflow-hidden rounded-lg border border-gray-200"
+                  >
+                    {p.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        className="h-36 w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-36 w-full items-center justify-center bg-gray-100 text-xs text-gray-400">
+                        {p.name}
+                      </div>
+                    )}
+                    <div className="p-3">
+                      <p className="font-semibold text-[#1B2A4A]">{p.name}</p>
+                      {p.desc && (
+                        <p className="mt-0.5 text-xs text-gray-500">{p.desc}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         ))}
       </div>

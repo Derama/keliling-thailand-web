@@ -273,6 +273,10 @@ a, button {
 
 /* ── Admin print documents ── */
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
   .no-print {
     display: none !important;
   }
@@ -281,5 +285,19 @@ a, button {
     border-radius: 0 !important;
     max-width: none !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Itinerary: one day per printed page. */
+  .itin-day {
+    break-inside: avoid;
+  }
+  .itin-day + .itin-day {
+    break-before: page;
+  }
+  /* Keep place photos in print. */
+  img {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
