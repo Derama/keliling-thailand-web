@@ -583,7 +583,7 @@ function CustomPlaces({
             }
           }}
           placeholder={label}
-          className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-[#1B2A4A] outline-none focus:border-[#F5C518] focus:ring-2 focus:ring-[#F5C518]/20"
+          className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-base sm:text-sm text-[#1B2A4A] outline-none focus:border-[#F5C518] focus:ring-2 focus:ring-[#F5C518]/20"
         />
         <button
           type="button"
@@ -682,7 +682,7 @@ function PlanConverter({ totalThb }: { totalThb: number }) {
               setRate(e.target.value);
             }}
             placeholder={c.ratePlaceholder}
-            className="min-w-0 flex-1 bg-transparent px-1 py-2 text-right text-sm font-semibold text-[#1B2A4A] outline-none"
+            className="min-w-0 flex-1 bg-transparent px-1 py-2 text-right text-base sm:text-sm font-semibold text-[#1B2A4A] outline-none"
           />
         </div>
       </div>
