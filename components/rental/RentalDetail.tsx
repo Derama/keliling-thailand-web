@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import type { RentalWithRefs, RentalPayment, PaymentKind } from "@/lib/rental/types";
+import type { RentalWithRefs, RentalPayment, PaymentKind, RentalHandover } from "@/lib/rental/types";
+import HandoverForm from "@/components/rental/HandoverForm";
 import {
   RENTAL_STATUS_LABELS,
   RENTAL_STATUS_COLORS,
@@ -17,6 +18,7 @@ import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/component
 export default function RentalDetail({ rentalId }: { rentalId: string }) {
   const [rental, setRental] = useState<RentalWithRefs | null>(null);
   const [payments, setPayments] = useState<RentalPayment[]>([]);
+  const [pickup, setPickup] = useState<RentalHandover | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [payKind, setPayKind] = useState<PaymentKind>("deposit");
   const [payAmount, setPayAmount] = useState("");
@@ -39,6 +41,13 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
       .eq("rental_id", rentalId)
       .order("paid_at", { ascending: false })
       .then(({ data }) => setPayments(data ?? []));
+    supabase
+      .from("rental_handovers")
+      .select("*")
+      .eq("rental_id", rentalId)
+      .eq("kind", "out")
+      .maybeSingle()
+      .then(({ data }) => setPickup((data as RentalHandover | null) ?? null));
   }, [rentalId]);
 
   useEffect(load, [load]);
@@ -188,8 +197,8 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
 
       <ErrorNote message={error} />
 
-      {/* Handover panels are inserted here in Task 16. */}
-      <div id="handover-panels" data-rental-id={rental.id} />
+      <HandoverForm rentalId={rental.id} kind="out" />
+      <HandoverForm rentalId={rental.id} kind="in" compareTo={pickup} />
     </div>
   );
 }
