@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { Customer } from "@/lib/admin/types";
-import { inputCls, ErrorNote } from "@/components/admin/ui";
+import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import Modal from "@/components/admin/Modal";
 
 export default function CustomersView() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     createClient()
       .from("customers")
       .select("*")
@@ -22,13 +24,24 @@ export default function CustomersView() {
       });
   }, []);
 
+  useEffect(load, [load]);
+
   const filtered = customers.filter((c) =>
     c.name.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-[#1B2A4A]">Customer</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-[#1B2A4A]">Customer</h1>
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          className={btnCls}
+        >
+          + Customer baru
+        </button>
+      </div>
       <input
         placeholder="Cari nama…"
         value={query}
@@ -128,6 +141,78 @@ export default function CustomersView() {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        open={creating}
+        onClose={() => setCreating(false)}
+        title="Customer baru"
+      >
+        <CustomerForm
+          onCreated={() => {
+            setCreating(false);
+            load();
+          }}
+        />
+      </Modal>
     </div>
+  );
+}
+
+function CustomerForm({ onCreated }: { onCreated: () => void }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const { error } = await createClient()
+      .from("customers")
+      .insert({
+        name,
+        phone: phone || null,
+        origin_city: city || null,
+      });
+    if (error) {
+      setError(`Gagal membuat customer: ${error.message}`);
+      setBusy(false);
+      return;
+    }
+    onCreated();
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <Field label="Nama">
+        <input
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={inputCls}
+        />
+      </Field>
+      <Field label="WhatsApp">
+        <input
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className={inputCls}
+          placeholder="628…"
+        />
+      </Field>
+      <Field label="Kota asal">
+        <input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className={inputCls}
+        />
+      </Field>
+      <ErrorNote message={error} />
+      <button type="submit" disabled={busy} className={btnCls}>
+        {busy ? "Menyimpan…" : "Buat customer"}
+      </button>
+    </form>
   );
 }

@@ -52,10 +52,16 @@ function toDraft(o: Order | null): Draft {
 export default function OrderForm({
   order,
   onSaved,
+  onCreated,
 }: {
   order: Order | null;
   /** Called after a successful update so the parent page can refetch. */
   onSaved?: () => void;
+  /**
+   * Called after a successful create. When provided (modal mode) the form
+   * stays put instead of routing to the new order's detail page.
+   */
+  onCreated?: () => void;
 }) {
   const router = useRouter();
   const [draft, setDraft] = useState<Draft>(() => toDraft(order));
@@ -162,7 +168,12 @@ export default function OrderForm({
         setBusy(false);
         return;
       }
-      router.push(`/admin/orders/${data.id}`);
+      if (onCreated) {
+        onCreated();
+        setBusy(false);
+      } else {
+        router.push(`/admin/orders/${data.id}`);
+      }
     }
   }
 

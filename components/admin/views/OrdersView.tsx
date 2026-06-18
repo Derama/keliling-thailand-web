@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderWithCustomer, OrderStatus } from "@/lib/admin/types";
@@ -11,14 +11,17 @@ import {
 } from "@/lib/admin/types";
 import { formatIDR, formatDate } from "@/lib/admin/utils";
 import { inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import Modal from "@/components/admin/Modal";
+import OrderForm from "@/components/admin/OrderForm";
 
 export default function OrdersView() {
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
   const [status, setStatus] = useState<OrderStatus | "all">("all");
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     createClient()
       .from("orders")
       .select("*, customers(*)")
@@ -28,6 +31,8 @@ export default function OrdersView() {
         else setOrders((data as OrderWithCustomer[]) ?? []);
       });
   }, []);
+
+  useEffect(load, [load]);
 
   const filtered = orders.filter(
     (o) =>
@@ -41,9 +46,13 @@ export default function OrdersView() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-[#1B2A4A]">Order</h1>
-        <Link href="/admin/orders/new" className={btnCls}>
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          className={btnCls}
+        >
           + Order baru
-        </Link>
+        </button>
       </div>
       <div className="flex flex-wrap gap-3">
         <select
@@ -164,6 +173,20 @@ export default function OrdersView() {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        open={creating}
+        onClose={() => setCreating(false)}
+        title="Order baru"
+      >
+        <OrderForm
+          order={null}
+          onCreated={() => {
+            setCreating(false);
+            load();
+          }}
+        />
+      </Modal>
     </div>
   );
 }
