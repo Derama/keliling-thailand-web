@@ -101,63 +101,48 @@ export default function PlacesView() {
     else load();
   }
 
-  // One-click cleanup: remove duplicate (city+name) rows keeping the first,
-  // and repoint every seeded attraction's photo to the local seed image
-  // (fixes broken / empty hotlink photos from earlier imports).
-  async function tidy() {
-    if (!confirm("Hapus duplikat & perbaiki foto yang kosong?")) return;
+  // Hard reset: delete every place row and re-import the full seed clean.
+  // Guarantees no duplicates and that every attraction uses its local photo,
+  // regardless of how older rows were named or imaged.
+  async function resetGallery() {
+    if (
+      !confirm(
+        "Hapus SEMUA tempat lalu impor ulang dari daftar bawaan?\n\nIni menghilangkan duplikat & memperbaiki foto kosong. Foto yang sudah Anda unggah sendiri akan hilang."
+      )
+    )
+      return;
     setTidying(true);
     setError(null);
     const supabase = createClient();
-    const { data, error: readErr } = await supabase
+
+    // Delete all rows (Supabase requires a filter; this matches everything).
+    const { error: delErr } = await supabase
       .from("places")
-      .select("*")
-      .order("sort", { ascending: true });
-    if (readErr) {
-      setError(readErr.message);
+      .delete()
+      .not("id", "is", null);
+    if (delErr) {
+      setError(delErr.message);
       setTidying(false);
       return;
     }
-    const all = (data as Place[]) ?? [];
 
-    // 1) Drop duplicates, keep the first occurrence per city+name.
-    const kept = new Map<string, Place>();
-    const dupIds: string[] = [];
-    for (const r of all) {
-      const k = placeKey(r.city, r.name);
-      if (kept.has(k)) dupIds.push(r.id);
-      else kept.set(k, r);
-    }
-    if (dupIds.length) {
-      const { error } = await supabase.from("places").delete().in("id", dupIds);
-      if (error) {
-        setError(error.message);
-        setTidying(false);
-        return;
-      }
-    }
-
-    // 2) Repoint photos to the local seed image where we have one.
-    const seedImg = new Map(
-      seedPlaces().map((s) => [placeKey(s.city, s.name), s.image_url])
-    );
-    let fixed = 0;
-    for (const r of kept.values()) {
-      const img = seedImg.get(placeKey(r.city, r.name));
-      // Only repair empty or old Unsplash-hotlink photos. Never overwrite a
-      // photo the user uploaded (Supabase storage URL) or an existing local one.
-      const broken = !r.image_url || r.image_url.includes("images.unsplash.com");
-      if (img && broken && r.image_url !== img) {
-        const { error } = await supabase
-          .from("places")
-          .update({ image_url: img })
-          .eq("id", r.id);
-        if (!error) fixed++;
-      }
-    }
-
+    // Re-insert the full seed with local photo paths.
+    let sort = 0;
+    const payload = seedPlaces().map((s) => ({
+      id: crypto.randomUUID(),
+      city: s.city,
+      name: s.name,
+      image_url: s.image_url,
+      description: null,
+      sort: (sort += 10),
+    }));
+    const { error: insErr } = await supabase.from("places").insert(payload);
     setTidying(false);
-    alert(`Selesai. Hapus ${dupIds.length} duplikat, perbaiki ${fixed} foto.`);
+    if (insErr) {
+      setError(insErr.message);
+      return;
+    }
+    alert(`Selesai. ${payload.length} tempat diimpor ulang tanpa duplikat.`);
     load();
   }
 
@@ -176,11 +161,11 @@ export default function PlacesView() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={tidy}
+            onClick={resetGallery}
             disabled={tidying}
             className={`${btnSecondaryCls} disabled:opacity-50`}
           >
-            {tidying ? "Merapikan…" : "Rapikan"}
+            {tidying ? "Mereset…" : "Reset & impor ulang"}
           </button>
           <button
             type="button"
