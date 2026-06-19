@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import Modal from "@/components/admin/Modal";
 import { groupPlaces, type Place } from "@/lib/admin/places";
+import { seedPlaces } from "@/lib/admin/placeSeed";
 
 // Public bucket holding attraction photos. Create it once in Supabase:
 //   Storage → New bucket → name "place-images", Public = on.
@@ -33,14 +34,18 @@ async function aiDescription(name: string, city: string): Promise<string> {
   return String(data.description ?? "");
 }
 
+const placeKey = (city: string, name: string) =>
+  `${city.trim().toLowerCase()}|${name.trim().toLowerCase()}`;
+
 export default function PlacesView() {
   const [rows, setRows] = useState<Place[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [dirty, setDirty] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [cardBusy, setCardBusy] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [tidying, setTidying] = useState(false);
+  // Editing an existing place, adding a new one (with optional preset city),
+  // or closed.
+  const [editing, setEditing] = useState<Place | null>(null);
+  const [adding, setAdding] = useState<{ city: string } | null>(null);
 
   const load = useCallback(() => {
     createClient()
@@ -55,66 +60,105 @@ export default function PlacesView() {
 
   useEffect(load, [load]);
 
-  function patch(id: string, p: Partial<Place>) {
-    setRows((arr) => arr.map((r) => (r.id === id ? { ...r, ...p } : r)));
-    setDirty(true);
-    setSaved(false);
-  }
-
-  async function save() {
-    setSaving(true);
+  // Insert any tours.ts attractions not already in the DB (dedupe city+name).
+  // Re-reads from the DB first so a stale `rows` state can't cause dupes.
+  async function importSeed() {
+    setImporting(true);
     setError(null);
-    const payload = rows.map((r) => ({
-      id: r.id,
-      city: r.city,
-      name: r.name,
-      image_url: r.image_url,
-      description: r.description,
-      sort: r.sort,
-      updated_at: new Date().toISOString(),
+    const supabase = createClient();
+    const { data, error: readErr } = await supabase.from("places").select("*");
+    if (readErr) {
+      setError(readErr.message);
+      setImporting(false);
+      return;
+    }
+    const current = (data as Place[]) ?? [];
+    const existing = new Set(current.map((r) => placeKey(r.city, r.name)));
+    const missing = seedPlaces().filter(
+      (s) => !existing.has(placeKey(s.city, s.name))
+    );
+    if (missing.length === 0) {
+      setImporting(false);
+      alert("Semua atraksi bawaan sudah ada.");
+      return;
+    }
+    if (!confirm(`Impor ${missing.length} atraksi sebagai placeholder?`)) {
+      setImporting(false);
+      return;
+    }
+    let sort = current.reduce((m, r) => Math.max(m, r.sort), 0) + 10;
+    const payload = missing.map((s) => ({
+      id: crypto.randomUUID(),
+      city: s.city,
+      name: s.name,
+      image_url: s.image_url,
+      description: null,
+      sort: (sort += 10),
     }));
-    const { error } = await createClient().from("places").upsert(payload);
-    setSaving(false);
+    const { error } = await supabase.from("places").insert(payload);
+    setImporting(false);
     if (error) setError(error.message);
-    else {
-      setDirty(false);
-      setSaved(true);
-    }
+    else load();
   }
 
-  async function deletePlace(id: string) {
-    if (!confirm("Hapus tempat ini?")) return;
-    const { error } = await createClient().from("places").delete().eq("id", id);
-    if (error) setError(error.message);
-    else setRows((arr) => arr.filter((r) => r.id !== id));
-  }
-
-  // Per-card photo replace: upload, then patch the row (saved on "Simpan").
-  async function replacePhoto(p: Place, file: File) {
-    setCardBusy(p.id);
+  // One-click cleanup: remove duplicate (city+name) rows keeping the first,
+  // and repoint every seeded attraction's photo to the local seed image
+  // (fixes broken / empty hotlink photos from earlier imports).
+  async function tidy() {
+    if (!confirm("Hapus duplikat & perbaiki foto yang kosong?")) return;
+    setTidying(true);
     setError(null);
-    try {
-      const url = await uploadPlaceImage(file, p.city);
-      patch(p.id, { image_url: url });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal unggah foto.");
-    } finally {
-      setCardBusy(null);
+    const supabase = createClient();
+    const { data, error: readErr } = await supabase
+      .from("places")
+      .select("*")
+      .order("sort", { ascending: true });
+    if (readErr) {
+      setError(readErr.message);
+      setTidying(false);
+      return;
     }
-  }
+    const all = (data as Place[]) ?? [];
 
-  // Per-card AI description: write into the row (saved on "Simpan").
-  async function aiCard(p: Place) {
-    setCardBusy(p.id);
-    setError(null);
-    try {
-      const desc = await aiDescription(p.name, p.city);
-      patch(p.id, { description: desc });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal generate.");
-    } finally {
-      setCardBusy(null);
+    // 1) Drop duplicates, keep the first occurrence per city+name.
+    const kept = new Map<string, Place>();
+    const dupIds: string[] = [];
+    for (const r of all) {
+      const k = placeKey(r.city, r.name);
+      if (kept.has(k)) dupIds.push(r.id);
+      else kept.set(k, r);
     }
+    if (dupIds.length) {
+      const { error } = await supabase.from("places").delete().in("id", dupIds);
+      if (error) {
+        setError(error.message);
+        setTidying(false);
+        return;
+      }
+    }
+
+    // 2) Repoint photos to the local seed image where we have one.
+    const seedImg = new Map(
+      seedPlaces().map((s) => [placeKey(s.city, s.name), s.image_url])
+    );
+    let fixed = 0;
+    for (const r of kept.values()) {
+      const img = seedImg.get(placeKey(r.city, r.name));
+      // Only repair empty or old Unsplash-hotlink photos. Never overwrite a
+      // photo the user uploaded (Supabase storage URL) or an existing local one.
+      const broken = !r.image_url || r.image_url.includes("images.unsplash.com");
+      if (img && broken && r.image_url !== img) {
+        const { error } = await supabase
+          .from("places")
+          .update({ image_url: img })
+          .eq("id", r.id);
+        if (!error) fixed++;
+      }
+    }
+
+    setTidying(false);
+    alert(`Selesai. Hapus ${dupIds.length} duplikat, perbaiki ${fixed} foto.`);
+    load();
   }
 
   const cities = groupPlaces(rows);
@@ -126,28 +170,32 @@ export default function PlacesView() {
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Tempat &amp; Foto</h1>
           <p className="text-sm text-gray-500">
-            Daftar atraksi per kota beserta foto &amp; deskripsi. Dipakai di
-            Itinerary.
+            Galeri atraksi per kota. Klik foto untuk ubah / unggah foto asli.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {saved && !dirty && (
-            <span className="text-sm text-green-700">Tersimpan ✓</span>
-          )}
           <button
             type="button"
-            onClick={() => setAdding(true)}
-            className={btnCls}
+            onClick={tidy}
+            disabled={tidying}
+            className={`${btnSecondaryCls} disabled:opacity-50`}
           >
-            + Tambah tempat
+            {tidying ? "Merapikan…" : "Rapikan"}
           </button>
           <button
             type="button"
-            onClick={save}
-            disabled={!dirty || saving}
-            className={`${btnCls} disabled:cursor-not-allowed disabled:opacity-50`}
+            onClick={importSeed}
+            disabled={importing}
+            className={`${btnSecondaryCls} disabled:opacity-50`}
           >
-            {saving ? "Menyimpan…" : "Simpan perubahan"}
+            {importing ? "Mengimpor…" : "Impor atraksi bawaan"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setAdding({ city: "" })}
+            className={btnCls}
+          >
+            + Tambah tempat
           </button>
         </div>
       </div>
@@ -155,97 +203,73 @@ export default function PlacesView() {
       <ErrorNote message={error} />
 
       {cities.map((c) => (
-        <section key={c.city} className="space-y-3">
+        <section key={c.city} className="space-y-2">
           <h2 className="font-bold text-[#1B2A4A]">{c.city}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {c.items.map((p) => (
-              <div
+          {/* Facebook-album style collage: first tile large, rest small. */}
+          <div className="grid auto-rows-[120px] grid-cols-2 gap-1 sm:auto-rows-[150px] sm:grid-cols-4">
+            {c.items.map((p, i) => (
+              <button
                 key={p.id}
-                className="overflow-hidden rounded-xl border border-gray-200 bg-white"
+                type="button"
+                onClick={() => setEditing(p)}
+                className={`group relative overflow-hidden rounded-lg bg-gray-100 ${
+                  i === 0 ? "col-span-2 row-span-2" : ""
+                }`}
               >
-                <div className="relative">
-                  {p.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.image_url}
-                      alt={p.name}
-                      className="h-36 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-36 w-full items-center justify-center bg-gray-100 text-xs text-gray-400">
-                      belum ada foto
-                    </div>
-                  )}
-                  <label className="absolute bottom-2 right-2 cursor-pointer rounded-lg bg-black/60 px-2 py-1 text-xs font-medium text-white hover:bg-black/75">
-                    {cardBusy === p.id ? "…" : "Ganti foto"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f) replacePhoto(p, f);
-                        e.target.value = "";
-                      }}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-                <div className="space-y-2 p-3">
-                  <input
-                    value={p.name}
-                    onChange={(e) => patch(p.id, { name: e.target.value })}
-                    className={`${inputCls} font-semibold`}
+                {p.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.image_url}
+                    alt={p.name}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
                   />
-                  <textarea
-                    rows={2}
-                    value={p.description ?? ""}
-                    onChange={(e) =>
-                      patch(p.id, { description: e.target.value || null })
-                    }
-                    placeholder="Deskripsi singkat"
-                    className={`${inputCls} text-xs`}
-                  />
-                  <div className="flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => aiCard(p)}
-                      disabled={cardBusy === p.id}
-                      className="text-sm font-medium text-[#1B2A4A] hover:underline disabled:opacity-50"
-                    >
-                      {cardBusy === p.id ? "…" : "✨ Deskripsi AI"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deletePlace(p.id)}
-                      className="text-sm text-red-500 hover:underline"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </div>
-              </div>
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                    belum ada foto
+                  </span>
+                )}
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-left text-xs font-semibold text-white">
+                  {p.name}
+                </span>
+              </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setAdding({ city: c.city })}
+              className="flex flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-300 text-gray-400 hover:border-[#F5C518] hover:text-[#1B2A4A]"
+            >
+              <span className="text-2xl leading-none">+</span>
+              <span className="text-xs font-medium">Tambah</span>
+            </button>
           </div>
         </section>
       ))}
 
       {rows.length === 0 && !error && (
-        <p className="text-sm text-gray-400">
-          Belum ada tempat. Klik “+ Tambah tempat”.
-        </p>
+        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">
+          Belum ada tempat. Klik{" "}
+          <span className="font-semibold">“Impor atraksi bawaan”</span> untuk
+          mulai dari daftar atraksi, lalu unggah foto asli.
+        </div>
       )}
 
       <Modal
-        open={adding}
-        onClose={() => setAdding(false)}
-        title="Tambah tempat baru"
+        open={editing !== null || adding !== null}
+        onClose={() => {
+          setEditing(null);
+          setAdding(null);
+        }}
+        title={editing ? "Ubah tempat" : "Tambah tempat baru"}
       >
-        <AddPlaceForm
+        <PlaceForm
+          place={editing}
+          initialCity={adding?.city ?? ""}
           existingCities={existingCities}
           nextSort={rows.reduce((m, r) => Math.max(m, r.sort), 0) + 10}
-          onAdded={(row) => {
-            setRows((arr) => [...arr, row]);
-            setAdding(false);
+          onDone={() => {
+            setEditing(null);
+            setAdding(null);
+            load();
           }}
         />
       </Modal>
@@ -253,19 +277,23 @@ export default function PlacesView() {
   );
 }
 
-function AddPlaceForm({
+function PlaceForm({
+  place,
+  initialCity,
   existingCities,
   nextSort,
-  onAdded,
+  onDone,
 }: {
+  place: Place | null;
+  initialCity: string;
   existingCities: string[];
   nextSort: number;
-  onAdded: (row: Place) => void;
+  onDone: () => void;
 }) {
-  const [city, setCity] = useState("");
-  const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [desc, setDesc] = useState("");
+  const [city, setCity] = useState(place?.city ?? initialCity);
+  const [name, setName] = useState(place?.name ?? "");
+  const [imageUrl, setImageUrl] = useState<string | null>(place?.image_url ?? null);
+  const [desc, setDesc] = useState(place?.description ?? "");
   const [uploading, setUploading] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -307,21 +335,42 @@ function AddPlaceForm({
     if (!city.trim() || !name.trim()) return;
     setBusy(true);
     setError(null);
-    const row: Place = {
-      id: crypto.randomUUID(),
+    const supabase = createClient();
+    const fields = {
       city: city.trim(),
       name: name.trim(),
       image_url: imageUrl,
       description: desc.trim() || null,
-      sort: nextSort,
     };
-    const { error } = await createClient().from("places").insert(row);
+    const { error } = place
+      ? await supabase
+          .from("places")
+          .update({ ...fields, updated_at: new Date().toISOString() })
+          .eq("id", place.id)
+      : await supabase
+          .from("places")
+          .insert({ id: crypto.randomUUID(), ...fields, sort: nextSort });
     if (error) {
       setError(error.message);
       setBusy(false);
       return;
     }
-    onAdded(row);
+    onDone();
+  }
+
+  async function onDelete() {
+    if (!place || !confirm("Hapus tempat ini?")) return;
+    setBusy(true);
+    const { error } = await createClient()
+      .from("places")
+      .delete()
+      .eq("id", place.id);
+    if (error) {
+      setError(error.message);
+      setBusy(false);
+      return;
+    }
+    onDone();
   }
 
   return (
@@ -331,11 +380,11 @@ function AddPlaceForm({
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            list="add-place-cities"
+            list="place-cities"
             placeholder="Bangkok"
             className={inputCls}
           />
-          <datalist id="add-place-cities">
+          <datalist id="place-cities">
             {existingCities.map((c) => (
               <option key={c} value={c} />
             ))}
@@ -358,14 +407,14 @@ function AddPlaceForm({
             <img
               src={imageUrl}
               alt=""
-              className="h-20 w-28 rounded-lg object-cover"
+              className="h-24 w-36 rounded-lg object-cover"
             />
           ) : (
-            <div className="flex h-20 w-28 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400">
+            <div className="flex h-24 w-36 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400">
               belum ada
             </div>
           )}
-          <label className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+          <label className={`${btnSecondaryCls} cursor-pointer`}>
             {uploading ? "Mengunggah…" : imageUrl ? "Ganti foto" : "Unggah foto"}
             <input
               type="file"
@@ -396,13 +445,25 @@ function AddPlaceForm({
       </button>
 
       <ErrorNote message={error} />
-      <button
-        type="submit"
-        disabled={busy || uploading || !city.trim() || !name.trim()}
-        className={`${btnCls} disabled:opacity-50`}
-      >
-        {busy ? "Menyimpan…" : "Tambah tempat"}
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          type="submit"
+          disabled={busy || uploading || !city.trim() || !name.trim()}
+          className={`${btnCls} disabled:opacity-50`}
+        >
+          {busy ? "Menyimpan…" : place ? "Simpan" : "Tambah tempat"}
+        </button>
+        {place && (
+          <button
+            type="button"
+            onClick={onDelete}
+            disabled={busy}
+            className="text-sm text-red-500 hover:underline disabled:opacity-50"
+          >
+            Hapus
+          </button>
+        )}
+      </div>
     </form>
   );
 }
