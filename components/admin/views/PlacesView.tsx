@@ -42,6 +42,7 @@ export default function PlacesView() {
   const [error, setError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [tidying, setTidying] = useState(false);
+  const [filling, setFilling] = useState(false);
   // Editing an existing place, adding a new one (with optional preset city),
   // or closed.
   const [editing, setEditing] = useState<Place | null>(null);
@@ -92,7 +93,7 @@ export default function PlacesView() {
       city: s.city,
       name: s.name,
       image_url: s.image_url,
-      description: null,
+      description: s.description,
       sort: (sort += 10),
     }));
     const { error } = await supabase.from("places").insert(payload);
@@ -133,7 +134,7 @@ export default function PlacesView() {
       city: s.city,
       name: s.name,
       image_url: s.image_url,
-      description: null,
+      description: s.description,
       sort: (sort += 10),
     }));
     const { error: insErr } = await supabase.from("places").insert(payload);
@@ -143,6 +144,37 @@ export default function PlacesView() {
       return;
     }
     alert(`Selesai. ${payload.length} tempat diimpor ulang tanpa duplikat.`);
+    load();
+  }
+
+  // Non-destructive: fill empty descriptions from the seed by city+name.
+  // Leaves photos and existing descriptions untouched.
+  async function fillDescriptions() {
+    setFilling(true);
+    setError(null);
+    const supabase = createClient();
+    const { data, error: readErr } = await supabase.from("places").select("*");
+    if (readErr) {
+      setError(readErr.message);
+      setFilling(false);
+      return;
+    }
+    const seedDesc = new Map(
+      seedPlaces().map((s) => [placeKey(s.city, s.name), s.description])
+    );
+    let filled = 0;
+    for (const r of (data as Place[]) ?? []) {
+      if (r.description && r.description.trim()) continue;
+      const desc = seedDesc.get(placeKey(r.city, r.name));
+      if (!desc) continue;
+      const { error } = await supabase
+        .from("places")
+        .update({ description: desc })
+        .eq("id", r.id);
+      if (!error) filled++;
+    }
+    setFilling(false);
+    alert(`Selesai. ${filled} deskripsi terisi.`);
     load();
   }
 
@@ -159,6 +191,14 @@ export default function PlacesView() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={fillDescriptions}
+            disabled={filling}
+            className={`${btnSecondaryCls} disabled:opacity-50`}
+          >
+            {filling ? "Mengisi…" : "Isi deskripsi"}
+          </button>
           <button
             type="button"
             onClick={resetGallery}
