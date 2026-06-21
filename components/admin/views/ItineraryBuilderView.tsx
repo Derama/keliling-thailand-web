@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import { isoLocal } from "@/lib/admin/utils";
@@ -75,6 +75,8 @@ export default function ItineraryBuilderView() {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [qDays, setQDays] = useState(3);
+  const [qDest, setQDest] = useState<string[]>([]);
 
   const hydrated = useRef(false);
 
@@ -136,15 +138,29 @@ export default function ItineraryBuilderView() {
   const hasContent =
     days.length > 0 || tripTitle || customer || notes || aiPrompt;
 
+  const destOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of places) if (p.image_url) set.add(p.city.toUpperCase());
+    return [...set].sort();
+  }, [places]);
+
   async function generateWithAI() {
-    if (!aiPrompt.trim() || aiBusy) return;
+    if (aiBusy) return;
+    const parts: string[] = [];
+    if (customer) parts.push(`Customer: ${customer}.`);
+    if (pax) parts.push(`Jumlah: ${pax}.`);
+    if (qDays) parts.push(`Durasi: ${qDays} hari.`);
+    if (qDest.length) parts.push(`Tujuan: ${qDest.join(", ")}.`);
+    if (aiPrompt.trim()) parts.push(aiPrompt.trim());
+    const effectivePrompt = parts.join(" ");
+    if (!effectivePrompt) return;
     setAiBusy(true);
     setAiError(null);
     try {
       const res = await fetch("/api/itinerary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: aiPrompt.trim() }),
+        body: JSON.stringify({ prompt: effectivePrompt }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Gagal generate.");
@@ -219,6 +235,8 @@ export default function ItineraryBuilderView() {
     setDays([]);
     setAiPrompt("");
     setAiError(null);
+    setQDays(3);
+    setQDest([]);
     localStorage.removeItem(DRAFT_KEY);
   }
 
@@ -386,8 +404,8 @@ export default function ItineraryBuilderView() {
           <section className="space-y-3 rounded-xl border border-[#F5C518]/40 border-t-4 border-t-[#F5C518] bg-[#FFFCEF] p-5">
             <StepHead n="AI" title="Generate dengan AI" accent />
             <p className="text-xs text-gray-500">
-              Tulis permintaan customer (kota, durasi, minat, jumlah orang).
-              Hasilnya bisa kamu sunting di bawah.
+              Isi data cepat di atas, lalu Generate. Kotak di bawah opsional —
+              untuk minat khusus (mis. suka belanja, ada anak kecil).
             </p>
             <div className="flex flex-wrap gap-2">
               <span className="self-center text-xs font-medium text-gray-400">
@@ -404,6 +422,65 @@ export default function ItineraryBuilderView() {
                 </button>
               ))}
             </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <LabeledInput
+                label="Customer"
+                value={customer}
+                onChange={setCustomer}
+                placeholder="Nama customer"
+              />
+              <LabeledInput
+                label="Jumlah orang"
+                value={pax}
+                onChange={setPax}
+                placeholder="4 dewasa"
+              />
+              <label className="block sm:col-span-2">
+                <span className="mb-1 block text-sm font-medium text-gray-700">
+                  Jumlah hari
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={14}
+                  value={qDays}
+                  onChange={(e) => setQDays(Number(e.target.value) || 1)}
+                  className={inputCls}
+                />
+              </label>
+            </div>
+            {destOptions.length > 0 && (
+              <div className="space-y-1">
+                <span className="block text-sm font-medium text-gray-700">
+                  Tujuan
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {destOptions.map((city) => {
+                    const on = qDest.includes(city);
+                    return (
+                      <button
+                        key={city}
+                        type="button"
+                        onClick={() =>
+                          setQDest((prev) =>
+                            on
+                              ? prev.filter((c) => c !== city)
+                              : [...prev, city]
+                          )
+                        }
+                        className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                          on
+                            ? "border-[#1B2A4A] bg-[#1B2A4A] text-white"
+                            : "border-[#1B2A4A]/20 bg-white text-[#1B2A4A] hover:border-[#1B2A4A]"
+                        }`}
+                      >
+                        {city}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <textarea
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
@@ -416,7 +493,7 @@ export default function ItineraryBuilderView() {
               <button
                 type="button"
                 onClick={generateWithAI}
-                disabled={!aiPrompt.trim() || aiBusy}
+                disabled={aiBusy}
                 className={`${btnCls} disabled:cursor-not-allowed`}
               >
                 {aiBusy
