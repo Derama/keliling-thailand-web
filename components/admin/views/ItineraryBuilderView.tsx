@@ -11,6 +11,8 @@ import {
   type ItineraryActivity,
   type ItineraryPlace,
   scheduleFromPlaces,
+  sortActivitiesByTime,
+  MEAL_STOPS,
 } from "@/lib/admin/itinerary";
 import type { Place } from "@/lib/admin/places";
 import {
@@ -939,13 +941,38 @@ function DayCard({
     if (payload) onDropPlace(payload);
   }
 
-  // Timetable rows mirror the attraction photos (add/remove/reorder via the
-  // photo picker below). Here you only fine-tune each stop's time and label.
+  // Timetable = attraction stops (synced to the photos) + manual rows the admin
+  // adds here (meals / custom stops). Manual rows survive photo changes.
+  const placeIds = new Set(day.places.map((p) => p.id));
+
   function patchActivity(id: string, patch: Partial<ItineraryActivity>) {
     onPatch({
       activities: day.activities.map((a) =>
         a.id === id ? { ...a, ...patch } : a
       ),
+    });
+  }
+  function removeActivity(id: string) {
+    onPatch({ activities: day.activities.filter((a) => a.id !== id) });
+  }
+  function addCustomRow() {
+    onPatch({
+      activities: [...day.activities, { id: newId(), time: "", text: "" }],
+    });
+  }
+  function addMeals() {
+    const has = (text: string) =>
+      day.activities.some(
+        (a) => a.text.trim().toLowerCase() === text.toLowerCase()
+      );
+    const missing = MEAL_STOPS.filter((m) => !has(m.text)).map((m) => ({
+      id: newId(),
+      time: m.time,
+      text: m.text,
+    }));
+    if (missing.length === 0) return;
+    onPatch({
+      activities: sortActivitiesByTime([...day.activities, ...missing]),
     });
   }
 
@@ -1070,32 +1097,61 @@ function DayCard({
           )}
         </div>
 
-        {/* Timetable — one stop per attraction, edit time & label only */}
+        {/* Timetable — attraction stops (auto) + meals / custom rows (manual) */}
         <div className="space-y-2">
           <p className="text-xs font-medium text-gray-400">
-            Jadwal (otomatis dari atraksi · sunting jam &amp; nama)
+            Jadwal (atraksi otomatis · tambah makan / jam lain di bawah)
           </p>
-          {day.activities.map((a) => (
-            <div key={a.id} className="flex items-center gap-2">
-              <input
-                value={a.time}
-                onChange={(e) => patchActivity(a.id, { time: e.target.value })}
-                placeholder="08:00"
-                className="w-16 shrink-0 rounded-lg border border-gray-300 px-2 py-2 text-center text-sm tabular-nums focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
-              />
-              <input
-                value={a.text}
-                onChange={(e) => patchActivity(a.id, { text: e.target.value })}
-                placeholder="Nama atraksi…"
-                className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
-              />
-            </div>
-          ))}
+          {day.activities.map((a) => {
+            const isPlace = placeIds.has(a.id);
+            return (
+              <div key={a.id} className="flex items-center gap-2">
+                <input
+                  value={a.time}
+                  onChange={(e) => patchActivity(a.id, { time: e.target.value })}
+                  placeholder="08:00"
+                  className="w-16 shrink-0 rounded-lg border border-gray-300 px-2 py-2 text-center text-sm tabular-nums focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
+                />
+                <input
+                  value={a.text}
+                  onChange={(e) => patchActivity(a.id, { text: e.target.value })}
+                  placeholder={isPlace ? "Nama atraksi…" : "Kegiatan…"}
+                  className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
+                />
+                <button
+                  type="button"
+                  aria-label="Hapus baris"
+                  title={isPlace ? "Hapus via foto atraksi" : "Hapus baris"}
+                  onClick={() => removeActivity(a.id)}
+                  disabled={isPlace}
+                  className="shrink-0 px-1.5 text-gray-400 hover:text-red-500 disabled:opacity-25"
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })}
           {day.activities.length === 0 && (
             <p className="text-xs text-gray-400">
               Tambah foto atraksi di bawah — jadwalnya muncul otomatis.
             </p>
           )}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={addMeals}
+              className="rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 hover:border-[#1B2A4A] hover:text-[#1B2A4A]"
+            >
+              + Jam makan
+            </button>
+            <button
+              type="button"
+              onClick={addCustomRow}
+              className="rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 hover:border-[#1B2A4A] hover:text-[#1B2A4A]"
+            >
+              + Tambah jam
+            </button>
+          </div>
         </div>
 
         {/* Places */}

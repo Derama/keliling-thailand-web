@@ -56,19 +56,44 @@ export function distributeTimes(n: number): string[] {
   );
 }
 
+/** Default meal stops the admin can add to a day (Indonesian labels). */
+export const MEAL_STOPS: { time: string; text: string }[] = [
+  { time: "07:30", text: "Sarapan" },
+  { time: "12:30", text: "Makan Siang" },
+  { time: "19:00", text: "Makan Malam" },
+];
+
+function timeToMin(t: string): number {
+  const m = /^(\d{1,2}):(\d{2})$/.exec((t || "").trim());
+  // Rows without a valid time sink to the end so they're easy to fill in.
+  return m ? Number(m[1]) * 60 + Number(m[2]) : Number.MAX_SAFE_INTEGER;
+}
+
+/** Order a day's stops chronologically; untimed rows go last. */
+export function sortActivitiesByTime(
+  acts: ItineraryActivity[]
+): ItineraryActivity[] {
+  return [...acts].sort((a, b) => timeToMin(a.time) - timeToMin(b.time));
+}
+
 /**
- * Build a day's timetable from its attraction photos: one stop per place,
- * times auto-distributed, label = place name (preserving a prior manual edit).
+ * Rebuild a day's timetable around its attraction photos: one stop per place
+ * (times auto-distributed, label = place name, preserving a prior edit), while
+ * KEEPING any extra rows the admin added (meals, custom stops). Sorted by time.
  */
 export function scheduleFromPlaces(
   places: ItineraryPlace[],
   prev: ItineraryActivity[] = []
 ): ItineraryActivity[] {
+  const placeIds = new Set(places.map((p) => p.id));
   const times = distributeTimes(places.length);
-  return places.map((p, i) => {
+  const placeStops = places.map((p, i) => {
     const existing = prev.find((a) => a.id === p.id);
     return { id: p.id, time: times[i], text: existing?.text || p.name };
   });
+  // Anything not tied to a current place is a manual row — keep it untouched.
+  const extras = prev.filter((a) => !placeIds.has(a.id));
+  return sortActivitiesByTime([...placeStops, ...extras]);
 }
 
 /** Trip-level meta for the brochure cover + day pills. */
