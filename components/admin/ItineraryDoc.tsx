@@ -277,6 +277,24 @@ function DayPage({
 
   return (
     <div className="flex flex-1 flex-col p-10 sm:p-12">
+      {/* Running brand header */}
+      <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5C518]">
+            <Image src="/Logo.png" alt="" width={18} height={14} />
+          </span>
+          <span
+            className="text-[11px] font-extrabold tracking-tight"
+            style={{ color: NAVY }}
+          >
+            KELILING THAILAND
+          </span>
+        </div>
+        <span className="font-mono text-[9px] tracking-[0.25em] text-gray-400">
+          ITINERARY · EDISI 2026
+        </span>
+      </div>
+
       {/* Header: D0x marker + gold pill */}
       <div className="flex items-start justify-between">
         <p className="font-serif text-5xl leading-none" style={{ color: NAVY }}>
@@ -390,8 +408,9 @@ function DayPage({
         </section>
       )}
 
-      <footer className="mt-4 flex items-center justify-between border-t border-gray-100 pt-2 text-[9px] tracking-[0.2em] text-gray-400">
-        <span>HARI {dayNo}</span>
+      <footer className="mt-4 flex items-center justify-between border-t border-gray-200 pt-2.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+        <span style={{ color: NAVY }}>Keliling Thailand</span>
+        <span>Hari {dayNo}</span>
         <span>{KELILING_THAILAND.website}</span>
       </footer>
     </div>
