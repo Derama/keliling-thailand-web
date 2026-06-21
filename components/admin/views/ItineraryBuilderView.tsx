@@ -955,6 +955,14 @@ function DayCard({
   function removeActivity(id: string) {
     onPatch({ activities: day.activities.filter((a) => a.id !== id) });
   }
+  function moveActivity(id: string, dir: -1 | 1) {
+    const i = day.activities.findIndex((a) => a.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= day.activities.length) return;
+    const next = [...day.activities];
+    [next[i], next[j]] = [next[j], next[i]];
+    onPatch({ activities: next });
+  }
   function addCustomRow() {
     onPatch({
       activities: [...day.activities, { id: newId(), time: "", text: "" }],
@@ -1102,7 +1110,7 @@ function DayCard({
           <p className="text-xs font-medium text-gray-400">
             Jadwal (atraksi otomatis · tambah makan / jam lain di bawah)
           </p>
-          {day.activities.map((a) => {
+          {day.activities.map((a, i) => {
             const isPlace = placeIds.has(a.id);
             return (
               <div key={a.id} className="flex items-center gap-2">
@@ -1118,16 +1126,36 @@ function DayCard({
                   placeholder={isPlace ? "Nama atraksi…" : "Kegiatan…"}
                   className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
                 />
-                <button
-                  type="button"
-                  aria-label="Hapus baris"
-                  title={isPlace ? "Hapus via foto atraksi" : "Hapus baris"}
-                  onClick={() => removeActivity(a.id)}
-                  disabled={isPlace}
-                  className="shrink-0 px-1.5 text-gray-400 hover:text-red-500 disabled:opacity-25"
-                >
-                  ✕
-                </button>
+                <div className="flex shrink-0 items-center text-gray-400">
+                  <button
+                    type="button"
+                    aria-label="Naikkan"
+                    onClick={() => moveActivity(a.id, -1)}
+                    disabled={i === 0}
+                    className="px-1 hover:text-[#1B2A4A] disabled:opacity-25"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Turunkan"
+                    onClick={() => moveActivity(a.id, 1)}
+                    disabled={i === day.activities.length - 1}
+                    className="px-1 hover:text-[#1B2A4A] disabled:opacity-25"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Hapus baris"
+                    title={isPlace ? "Hapus via foto atraksi" : "Hapus baris"}
+                    onClick={() => removeActivity(a.id)}
+                    disabled={isPlace}
+                    className="px-1 hover:text-red-500 disabled:opacity-25"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             );
           })}
