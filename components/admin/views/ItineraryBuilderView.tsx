@@ -181,7 +181,12 @@ export default function ItineraryBuilderView() {
               intro?: string;
               cityHighlight?: string;
               activities?: { time?: string; text?: string }[];
-              places?: { name?: string; image?: string; desc?: string }[];
+              places?: {
+                name?: string;
+                image?: string;
+                desc?: string;
+                activity?: string;
+              }[];
             },
             i: number
           ) => {
@@ -192,6 +197,7 @@ export default function ItineraryBuilderView() {
                 name: p.name ?? "",
                 image: p.image ?? "",
                 desc: p.desc ?? "",
+                activity: p.activity ?? "",
               }));
             return {
               id: newId(),

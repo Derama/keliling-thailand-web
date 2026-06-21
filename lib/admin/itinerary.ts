@@ -12,6 +12,8 @@ export interface ItineraryPlace {
   name: string;
   image: string;
   desc: string;
+  /** AI-written descriptive line for the timetable (what you do there). */
+  activity?: string;
 }
 
 export interface ItineraryDay {
@@ -58,9 +60,9 @@ export function distributeTimes(n: number): string[] {
 
 /** Default meal stops the admin can add to a day (Indonesian labels). */
 export const MEAL_STOPS: { time: string; text: string }[] = [
-  { time: "07:30", text: "Sarapan" },
-  { time: "12:30", text: "Makan Siang" },
-  { time: "19:00", text: "Makan Malam" },
+  { time: "07:30", text: "Sarapan di hotel" },
+  { time: "12:30", text: "Makan siang kuliner lokal" },
+  { time: "19:00", text: "Makan malam santai" },
 ];
 
 /**
@@ -84,7 +86,11 @@ export function scheduleFromPlaces(
   for (const a of prev) {
     const p = byId.get(a.id);
     if (p) {
-      out.push({ id: a.id, time: a.time || defaultTime.get(a.id) || "", text: a.text || p.name });
+      out.push({
+        id: a.id,
+        time: a.time || defaultTime.get(a.id) || "",
+        text: a.text || p.activity || p.desc || p.name,
+      });
       seen.add(a.id);
     } else {
       out.push(a); // manual row — keep as-is, in place
@@ -92,7 +98,11 @@ export function scheduleFromPlaces(
   }
   for (const p of places) {
     if (!seen.has(p.id)) {
-      out.push({ id: p.id, time: defaultTime.get(p.id) || "", text: p.name });
+      out.push({
+        id: p.id,
+        time: defaultTime.get(p.id) || "",
+        text: p.activity || p.desc || p.name,
+      });
     }
   }
   return out;

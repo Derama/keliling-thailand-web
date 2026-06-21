@@ -46,8 +46,9 @@ const SCHEMA = {
               additionalProperties: false,
               properties: {
                 name: { type: "string" },
+                activity: { type: "string" },
               },
-              required: ["name"],
+              required: ["name", "activity"],
             },
           },
         },
@@ -149,7 +150,10 @@ export async function POST(request: Request) {
       SYSTEM +
       `\n\nKATALOG ATRAKSI (pilih HANYA dari daftar ini untuk "places"):\n` +
       catalogText +
-      `\n\nUntuk setiap hari, isi "places" dengan 3-4 nama atraksi NYATA dari katalog yang cocok dengan kota hari itu (field "city"), urut sesuai alur kunjungan dari pagi ke sore. Salin nama PERSIS seperti di katalog. Jika kota itu tidak ada di katalog, kembalikan "places": [].`;
+      `\n\nUntuk setiap hari, isi "places" dengan 3-4 atraksi NYATA dari katalog yang cocok dengan kota hari itu (field "city"), urut sesuai alur kunjungan dari pagi ke sore. Untuk tiap atraksi:
+- "name": salin nama PERSIS seperti di katalog.
+- "activity": satu kalimat deskriptif yang hangat & mengundang dalam Bahasa Indonesia tentang pengalaman di sana (apa yang dilakukan/dirasakan), BUKAN sekadar mengulang nama. Contoh: "Menyusuri tepian pantai Hua Hin yang tenang sambil menikmati semilir angin laut sore."
+Jika kota itu tidak ada di katalog, kembalikan "places": [].`;
 
     const completion = await client.chat.completions.create({
       model: MODEL,
@@ -169,31 +173,37 @@ export async function POST(request: Request) {
       notes?: string;
       days?: Array<{
         city?: string;
-        places?: { name?: string }[];
+        places?: { name?: string; activity?: string }[];
         [k: string]: unknown;
       }>;
     };
 
     // Resolve place names to real cards: exact (case-insensitive) match,
-    // preferring the day's city, else any city. Drop misses. Cap 3/day.
+    // preferring the day's city, else any city. Drop misses. Cap 4/day.
     const norm = (s: string) => s.trim().toLowerCase();
     const days = (parsed.days ?? []).map((d) => {
       const cityKey = (d.city ?? "").toUpperCase();
       const chosen = (d.places ?? [])
-        .map((p) => norm(p.name ?? ""))
-        .filter(Boolean);
-      const cards: { name: string; image: string; desc: string }[] = [];
-      for (const wanted of chosen) {
+        .map((p) => ({ name: norm(p.name ?? ""), activity: p.activity ?? "" }))
+        .filter((c) => c.name);
+      const cards: {
+        name: string;
+        image: string;
+        desc: string;
+        activity: string;
+      }[] = [];
+      for (const c of chosen) {
         if (cards.length >= 4) break;
         const row =
           catalogRows.find(
-            (r) => (r.city ?? "").toUpperCase() === cityKey && norm(r.name) === wanted
-          ) ?? catalogRows.find((r) => norm(r.name) === wanted);
-        if (row && !cards.some((c) => norm(c.name) === norm(row.name))) {
+            (r) => (r.city ?? "").toUpperCase() === cityKey && norm(r.name) === c.name
+          ) ?? catalogRows.find((r) => norm(r.name) === c.name);
+        if (row && !cards.some((x) => norm(x.name) === norm(row.name))) {
           cards.push({
             name: row.name,
             image: row.image_url ?? "",
             desc: row.description ?? "",
+            activity: c.activity,
           });
         }
       }
