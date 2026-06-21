@@ -200,9 +200,11 @@ export async function POST(request: Request) {
       return { ...d, places: cards };
     });
 
-    // Auto cover: first available place photo across the trip (editable client-side).
+    // Auto cover: an attraction photo from the FIRST city (day 1). Fall back to
+    // any later day only if day 1 has no photo. Editable client-side.
     const heroImage =
-      days.flatMap((d) => d.places).find((c) => c.image)?.image ?? "";
+      ((days[0]?.places ?? []).find((c) => c.image) ??
+        days.flatMap((d) => d.places).find((c) => c.image))?.image ?? "";
 
     return Response.json({ ...parsed, days, heroImage });
   } catch (err) {
