@@ -208,18 +208,18 @@ function CoverPage({
         <div className="mt-4 h-1 w-24 rounded-full" style={{ backgroundColor: GOLD }} />
 
         {customer ? (
-          <div className="mt-6 inline-flex flex-col gap-1.5 rounded-2xl border border-white/20 bg-white/10 px-7 py-5 backdrop-blur-sm">
+          <div className="mt-5 inline-flex flex-col gap-1 rounded-xl border border-white/20 bg-white/10 px-5 py-3 backdrop-blur-sm">
             <span
-              className="text-[10px] font-bold uppercase tracking-[0.3em]"
+              className="text-[9px] font-bold uppercase tracking-[0.28em]"
               style={{ color: GOLD }}
             >
               Disusun khusus untuk
             </span>
-            <span className="font-serif text-4xl leading-tight text-white">
+            <span className="font-serif text-2xl leading-tight text-white">
               {customer}
             </span>
             {(pax || dateRange) && (
-              <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
+              <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/80">
                 {pax && <span>{pax} Tamu</span>}
                 {pax && dateRange && <span style={{ color: GOLD }}>•</span>}
                 {dateRange && <span>{dateRange}</span>}
