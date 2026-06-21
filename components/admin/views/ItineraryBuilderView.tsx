@@ -6,10 +6,11 @@ import { inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin
 import { isoLocal } from "@/lib/admin/utils";
 import { uploadPlaceImage } from "@/lib/admin/storage";
 import ItineraryDoc from "@/components/admin/ItineraryDoc";
-import type {
-  ItineraryDay,
-  ItineraryActivity,
-  ItineraryPlace,
+import {
+  type ItineraryDay,
+  type ItineraryActivity,
+  type ItineraryPlace,
+  scheduleFromPlaces,
 } from "@/lib/admin/itinerary";
 import type { Place } from "@/lib/admin/places";
 import {
@@ -182,29 +183,29 @@ export default function ItineraryBuilderView() {
               places?: { name?: string; image?: string; desc?: string }[];
             },
             i: number
-          ) => ({
-            id: newId(),
-            title: d.title ?? "",
-            theme: d.theme ?? "",
-            city: d.city ?? "",
-            route: d.route ?? "",
-            intro: d.intro ?? "",
-            cityHighlight: d.cityHighlight ?? "",
-            date: addDaysIso(startDate, i),
-            activities: (d.activities ?? []).map((a) => ({
-              id: newId(),
-              time: a.time ?? "",
-              text: a.text ?? "",
-            })),
-            places: (d.places ?? [])
+          ) => {
+            const places = (d.places ?? [])
               .slice(0, MAX_DAY_PHOTOS)
               .map((p) => ({
                 id: newId(),
                 name: p.name ?? "",
                 image: p.image ?? "",
                 desc: p.desc ?? "",
-              })),
-          })
+              }));
+            return {
+              id: newId(),
+              title: d.title ?? "",
+              theme: d.theme ?? "",
+              city: d.city ?? "",
+              route: d.route ?? "",
+              intro: d.intro ?? "",
+              cityHighlight: d.cityHighlight ?? "",
+              date: addDaysIso(startDate, i),
+              // Timetable is derived from the attractions (one timed stop each).
+              activities: scheduleFromPlaces(places),
+              places,
+            };
+          }
         )
       );
       // Set cover from a picked attraction unless the admin set one manually.
@@ -286,11 +287,15 @@ export default function ItineraryBuilderView() {
   }
 
   // ── Place (photo) mutators — used by picker + drag-and-drop ──
+  // Each attraction is a timed stop: keep the schedule in sync with the photos.
+  function syncDay(d: ItineraryDay): ItineraryDay {
+    return { ...d, activities: scheduleFromPlaces(d.places, d.activities) };
+  }
   function addPlaceToDay(dayId: string, place: ItineraryPlace) {
     setDays((arr) =>
       arr.map((d) =>
         d.id === dayId && d.places.length < MAX_DAY_PHOTOS
-          ? { ...d, places: [...d.places, place] }
+          ? syncDay({ ...d, places: [...d.places, place] })
           : d
       )
     );
@@ -299,7 +304,7 @@ export default function ItineraryBuilderView() {
     setDays((arr) =>
       arr.map((d) =>
         d.id === dayId
-          ? { ...d, places: d.places.filter((p) => p.id !== placeId) }
+          ? syncDay({ ...d, places: d.places.filter((p) => p.id !== placeId) })
           : d
       )
     );
@@ -311,7 +316,7 @@ export default function ItineraryBuilderView() {
       if (!target) return arr; // every day full
       return arr.map((d) =>
         d.id === target.id
-          ? { ...d, places: [...d.places, { ...place, id: newId() }] }
+          ? syncDay({ ...d, places: [...d.places, { ...place, id: newId() }] })
           : d
       );
     });
@@ -324,12 +329,12 @@ export default function ItineraryBuilderView() {
     setDays((arr) =>
       arr.map((d) =>
         d.id === dayId
-          ? {
+          ? syncDay({
               ...d,
               places: d.places.map((p) =>
                 p.id === placeId ? { ...p, ...patch } : p
               ),
-            }
+            })
           : d
       )
     );
@@ -354,13 +359,13 @@ export default function ItineraryBuilderView() {
       if (target && target.places.length >= MAX_DAY_PHOTOS) return arr; // full
       return arr.map((d) => {
         if (d.id === payload.fromDayId) {
-          return {
+          return syncDay({
             ...d,
             places: d.places.filter((p) => p.id !== payload.place.id),
-          };
+          });
         }
         if (d.id === targetDayId) {
-          return { ...d, places: [...d.places, payload.place] };
+          return syncDay({ ...d, places: [...d.places, payload.place] });
         }
         return d;
       });
@@ -768,37 +773,6 @@ function CoverSlot({
   );
 }
 
-function IconBtn({
-  label,
-  onClick,
-  disabled,
-  danger,
-  children,
-}: {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-  danger?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      disabled={disabled}
-      className={`flex h-7 w-7 items-center justify-center rounded-md border text-sm transition-colors disabled:opacity-30 ${
-        danger
-          ? "border-red-200 text-red-500 hover:bg-red-50"
-          : "border-gray-200 text-gray-500 hover:bg-gray-50"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
 // ── Draggable attraction palette ──────────────────────────────
 
 function PlacePalette({
@@ -965,27 +939,14 @@ function DayCard({
     if (payload) onDropPlace(payload);
   }
 
-  function setActivities(activities: ItineraryActivity[]) {
-    onPatch({ activities });
-  }
-  function addActivity() {
-    setActivities([...day.activities, { id: newId(), time: "", text: "" }]);
-  }
+  // Timetable rows mirror the attraction photos (add/remove/reorder via the
+  // photo picker below). Here you only fine-tune each stop's time and label.
   function patchActivity(id: string, patch: Partial<ItineraryActivity>) {
-    setActivities(
-      day.activities.map((a) => (a.id === id ? { ...a, ...patch } : a))
-    );
-  }
-  function removeActivity(id: string) {
-    setActivities(day.activities.filter((a) => a.id !== id));
-  }
-  function moveActivity(id: string, dir: -1 | 1) {
-    const i = day.activities.findIndex((a) => a.id === id);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= day.activities.length) return;
-    const next = [...day.activities];
-    [next[i], next[j]] = [next[j], next[i]];
-    setActivities(next);
+    onPatch({
+      activities: day.activities.map((a) =>
+        a.id === id ? { ...a, ...patch } : a
+      ),
+    });
   }
 
   return (
@@ -1109,9 +1070,12 @@ function DayCard({
           )}
         </div>
 
-        {/* Activities */}
+        {/* Timetable — one stop per attraction, edit time & label only */}
         <div className="space-y-2">
-          {day.activities.map((a, i) => (
+          <p className="text-xs font-medium text-gray-400">
+            Jadwal (otomatis dari atraksi · sunting jam &amp; nama)
+          </p>
+          {day.activities.map((a) => (
             <div key={a.id} className="flex items-center gap-2">
               <input
                 value={a.time}
@@ -1122,37 +1086,16 @@ function DayCard({
               <input
                 value={a.text}
                 onChange={(e) => patchActivity(a.id, { text: e.target.value })}
-                placeholder="Kegiatan…"
+                placeholder="Nama atraksi…"
                 className={`${inputCls} min-w-0 flex-1`}
               />
-              <div className="flex shrink-0 items-center gap-1">
-                <IconBtn
-                  label="Naikkan"
-                  onClick={() => moveActivity(a.id, -1)}
-                  disabled={i === 0}
-                >
-                  ↑
-                </IconBtn>
-                <IconBtn
-                  label="Turunkan"
-                  onClick={() => moveActivity(a.id, 1)}
-                  disabled={i === day.activities.length - 1}
-                >
-                  ↓
-                </IconBtn>
-                <IconBtn label="Hapus" danger onClick={() => removeActivity(a.id)}>
-                  ✕
-                </IconBtn>
-              </div>
             </div>
           ))}
-          <button
-            type="button"
-            onClick={addActivity}
-            className="text-sm font-medium text-[#1B2A4A] hover:underline"
-          >
-            + Tambah kegiatan
-          </button>
+          {day.activities.length === 0 && (
+            <p className="text-xs text-gray-400">
+              Tambah foto atraksi di bawah — jadwalnya muncul otomatis.
+            </p>
+          )}
         </div>
 
         {/* Places */}

@@ -149,7 +149,7 @@ export async function POST(request: Request) {
       SYSTEM +
       `\n\nKATALOG ATRAKSI (pilih HANYA dari daftar ini untuk "places"):\n` +
       catalogText +
-      `\n\nUntuk setiap hari, isi "places" dengan 2-3 nama atraksi NYATA dari katalog yang cocok dengan kota hari itu (field "city"). Salin nama PERSIS seperti di katalog. Jika kota itu tidak ada di katalog, kembalikan "places": [].`;
+      `\n\nUntuk setiap hari, isi "places" dengan 3-4 nama atraksi NYATA dari katalog yang cocok dengan kota hari itu (field "city"), urut sesuai alur kunjungan dari pagi ke sore. Salin nama PERSIS seperti di katalog. Jika kota itu tidak ada di katalog, kembalikan "places": [].`;
 
     const completion = await client.chat.completions.create({
       model: MODEL,
@@ -184,7 +184,7 @@ export async function POST(request: Request) {
         .filter(Boolean);
       const cards: { name: string; image: string; desc: string }[] = [];
       for (const wanted of chosen) {
-        if (cards.length >= 3) break;
+        if (cards.length >= 4) break;
         const row =
           catalogRows.find(
             (r) => (r.city ?? "").toUpperCase() === cityKey && norm(r.name) === wanted
