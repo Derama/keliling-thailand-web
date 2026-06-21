@@ -205,6 +205,8 @@ export default function ItineraryBuilderView() {
           })
         )
       );
+      // Auto-fill cover from a picked attraction; keep any cover the admin set.
+      if (data.heroImage) setHeroImage((prev) => prev || data.heroImage);
     } catch (err) {
       setAiError(err instanceof Error ? err.message : "Gagal generate.");
     } finally {

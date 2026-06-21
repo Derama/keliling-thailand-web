@@ -200,7 +200,11 @@ export async function POST(request: Request) {
       return { ...d, places: cards };
     });
 
-    return Response.json({ ...parsed, days });
+    // Auto cover: first available place photo across the trip (editable client-side).
+    const heroImage =
+      days.flatMap((d) => d.places).find((c) => c.image)?.image ?? "";
+
+    return Response.json({ ...parsed, days, heroImage });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "AI error";
     return Response.json({ error: msg }, { status: 502 });
