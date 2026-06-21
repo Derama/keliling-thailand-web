@@ -63,37 +63,39 @@ export const MEAL_STOPS: { time: string; text: string }[] = [
   { time: "19:00", text: "Makan Malam" },
 ];
 
-function timeToMin(t: string): number {
-  const m = /^(\d{1,2}):(\d{2})$/.exec((t || "").trim());
-  // Rows without a valid time sink to the end so they're easy to fill in.
-  return m ? Number(m[1]) * 60 + Number(m[2]) : Number.MAX_SAFE_INTEGER;
-}
-
-/** Order a day's stops chronologically; untimed rows go last. */
-export function sortActivitiesByTime(
-  acts: ItineraryActivity[]
-): ItineraryActivity[] {
-  return [...acts].sort((a, b) => timeToMin(a.time) - timeToMin(b.time));
-}
-
 /**
- * Rebuild a day's timetable around its attraction photos: one stop per place
- * (times auto-distributed, label = place name, preserving a prior edit), while
- * KEEPING any extra rows the admin added (meals, custom stops). Sorted by time.
+ * Rebuild a day's timetable around its attraction photos while preserving the
+ * admin's arranged ORDER (rows are not re-sorted by clock time):
+ *   - existing rows stay in their current positions;
+ *   - attraction rows keep their time/label edits (default time only if empty);
+ *   - manual rows (meals, custom stops) are left untouched;
+ *   - newly added attractions are appended at the end.
  */
 export function scheduleFromPlaces(
   places: ItineraryPlace[],
   prev: ItineraryActivity[] = []
 ): ItineraryActivity[] {
-  const placeIds = new Set(places.map((p) => p.id));
-  const times = distributeTimes(places.length);
-  const placeStops = places.map((p, i) => {
-    const existing = prev.find((a) => a.id === p.id);
-    return { id: p.id, time: times[i], text: existing?.text || p.name };
-  });
-  // Anything not tied to a current place is a manual row — keep it untouched.
-  const extras = prev.filter((a) => !placeIds.has(a.id));
-  return sortActivitiesByTime([...placeStops, ...extras]);
+  const byId = new Map(places.map((p) => [p.id, p]));
+  const defaults = distributeTimes(places.length);
+  const defaultTime = new Map(places.map((p, i) => [p.id, defaults[i]]));
+
+  const out: ItineraryActivity[] = [];
+  const seen = new Set<string>();
+  for (const a of prev) {
+    const p = byId.get(a.id);
+    if (p) {
+      out.push({ id: a.id, time: a.time || defaultTime.get(a.id) || "", text: a.text || p.name });
+      seen.add(a.id);
+    } else {
+      out.push(a); // manual row — keep as-is, in place
+    }
+  }
+  for (const p of places) {
+    if (!seen.has(p.id)) {
+      out.push({ id: p.id, time: defaultTime.get(p.id) || "", text: p.name });
+    }
+  }
+  return out;
 }
 
 /** Trip-level meta for the brochure cover + day pills. */

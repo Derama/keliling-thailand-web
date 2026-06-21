@@ -11,7 +11,6 @@ import {
   type ItineraryActivity,
   type ItineraryPlace,
   scheduleFromPlaces,
-  sortActivitiesByTime,
   MEAL_STOPS,
 } from "@/lib/admin/itinerary";
 import type { Place } from "@/lib/admin/places";
@@ -979,9 +978,8 @@ function DayCard({
       text: m.text,
     }));
     if (missing.length === 0) return;
-    onPatch({
-      activities: sortActivitiesByTime([...day.activities, ...missing]),
-    });
+    // Append in itinerary order (no clock sort) — reorder with ↑ / ↓ as needed.
+    onPatch({ activities: [...day.activities, ...missing] });
   }
 
   return (
