@@ -406,8 +406,9 @@ export default function ItineraryBuilderView() {
           <section className="space-y-3 rounded-xl border border-[#F5C518]/40 border-t-4 border-t-[#F5C518] bg-[#FFFCEF] p-5">
             <StepHead n="AI" title="Generate dengan AI" accent />
             <p className="text-xs text-gray-500">
-              Isi data cepat di atas, lalu Generate. Kotak di bawah opsional —
-              untuk minat khusus (mis. suka belanja, ada anak kecil).
+              Isi Detail trip (customer, pax, jumlah hari) di bawah, pilih
+              tujuan, lalu Generate. Kotak teks opsional — untuk minat khusus
+              (mis. suka belanja, ada anak kecil).
             </p>
             <div className="flex flex-wrap gap-2">
               <span className="self-center text-xs font-medium text-gray-400">
@@ -423,33 +424,6 @@ export default function ItineraryBuilderView() {
                   {s.split(",")[0]}
                 </button>
               ))}
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <LabeledInput
-                label="Customer"
-                value={customer}
-                onChange={setCustomer}
-                placeholder="Nama customer"
-              />
-              <LabeledInput
-                label="Jumlah orang"
-                value={pax}
-                onChange={setPax}
-                placeholder="4 dewasa"
-              />
-              <label className="block sm:col-span-2">
-                <span className="mb-1 block text-sm font-medium text-gray-700">
-                  Jumlah hari
-                </span>
-                <input
-                  type="number"
-                  min={1}
-                  max={14}
-                  value={qDays}
-                  onChange={(e) => setQDays(Number(e.target.value) || 1)}
-                  className={inputCls}
-                />
-              </label>
             </div>
             {destOptions.length > 0 && (
               <div className="space-y-1">
@@ -519,6 +493,19 @@ export default function ItineraryBuilderView() {
               <LabeledInput label="Judul trip" value={tripTitle} onChange={setTripTitle} placeholder="Bangkok 4D3N" />
               <LabeledInput label="Customer" value={customer} onChange={setCustomer} placeholder="Nama customer" />
               <LabeledInput label="Pax" value={pax} onChange={setPax} placeholder="2 dewasa" />
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium text-gray-700">
+                  Jumlah hari
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={14}
+                  value={qDays}
+                  onChange={(e) => setQDays(Number(e.target.value) || 1)}
+                  className={inputCls}
+                />
+              </label>
               <label className="block">
                 <span className="mb-1 block text-sm font-medium text-gray-700">
                   Tanggal mulai
