@@ -1081,13 +1081,13 @@ function DayCard({
                 value={a.time}
                 onChange={(e) => patchActivity(a.id, { time: e.target.value })}
                 placeholder="08:00"
-                className={`${inputCls} w-20 shrink-0 text-center`}
+                className="w-16 shrink-0 rounded-lg border border-gray-300 px-2 py-2 text-center text-sm tabular-nums focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
               />
               <input
                 value={a.text}
                 onChange={(e) => patchActivity(a.id, { text: e.target.value })}
                 placeholder="Nama atraksi…"
-                className={`${inputCls} min-w-0 flex-1`}
+                className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
               />
             </div>
           ))}
