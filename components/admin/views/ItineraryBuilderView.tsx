@@ -77,6 +77,8 @@ export default function ItineraryBuilderView() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [qDays, setQDays] = useState(3);
   const [qDest, setQDest] = useState<string[]>([]);
+  // True once the admin sets/uploads a cover manually — stops AI from overwriting it.
+  const [coverManual, setCoverManual] = useState(false);
 
   const hydrated = useRef(false);
 
@@ -205,8 +207,8 @@ export default function ItineraryBuilderView() {
           })
         )
       );
-      // Auto-fill cover from a picked attraction; keep any cover the admin set.
-      if (data.heroImage) setHeroImage((prev) => prev || data.heroImage);
+      // Set cover from a picked attraction unless the admin set one manually.
+      if (data.heroImage && !coverManual) setHeroImage(data.heroImage);
     } catch (err) {
       setAiError(err instanceof Error ? err.message : "Gagal generate.");
     } finally {
@@ -234,6 +236,7 @@ export default function ItineraryBuilderView() {
     setNotes("");
     setVehicle("VAN");
     setHeroImage("");
+    setCoverManual(false);
     setDays([]);
     setAiPrompt("");
     setAiError(null);
@@ -335,7 +338,10 @@ export default function ItineraryBuilderView() {
   function handleDropOnDay(targetDayId: string, payload: DragPayload) {
     // Cover hero: any dragged photo just sets the cover image (no move/remove).
     if (targetDayId === COVER_DROP_ID) {
-      if (payload.place.image) setHeroImage(payload.place.image);
+      if (payload.place.image) {
+        setHeroImage(payload.place.image);
+        setCoverManual(true);
+      }
       return;
     }
     if (payload.kind === "new") {
@@ -518,7 +524,13 @@ export default function ItineraryBuilderView() {
                 />
               </label>
               <LabeledInput label="Kendaraan" value={vehicle} onChange={setVehicle} placeholder="VAN" />
-              <CoverSlot value={heroImage} onChange={setHeroImage} />
+              <CoverSlot
+                value={heroImage}
+                onChange={(v) => {
+                  setHeroImage(v);
+                  setCoverManual(!!v);
+                }}
+              />
             </div>
           </section>
 
