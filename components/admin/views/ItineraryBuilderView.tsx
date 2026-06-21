@@ -11,6 +11,7 @@ import {
   type ItineraryActivity,
   type ItineraryPlace,
   scheduleFromPlaces,
+  insertByTime,
   MEAL_STOPS,
 } from "@/lib/admin/itinerary";
 import type { Place } from "@/lib/admin/places";
@@ -974,18 +975,16 @@ function DayCard({
     });
   }
   function addMeals() {
+    let acts = day.activities;
     const has = (text: string) =>
-      day.activities.some(
-        (a) => a.text.trim().toLowerCase() === text.toLowerCase()
-      );
-    const missing = MEAL_STOPS.filter((m) => !has(m.text)).map((m) => ({
-      id: newId(),
-      time: m.time,
-      text: m.text,
-    }));
-    if (missing.length === 0) return;
-    // Append in itinerary order (no clock sort) — reorder with ↑ / ↓ as needed.
-    onPatch({ activities: [...day.activities, ...missing] });
+      acts.some((a) => a.text.trim().toLowerCase() === text.toLowerCase());
+    // Slot each missing meal into its time position; keep other rows in place.
+    for (const m of MEAL_STOPS) {
+      if (has(m.text)) continue;
+      acts = insertByTime(acts, { id: newId(), time: m.time, text: m.text });
+    }
+    if (acts === day.activities) return;
+    onPatch({ activities: acts });
   }
 
   return (

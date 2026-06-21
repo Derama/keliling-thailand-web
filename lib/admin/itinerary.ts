@@ -65,6 +65,27 @@ export const MEAL_STOPS: { time: string; text: string }[] = [
   { time: "19:00", text: "Makan malam santai" },
 ];
 
+function timeToMin(t: string): number {
+  const m = /^(\d{1,2}):(\d{2})$/.exec((t || "").trim());
+  return m ? Number(m[1]) * 60 + Number(m[2]) : Number.MAX_SAFE_INTEGER;
+}
+
+/**
+ * Insert a row at the position its time fits (before the first later-timed row),
+ * without reordering the rest — keeps the admin's arrangement intact.
+ */
+export function insertByTime(
+  acts: ItineraryActivity[],
+  row: ItineraryActivity
+): ItineraryActivity[] {
+  const t = timeToMin(row.time);
+  let idx = acts.findIndex((a) => timeToMin(a.time) > t);
+  if (idx < 0) idx = acts.length;
+  const next = [...acts];
+  next.splice(idx, 0, row);
+  return next;
+}
+
 /**
  * Rebuild a day's timetable around its attraction photos while preserving the
  * admin's arranged ORDER (rows are not re-sorted by clock time):
