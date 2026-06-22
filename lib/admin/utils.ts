@@ -31,23 +31,27 @@ export function profitIDR(
   return thb === null ? null : thb * o.fx_rate;
 }
 
-/**
- * Document number like KT-2606-03 / KT-INV-2606-03.
- * `count` = how many numbers with this prefix+month already exist.
- */
-export function buildDocNumber(
-  prefix: "KT" | "KT-INV",
-  count: number,
-  date: Date = new Date()
-): string {
-  const yy = String(date.getFullYear()).slice(2);
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  return `${prefix}-${yy}${mm}-${String(count + 1).padStart(2, "0")}`;
-}
+// Document numbers (KT-YYMM-NN / KT-INV-YYMM-NN) are now assigned atomically by
+// Postgres BEFORE INSERT triggers — see scripts/migrations/007-doc-numbering.sql.
+// The old client-side buildDocNumber() was removed to avoid format drift.
 
 /** Local-time YYYY-MM-DD. Never use toISOString() for calendar dates — UTC+7 shifts the day. */
 export function isoLocal(d: Date = new Date()): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Date + time stamp for "Printed …" footers, e.g. "21 Jun 2026, 14:30". */
+export function formatPrintedAt(d: Date = new Date()): string {
+  const date = d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const time = d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${date}, ${time}`;
 }
 
 /** "2026-06-13" -> "13 Jun 2026"; null-safe. */

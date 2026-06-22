@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Order, InvoiceType, InvoiceLineItem } from "@/lib/admin/types";
 import { INVOICE_TYPES, INVOICE_TYPE_LABELS } from "@/lib/admin/types";
-import { buildDocNumber, formatIDR } from "@/lib/admin/utils";
+import { formatIDR } from "@/lib/admin/utils";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 
 export default function InvoiceForm({ order }: { order: Order }) {
@@ -31,15 +31,11 @@ export default function InvoiceForm({ order }: { order: Order }) {
     setBusy(true);
     setError(null);
     const supabase = createClient();
-    const prefix = `KT-INV-${buildDocNumber("KT", 0).split("-")[1]}-`;
-    const { count } = await supabase
-      .from("invoices")
-      .select("id", { count: "exact", head: true })
-      .like("invoice_number", `${prefix}%`);
+    // invoice_number is assigned atomically by a BEFORE INSERT trigger
+    // (assign_invoice_number) — see scripts/migrations/007-doc-numbering.sql.
     const { data, error } = await supabase
       .from("invoices")
       .insert({
-        invoice_number: buildDocNumber("KT-INV", count ?? 0),
         order_id: order.id,
         type,
         amount_idr: total,

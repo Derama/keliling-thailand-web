@@ -5,13 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Customer, Order, OrderStatus } from "@/lib/admin/types";
 import { ORDER_STATUSES, STATUS_LABELS } from "@/lib/admin/types";
-import {
-  buildDocNumber,
-  formatIDR,
-  formatTHB,
-  profitTHB,
-  profitIDR,
-} from "@/lib/admin/utils";
+import { formatIDR, formatTHB, profitTHB, profitIDR } from "@/lib/admin/utils";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 import FxRateHint from "@/components/admin/FxRateHint";
 
@@ -152,15 +146,11 @@ export default function OrderForm({
       onSaved?.();
       setBusy(false);
     } else {
-      const prefix = `KT-${buildDocNumber("KT", 0).split("-")[1]}-`;
-      const { count } = await supabase
-        .from("orders")
-        .select("id", { count: "exact", head: true })
-        .like("order_number", `${prefix}%`);
-      const orderNumber = buildDocNumber("KT", count ?? 0);
+      // order_number is assigned atomically by a BEFORE INSERT trigger
+      // (assign_order_number) — see scripts/migrations/007-doc-numbering.sql.
       const { data, error } = await supabase
         .from("orders")
-        .insert({ ...row, order_number: orderNumber })
+        .insert(row)
         .select("id")
         .single();
       if (error) {

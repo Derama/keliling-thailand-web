@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Order, Payment, Invoice } from "@/lib/admin/types";
 import OrderForm from "@/components/admin/OrderForm";
 import PaymentsCard from "@/components/admin/PaymentsCard";
-import { formatDate } from "@/lib/admin/utils";
+import { formatDate, formatPrintedAt, formatIDR } from "@/lib/admin/utils";
 import { btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 
 export default function OrderDetailPage({
@@ -53,9 +53,16 @@ export default function OrderDetailPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-[#1B2A4A]">
-          {order.order_number}
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">
+            {order.order_number}
+          </h1>
+          {order.last_printed_at && (
+            <p className="mt-0.5 text-xs text-gray-400">
+              Terakhir dicetak {formatPrintedAt(new Date(order.last_printed_at))}
+            </p>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/admin/orders/${order.id}/job-order`}
@@ -82,6 +89,31 @@ export default function OrderDetailPage({
       {invoices.length > 0 && (
         <section className="space-y-2 rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="font-semibold text-[#1B2A4A]">Invoice</h2>
+          {(() => {
+            const invoiced = invoices.reduce(
+              (sum, inv) => sum + Number(inv.amount_idr),
+              0
+            );
+            const price = Number(order.price_idr);
+            const diff = invoiced - price;
+            return (
+              <p className="text-sm">
+                Total invoice <strong>{formatIDR(invoiced)}</strong> dari harga{" "}
+                {formatIDR(price)} —{" "}
+                {diff === 0 ? (
+                  <span className="font-semibold text-green-700">cocok</span>
+                ) : diff > 0 ? (
+                  <span className="font-semibold text-amber-700">
+                    lebih {formatIDR(diff)}
+                  </span>
+                ) : (
+                  <span className="font-semibold text-amber-700">
+                    kurang {formatIDR(-diff)}
+                  </span>
+                )}
+              </p>
+            );
+          })()}
           <ul className="divide-y divide-gray-100 text-sm">
             {invoices.map((inv) => (
               <li key={inv.id} className="py-2">
