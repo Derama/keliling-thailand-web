@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   PRICE_BOOK,
-  ADD_ONS,
   HOTEL_MARGIN,
   FLEET_LABELS,
   FLEET_KEYS,
@@ -12,8 +11,10 @@ import {
   groupAttractions,
   isContact,
   type VehiclePrice,
+  mergeAddOns,
   type HotelRate,
   type Attraction,
+  type AddOnRate,
 } from "@/lib/admin/priceBook";
 import { formatTHB } from "@/lib/admin/utils";
 import { inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
@@ -108,38 +109,178 @@ export default function PriceListView() {
       {/* Attractions — editable, prices fill over time */}
       <AttractionRatesSection />
 
-      <section className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
-        <div className="border-b border-gray-100 px-4 py-3">
-          <h2 className="font-semibold text-[#1B2A4A]">Biaya Tambahan</h2>
+      {/* Add-ons — editable price, name & unit; rows can be added/removed */}
+      <AddOnsSection />
+    </div>
+  );
+}
+
+function AddOnsSection() {
+  const [rows, setRows] = useState<AddOnRate[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newUnit, setNewUnit] = useState("");
+
+  useEffect(() => {
+    createClient()
+      .from("add_ons")
+      .select("*")
+      .order("sort", { ascending: true })
+      .then(({ data, error }) => {
+        if (error) setError(error.message);
+        setRows(mergeAddOns((data as AddOnRate[]) ?? []));
+      });
+  }, []);
+
+  function patch(id: string, p: Partial<AddOnRate>) {
+    setRows((arr) => arr.map((r) => (r.id === id ? { ...r, ...p } : r)));
+    setDirty(true);
+    setSaved(false);
+  }
+  function setName(id: string, raw: string) {
+    patch(id, { name: raw });
+  }
+  function setPrice(id: string, raw: string) {
+    patch(id, { price: raw === "" ? null : Number(raw) });
+  }
+  function setUnit(id: string, raw: string) {
+    patch(id, { unit: raw === "" ? null : raw });
+  }
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    // Persist base rows (as price/unit overrides) and custom rows alike.
+    const payload = rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      price: r.price,
+      unit: r.unit,
+      sort: r.sort,
+      updated_at: new Date().toISOString(),
+    }));
+    const { error } = await createClient().from("add_ons").upsert(payload);
+    setSaving(false);
+    if (error) setError(error.message);
+    else {
+      setDirty(false);
+      setSaved(true);
+    }
+  }
+
+  async function addRow() {
+    const name = newName.trim();
+    if (!name) return;
+    const row: AddOnRate = {
+      id: crypto.randomUUID(),
+      name,
+      price: newPrice === "" ? null : Number(newPrice),
+      unit: newUnit.trim() === "" ? null : newUnit.trim(),
+      sort: rows.reduce((m, r) => Math.max(m, r.sort), 0) + 10,
+    };
+    setError(null);
+    const { error } = await createClient().from("add_ons").insert(row);
+    if (error) setError(error.message);
+    else {
+      setRows((arr) => [...arr, row]);
+      setNewName("");
+      setNewPrice("");
+      setNewUnit("");
+    }
+  }
+
+  async function deleteRow(id: string) {
+    if (!confirm("Hapus biaya tambahan ini?")) return;
+    const { error } = await createClient().from("add_ons").delete().eq("id", id);
+    if (error) setError(error.message);
+    else setRows((arr) => arr.filter((r) => r.id !== id));
+  }
+
+  return (
+    <>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-[#1B2A4A]">Biaya Tambahan</h2>
+          <p className="text-xs text-gray-400">
+            Ubah harga, kosongkan kalau sesuai harga aktual. Lalu simpan.
+          </p>
         </div>
+        <div className="flex items-center gap-3">
+          {saved && !dirty && (
+            <span className="text-sm text-green-700">Tersimpan ✓</span>
+          )}
+          <button
+            type="button"
+            onClick={save}
+            disabled={!dirty || saving}
+            className={`${btnCls} disabled:cursor-not-allowed disabled:opacity-50`}
+          >
+            {saving ? "Menyimpan…" : "Simpan biaya tambahan"}
+          </button>
+        </div>
+      </div>
+
+      <ErrorNote message={error} />
+
+      <section className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-gray-500">
             <tr>
               <th className="px-4 py-3">Item</th>
               <th className="px-4 py-3 text-right">Harga</th>
+              <th className="px-4 py-3">Unit</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {ADD_ONS.map((a) => (
+            {rows.map((a) => (
               <tr
-                key={a.name}
+                key={a.id}
                 className="border-t border-gray-100 hover:bg-gray-50"
               >
-                <td className="px-4 py-3 font-medium text-[#1B2A4A]">
-                  {a.name}
+                <td className="px-4 py-2 font-medium text-[#1B2A4A]">
+                  {a.base ? (
+                    a.name
+                  ) : (
+                    <input
+                      type="text"
+                      value={a.name}
+                      onChange={(e) => setName(a.id, e.target.value)}
+                      className={`${inputCls} w-full`}
+                    />
+                  )}
+                </td>
+                <td className="px-4 py-2 text-right">
+                  <input
+                    type="number"
+                    min="0"
+                    value={a.price ?? ""}
+                    placeholder="aktual"
+                    onChange={(e) => setPrice(a.id, e.target.value)}
+                    className={`${inputCls} ml-auto max-w-24 text-right`}
+                  />
+                </td>
+                <td className="px-4 py-2">
+                  <input
+                    type="text"
+                    value={a.unit ?? ""}
+                    placeholder="—"
+                    onChange={(e) => setUnit(a.id, e.target.value)}
+                    className={`${inputCls} max-w-28`}
+                  />
                 </td>
                 <td className="px-4 py-3 text-right">
-                  {a.price != null ? (
-                    <span className="font-semibold text-[#1B2A4A]">
-                      {formatTHB(a.price)}
-                      {a.unit ? (
-                        <span className="text-xs text-gray-400"> {a.unit}</span>
-                      ) : null}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 italic">
-                      Sesuai harga aktual
-                    </span>
+                  {!a.base && (
+                    <button
+                      onClick={() => deleteRow(a.id)}
+                      className="text-sm text-red-500 hover:underline"
+                    >
+                      Hapus
+                    </button>
                   )}
                 </td>
               </tr>
@@ -147,7 +288,55 @@ export default function PriceListView() {
           </tbody>
         </table>
       </section>
-    </div>
+
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-4">
+        <h3 className="mb-3 text-sm font-semibold text-[#1B2A4A]">
+          Tambah biaya baru
+        </h3>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-40">
+            <label className="mb-1 block text-xs text-gray-500">Item</label>
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className={`${inputCls} w-full`}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-gray-500">
+              Harga (THB)
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={newPrice}
+              placeholder="aktual"
+              onChange={(e) => setNewPrice(e.target.value)}
+              className={`${inputCls} max-w-28`}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-gray-500">Unit</label>
+            <input
+              type="text"
+              value={newUnit}
+              placeholder="/ jam"
+              onChange={(e) => setNewUnit(e.target.value)}
+              className={`${inputCls} max-w-28`}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={addRow}
+            disabled={!newName.trim()}
+            className={`${btnCls} disabled:cursor-not-allowed disabled:opacity-50`}
+          >
+            Tambah
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 

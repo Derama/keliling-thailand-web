@@ -1,15 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   LOVE_BANGKOK,
   passengerRowCount,
   type JobOrderData,
 } from "@/lib/admin/jobOrder";
+import PrintedStamp from "@/components/admin/PrintedStamp";
 
-// Love Bangkok brand colors (red + royal blue), matching their letterhead.
+// Love Bangkok brand colors (royal blue + red), matching their letterhead.
+// The builder chrome stays Keliling navy/gold; the printed doc keeps Love
+// Bangkok's identity since they are the licensed operator who issues it.
 const NAVY = "#1C2E73";
-const YELLOW = "#E2231A";
+const RED = "#E2231A";
+
+/** Usable content height per packed page, in px. The printed sheet is fixed to
+ *  272mm (≈1028px) and clipped (see `.invoice-page` in globals.css), so the
+ *  browser emits exactly one physical page per sheet — no phantom splits. We
+ *  pack to ~1015px, a hair under the 1028px sheet, leaving ~13px clip safety
+ *  while still using nearly the full page (so short docs stay on one sheet
+ *  instead of being needlessly pushed onto a second). */
+const PAGE_CONTENT_H = 1015;
+/** True content width of an A4 sheet (794 − 2×45). Measure at this width. */
+const CONTENT_W = 704;
+
+/** A packable piece of the doc. `headerOf` blocks are re-emitted at the top of
+ *  every page their group's rows continue onto; `group` blocks are those rows. */
+type Block = {
+  key: string;
+  node: React.ReactNode;
+  headerOf?: string;
+  group?: string;
+};
 
 /** Plain <img> that falls back to a neutral bordered box if the file is missing. */
 function AssetImg({
@@ -25,7 +47,7 @@ function AssetImg({
   if (failed) {
     return (
       <div
-        className={`grid place-items-center rounded border border-dashed border-gray-300 text-[9px] text-gray-400 ${className ?? ""}`}
+        className={`grid place-items-center rounded border border-dashed border-white/50 text-[9px] text-white/70 ${className ?? ""}`}
       >
         {alt}
       </div>
@@ -42,200 +64,407 @@ function AssetImg({
   );
 }
 
+export default function JobOrderDoc(data: JobOrderData) {
+  const paxRows = passengerRowCount(data.totalPax);
+
+  // Ordered block list. Rows are individual blocks so they flow across pages.
+  const blocks: Block[] = [
+    { key: "head", node: <Head data={data} /> },
+    { key: "itin-h", headerOf: "itin", node: <ItinHeader /> },
+    ...data.days.map((d, i) => ({
+      key: `itin-${d.id}`,
+      group: "itin",
+      node: <ItinRow d={d} alt={i % 2 === 1} />,
+    })),
+    ...(data.showPassengers
+      ? [
+          { key: "pax-h", headerOf: "pax", node: <PaxHeader /> },
+          ...Array.from({ length: paxRows }, (_, i) => ({
+            key: `pax-${i}`,
+            group: "pax",
+            node: <PaxRow n={i + 1} alt={i % 2 === 1} />,
+          })),
+        ]
+      : []),
+    { key: "tail", node: <Tail /> },
+  ];
+
+  // Measure every block, then greedily pack into A4 pages.
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [pages, setPages] = useState<Block[][]>([blocks]);
+  const daysKey = JSON.stringify(data.days);
+  const hotelsKey = JSON.stringify(data.hotels);
+
+  useLayoutEffect(() => {
+    const root = measureRef.current;
+    if (!root) return;
+    const heights = new Map<string, number>();
+    root.querySelectorAll<HTMLElement>("[data-block]").forEach((el) => {
+      heights.set(el.dataset.block!, el.getBoundingClientRect().height);
+    });
+
+    const headers: Record<string, Block> = {};
+    for (const b of blocks) if (b.headerOf) headers[b.headerOf] = b;
+
+    const out: Block[][] = [];
+    let cur: Block[] = [];
+    let h = 0;
+    let active: string | null = null; // group whose header is live on this page
+
+    const flush = () => {
+      if (cur.length) out.push(cur);
+      cur = [];
+      h = 0;
+      active = null;
+    };
+
+    for (const b of blocks) {
+      if (b.headerOf) continue; // headers are injected on demand, not packed
+      const bh = heights.get(b.key) ?? 0;
+
+      if (b.group) {
+        const hdr = headers[b.group];
+        const hdrH = heights.get(hdr.key) ?? 0;
+        const headerCost = active !== b.group ? hdrH : 0;
+        if (h > 0 && h + headerCost + bh > PAGE_CONTENT_H) flush();
+        if (active !== b.group) {
+          cur.push({ ...hdr, key: `${hdr.key}-p${out.length}` });
+          h += hdrH;
+          active = b.group;
+        }
+        cur.push(b);
+        h += bh;
+      } else {
+        if (h > 0 && h + bh > PAGE_CONTENT_H) flush();
+        cur.push(b);
+        h += bh;
+        active = null;
+      }
+    }
+    flush();
+    setPages(out.length ? out : [blocks]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    daysKey,
+    data.totalPax,
+    data.showPassengers,
+    data.jobOrderNo,
+    data.date,
+    data.travelAgent,
+    data.guideName,
+    data.idCard,
+    data.carRegister,
+    data.phone,
+    data.emergencyContact,
+    data.licenseNo,
+    data.urgentCall,
+    data.arrival,
+    data.departure,
+    data.bedType,
+    hotelsKey,
+  ]);
+
+  return (
+    <>
+      {/* Hidden measuring layer at the true content width (704px = 186mm). */}
+      <div ref={measureRef} className="invoice-measure" style={{ width: CONTENT_W }}>
+        {blocks.map((b) => (
+          <div key={b.key} data-block={b.key}>
+            {b.node}
+          </div>
+        ))}
+      </div>
+
+      {/* Visible Canva-style A4 sheets. */}
+      <div className="invoice-pages flex flex-col items-center gap-6 bg-gray-200/60 p-6 print:p-0">
+        {pages.map((page, pi) => (
+          <div
+            key={pi}
+            className="invoice-page print-doc relative shadow-md ring-1 ring-gray-200"
+          >
+            <div className="flex h-full flex-col text-[#1C2E73]">
+              {page.map((b) => (
+                <div key={b.key} className={b.key === "tail" ? "mt-auto" : ""}>
+                  {b.node}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ── Head: banner + job-order meta + bilingual info grid ─────────────────── */
+
+function Head({ data }: { data: JobOrderData }) {
+  return (
+    <div>
+      {/* Brand banner */}
+      <header
+        className="flex items-center justify-between gap-4 rounded-xl px-5 py-4 text-white shadow-sm"
+        style={{
+          background: `linear-gradient(100deg, ${NAVY} 0%, ${NAVY} 55%, ${RED} 100%)`,
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <AssetImg
+            src={LOVE_BANGKOK.logo}
+            alt="Love Bangkok"
+            className="h-14 w-14 shrink-0 rounded-full bg-white object-contain p-1"
+          />
+          <div className="leading-tight">
+            <p className="text-base font-extrabold tracking-wide">{LOVE_BANGKOK.name}</p>
+            <p className="text-[11px] text-white/85">{LOVE_BANGKOK.email}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <h1 className="text-xl font-extrabold leading-tight tracking-wide sm:text-2xl">
+            ใบสั่งงานมัคคุเทศก์
+          </h1>
+          <p className="text-[11px] uppercase tracking-[0.25em] text-white/80">
+            Guide Job Order
+          </p>
+        </div>
+      </header>
+
+      {/* Job order no + date */}
+      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 text-sm">
+        <div>
+          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+            Job Order No. / เลขที่
+          </span>
+          <span className="ml-2 font-bold text-[#1C2E73]">
+            {data.jobOrderNo || "—"}
+          </span>
+        </div>
+        <div>
+          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+            Date / วันที่
+          </span>
+          <span className="ml-2 font-bold text-[#1C2E73]">{data.date || "—"}</span>
+        </div>
+      </div>
+      <div
+        className="mt-2 h-[2px] rounded-full"
+        style={{ background: `linear-gradient(90deg, ${NAVY}, ${RED} 70%, transparent)` }}
+      />
+
+      {/* Bilingual info grid */}
+      <div className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-lg bg-gray-200 ring-1 ring-gray-200">
+        <InfoCell thai="ชื่อบริษัทนำเที่ยว" en="Travel Agent" value={data.travelAgent} />
+        <InfoCell thai="ผู้ติดต่อฉุกเฉิน" en="Emergency Contact" value={data.emergencyContact} />
+        <InfoCell thai="ชื่อมัคคุเทศก์" en="Guide Name" value={data.guideName} />
+        <InfoCell thai="ใบอนุญาตเลขที่" en="License No." value={data.licenseNo} />
+        <InfoCell thai="หมายเลขบัตรประชาชน" en="ID Card Number" value={data.idCard} />
+        <InfoCell thai="โทรศัพท์" en="Phone Number" value={data.phone} />
+        <InfoCell thai="ป้ายรถทะเบียน" en="Car Register" value={data.carRegister} />
+        <InfoCell thai="หมายเลขโทรศัพท์ด่วน" en="Urgent Call" value={data.urgentCall} />
+        <InfoCell thai="เวลาเดินทางถึงประเทศไทย" en="Waktu Kedatangan" value={data.arrival} />
+        <InfoCell thai="เวลาเดินทางกลับจากประเทศไทย" en="Waktu Kepulangan" value={data.departure} />
+        <InfoCell thai="จำนวนผู้เข้าพัก" en="Total Pax" value={data.totalPax} />
+        <InfoCell thai="ประเภทเตียง" en="Bed Type" value={data.bedType} />
+        {data.hotels.map((h) => (
+          <InfoCell
+            key={h.id}
+            thai="โรงแรม / Hotel"
+            en={h.city || "—"}
+            value={h.name}
+          />
+        ))}
+        {data.hotels.length % 2 === 1 && <div className="bg-white" />}
+      </div>
+    </div>
+  );
+}
+
 /** One labelled cell in the info grid: Thai label, English/ID label, value. */
 function InfoCell({
   thai,
   en,
   value,
-  className,
 }: {
   thai: string;
   en: string;
-  value?: string;
-  className?: string;
+  value: string;
 }) {
   return (
-    <div className={`flex flex-col gap-0.5 bg-white p-2 ${className ?? ""}`}>
-      <span className="text-[11px] leading-tight text-gray-500">{thai}</span>
+    <div className="flex flex-col gap-0 bg-white px-3 py-1.5">
+      <span className="text-[10px] leading-tight text-gray-400">{thai}</span>
       <span className="text-[11px] font-semibold leading-tight text-[#1C2E73]">
         {en}
       </span>
-      {value !== undefined && (
-        <span className="mt-0.5 text-[12px] font-bold text-[#1C2E73]">
-          {value || " "}
-        </span>
-      )}
+      <span className="min-h-[0.9rem] text-[12px] font-bold leading-tight text-gray-900">
+        {value || " "}
+      </span>
     </div>
   );
 }
 
-export default function JobOrderDoc(data: JobOrderData) {
-  const paxRows = passengerRowCount(data.totalPax);
+/* ── Itinerary table (grid rows) ─────────────────────────────────────────── */
 
+const ITIN_GRID = "grid grid-cols-[70px_1fr_58px_58px_58px]";
+
+function SectionLabel({ thai, en }: { thai: string; en: string }) {
   return (
-    <div className="print-doc mx-auto max-w-3xl bg-white shadow-sm">
-      {/* Header banner — Love Bangkok (licensed operator) */}
+    <div className="mb-1.5 flex items-baseline gap-2">
+      <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#1C2E73]">
+        {en}
+      </span>
+      <span className="text-[10px] text-gray-400">{thai}</span>
+    </div>
+  );
+}
+
+function ItinHeader() {
+  return (
+    <div className="pt-3">
+      <SectionLabel en="Itinerary" thai="รายการนำเที่ยว" />
       <div
-        className="flex items-center justify-between gap-4 px-6 py-4"
-        style={{
-          background: `linear-gradient(90deg, ${NAVY} 0%, ${NAVY} 60%, ${YELLOW} 100%)`,
-        }}
+        className={`${ITIN_GRID} border-t border-l border-gray-200 text-[10px] font-semibold uppercase tracking-wide text-[#1C2E73]`}
+        style={{ backgroundColor: "#EEF2FA" }}
       >
-        <AssetImg
-          src={LOVE_BANGKOK.logo}
-          alt="Love Bangkok"
-          className="h-16 w-16 shrink-0 rounded-full bg-white object-contain p-1"
+        <HCell>Date</HCell>
+        <HCell className="text-left">Itinerary</HCell>
+        <HCell>Lunch</HCell>
+        <HCell>Dinner</HCell>
+        <HCell>Hotel</HCell>
+      </div>
+    </div>
+  );
+}
+
+function ItinRow({ d, alt }: { d: JobOrderData["days"][number]; alt: boolean }) {
+  return (
+    <div className={`${ITIN_GRID} border-l border-gray-200 text-[12px] ${alt ? "bg-gray-50/60" : "bg-white"}`}>
+      <Cell className="text-center font-semibold text-[#1C2E73]">{d.date || " "}</Cell>
+      <Cell className="text-left">{d.itinerary || " "}</Cell>
+      <Cell className="text-center">{d.lunch || " "}</Cell>
+      <Cell className="text-center">{d.dinner || " "}</Cell>
+      <Cell className="text-center">{d.hotel || " "}</Cell>
+    </div>
+  );
+}
+
+/* ── Passenger table (grid rows, blank for handwriting) ──────────────────── */
+
+const PAX_GRID = "grid grid-cols-[44px_1.4fr_1fr_92px_1fr]";
+
+function PaxHeader() {
+  return (
+    <div className="pt-3">
+      <SectionLabel en="Passengers" thai="ผู้โดยสาร" />
+      <div
+        className={`${PAX_GRID} border-t border-l border-gray-200 text-[10px] font-semibold uppercase tracking-wide text-[#1C2E73]`}
+        style={{ backgroundColor: "#EEF2FA" }}
+      >
+        <HCell>No.</HCell>
+        <HCell className="text-left">Name</HCell>
+        <HCell className="text-left">Passport</HCell>
+        <HCell>Nationality</HCell>
+        <HCell className="text-left">Remark</HCell>
+      </div>
+    </div>
+  );
+}
+
+function PaxRow({ n, alt }: { n: number; alt: boolean }) {
+  return (
+    <div className={`${PAX_GRID} min-h-[1.6rem] border-l border-gray-200 text-[12px] ${alt ? "bg-gray-50/60" : "bg-white"}`}>
+      <Cell className="text-center font-semibold text-gray-400">{n}</Cell>
+      <Cell>{" "}</Cell>
+      <Cell>{" "}</Cell>
+      <Cell>{" "}</Cell>
+      <Cell>{" "}</Cell>
+    </div>
+  );
+}
+
+function HCell({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <span className={`border-b border-r border-gray-200 px-2 py-1.5 text-center ${className}`}>
+      {children}
+    </span>
+  );
+}
+
+function Cell({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <span className={`flex items-center border-b border-r border-gray-200 px-2 py-1.5 ${className}`}>
+      {children}
+    </span>
+  );
+}
+
+/* ── Tail: signatures + contact footer ───────────────────────────────────── */
+
+function Tail() {
+  return (
+    <div>
+      {/* Signatures — three uniform columns */}
+      <div className="grid grid-cols-3 gap-6 pt-8">
+        <SignBox thai="มัคคุเทศก์ลงนาม" en="Guide's Signature" />
+        <SignBox thai="ผู้มีอำนาจลงนาม" en="Authorized Signature" />
+        <SignBox
+          thai="ประทับตราบริษัท"
+          en="Company's Seal"
+          seal={LOVE_BANGKOK.seal}
         />
-        <h1 className="text-right text-xl font-extrabold leading-tight tracking-wide text-white sm:text-2xl">
-          ใบสั่งงานมัคคุเทศก์
-        </h1>
       </div>
 
-      <div className="space-y-4 px-6 py-5">
-        {/* Job order no + date */}
-        <div className="flex flex-wrap gap-x-10 gap-y-1 text-sm">
-          <div>
-            <span className="text-gray-500">ใบสั่งงานเลขที่ / Job Order No. </span>
-            <span className="font-bold text-[#1C2E73]">
-              {data.jobOrderNo || " "}
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-500">วันที่ / Date </span>
-            <span className="font-bold text-[#1C2E73]">
-              {data.date || " "}
-            </span>
-          </div>
-        </div>
-
-        {/* Info grid */}
-        <div className="grid grid-cols-2 gap-px bg-gray-300">
-          <InfoCell thai="ชื่อบริษัทนำเที่ยว" en="Travel Agent" value={data.travelAgent} />
-          <InfoCell thai="ผู้ติดต่อฉุกเฉิน" en="Emergency Contact" value={LOVE_BANGKOK.emergencyContact} />
-          <InfoCell thai="ชื่อมัคคุเทศก์" en="Guide Name" value="" />
-          <InfoCell thai="ใบอนุญาตเลขที่" en="License No." value={LOVE_BANGKOK.licenseNo} />
-          <InfoCell thai="หมายเลขบัตรประชาชน" en="ID Card Number" value="" />
-          <InfoCell thai="โทรศัพท์" en="Phone Number" value={LOVE_BANGKOK.phone} />
-          <InfoCell thai="ป้ายรถทะเบียน" en="Car Register" value="" />
-          <InfoCell thai="หมายเลขโทรศัพท์ด่วน" en="Urgent Call" value={LOVE_BANGKOK.urgentCall} />
-          <InfoCell thai="เวลาเดินทางถึงประเทศไทย" en="Waktu Kedatangan" value="" />
-          <InfoCell thai="โรงแรมในพัทยา" en="Hotel Pattaya" value={data.hotelPattaya} />
-          <InfoCell thai="เวลาเดินทางกลับจากประเทศไทย" en="Waktu Kepulangan" value="" />
-          <InfoCell thai="โรงแรมในกรุงเทพฯ" en="Hotel Bangkok" value={data.hotelBangkok} />
-          <InfoCell thai="จำนวนผู้เข้าพัก" en="Total Pax" value={data.totalPax} />
-          <InfoCell thai="ประเภทเตียง" en="Bed Type" value={data.bedType} />
-        </div>
-
-        {/* Itinerary table */}
-        <table className="w-full border-collapse text-[12px]">
-          <thead>
-            <tr style={{ backgroundColor: "#EEF2FA" }} className="text-[#1C2E73]">
-              <th className="border border-gray-300 px-2 py-2 text-left font-semibold">
-                วัน/เดือน/ปี<br />Date
-              </th>
-              <th className="border border-gray-300 px-2 py-2 text-left font-semibold">
-                รายการนำเที่ยว<br />Itinerary
-              </th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">Lunch</th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">Dinner</th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">Hotel</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.days.map((d) => (
-              <tr key={d.id}>
-                <td className="border border-gray-300 px-2 py-2 text-center font-semibold">
-                  {d.date || " "}
-                </td>
-                <td className="border border-gray-300 px-2 py-2">
-                  {d.itinerary || " "}
-                </td>
-                <td className="border border-gray-300 px-2 py-2 text-center">
-                  {d.lunch || " "}
-                </td>
-                <td className="border border-gray-300 px-2 py-2 text-center">
-                  {d.dinner || " "}
-                </td>
-                <td className="border border-gray-300 px-2 py-2 text-center">
-                  {d.hotel || " "}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Passenger table */}
-        <table className="w-full border-collapse text-[12px]">
-          <thead>
-            <tr style={{ backgroundColor: "#EEF2FA" }} className="text-[#1C2E73]">
-              <th className="border border-gray-300 px-2 py-2 font-semibold">
-                ลำดับ<br />No.
-              </th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">
-                ชื่อ<br />Name
-              </th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">
-                หมายเลขหนังสือเดินทาง<br />Passport
-              </th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">
-                สัญชาติ<br />Nationality
-              </th>
-              <th className="border border-gray-300 px-2 py-2 font-semibold">
-                หมายเหตุ<br />Remark
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: paxRows }, (_, i) => (
-              <tr key={i}>
-                <td className="border border-gray-300 px-2 py-3 text-center">
-                  {i + 1}
-                </td>
-                <td className="border border-gray-300 px-2 py-3">&nbsp;</td>
-                <td className="border border-gray-300 px-2 py-3">&nbsp;</td>
-                <td className="border border-gray-300 px-2 py-3">&nbsp;</td>
-                <td className="border border-gray-300 px-2 py-3">&nbsp;</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Signatures */}
-        <div className="flex items-end justify-between gap-8 pt-6 text-sm">
-          <div className="space-y-8">
-            <div>
-              <p className="text-gray-500">มัคคุเทศก์ลงนาม</p>
-              <p className="font-semibold text-[#1C2E73]">Guide&apos;s Signature</p>
-              <p className="mt-6 border-t border-dotted border-gray-400 pt-1">&nbsp;</p>
-            </div>
-            <div>
-              <p className="text-gray-500">ผู้มีอำนาจลงนาม</p>
-              <p className="font-semibold text-[#1C2E73]">Authorized Signature</p>
-              <p className="mt-6 border-t border-dotted border-gray-400 pt-1">&nbsp;</p>
-            </div>
-          </div>
-          <div className="text-center">
-            <p className="text-gray-500">ประทับตราบริษัท</p>
-            <p className="font-semibold text-[#1C2E73]">Company&apos;s Seal</p>
-            <AssetImg
-              src={LOVE_BANGKOK.seal}
-              alt="Company Seal"
-              className="mt-2 h-24 w-24 object-contain"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Footer banner */}
-      <div
-        className="mt-2 space-y-0.5 px-6 py-4 text-[12px] text-white"
+      {/* Contact footer banner */}
+      <footer
+        className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 rounded-xl px-5 py-3 text-[12px] text-white shadow-sm"
         style={{
-          background: `linear-gradient(90deg, ${YELLOW} 0%, ${NAVY} 45%, ${NAVY} 100%)`,
+          background: `linear-gradient(100deg, ${RED} 0%, ${NAVY} 45%, ${NAVY} 100%)`,
         }}
       >
-        <p className="font-bold">{LOVE_BANGKOK.footerPhone}</p>
-        <p>{LOVE_BANGKOK.email}</p>
-        <p className="text-white/85">{LOVE_BANGKOK.address}</p>
+        <span className="font-bold tracking-wide">{LOVE_BANGKOK.footerPhone}</span>
+        <span className="text-white/90">{LOVE_BANGKOK.email}</span>
+        <span className="text-white/80">{LOVE_BANGKOK.address}</span>
+      </footer>
+      <PrintedStamp className="mt-1.5 block text-right text-[10px] text-gray-400" />
+    </div>
+  );
+}
+
+function SignBox({
+  thai,
+  en,
+  seal,
+}: {
+  thai: string;
+  en: string;
+  seal?: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center">
+      {/* Sign / seal space — uniform height so all three columns line up. */}
+      <div className="flex h-24 w-full items-end justify-center">
+        {seal && (
+          <AssetImg
+            src={seal}
+            alt="Company Seal"
+            className="max-h-24 max-w-[88px] object-contain"
+          />
+        )}
+      </div>
+      <div className="w-full border-t border-dotted border-gray-400 pt-1.5">
+        <p className="text-[12px] font-semibold text-[#1C2E73]">{en}</p>
+        <p className="text-[10px] text-gray-400">{thai}</p>
       </div>
     </div>
   );

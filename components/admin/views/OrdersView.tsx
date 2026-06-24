@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderWithCustomer, OrderStatus } from "@/lib/admin/types";
 import {
@@ -13,6 +12,7 @@ import { formatIDR, formatDate } from "@/lib/admin/utils";
 import { inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 import Modal from "@/components/admin/Modal";
 import OrderForm from "@/components/admin/OrderForm";
+import OrderDetail from "@/components/admin/OrderDetail";
 
 export default function OrdersView() {
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
@@ -20,6 +20,7 @@ export default function OrdersView() {
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [selected, setSelected] = useState<OrderWithCustomer | null>(null);
 
   const load = useCallback(() => {
     createClient()
@@ -79,10 +80,11 @@ export default function OrdersView() {
       {/* Phone: card list */}
       <div className="space-y-2 sm:hidden">
         {filtered.map((o) => (
-          <Link
+          <button
             key={o.id}
-            href={`/admin/orders/${o.id}`}
-            className="block rounded-xl border border-gray-200 bg-white p-4"
+            type="button"
+            onClick={() => setSelected(o)}
+            className="block w-full rounded-xl border border-gray-200 bg-white p-4 text-left"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="font-semibold text-[#1B2A4A]">
@@ -106,7 +108,7 @@ export default function OrdersView() {
                 {formatIDR(Number(o.price_idr))}
               </span>
             </div>
-          </Link>
+          </button>
         ))}
         {filtered.length === 0 && (
           <p className="rounded-xl border border-gray-200 bg-white px-4 py-8 text-center text-gray-400">
@@ -131,15 +133,13 @@ export default function OrdersView() {
             {filtered.map((o) => (
               <tr
                 key={o.id}
-                className="border-t border-gray-100 hover:bg-gray-50"
+                onClick={() => setSelected(o)}
+                className="cursor-pointer border-t border-gray-100 hover:bg-gray-50"
               >
                 <td className="px-4 py-3">
-                  <Link
-                    href={`/admin/orders/${o.id}`}
-                    className="font-medium text-[#1B2A4A] hover:underline"
-                  >
+                  <span className="font-medium text-[#1B2A4A] hover:underline">
                     {o.order_number}
-                  </Link>
+                  </span>
                 </td>
                 <td className="px-4 py-3">{o.customers.name}</td>
                 <td className="px-4 py-3">
@@ -186,6 +186,16 @@ export default function OrdersView() {
             load();
           }}
         />
+      </Modal>
+
+      <Modal
+        open={selected !== null}
+        onClose={() => setSelected(null)}
+        title={selected?.order_number ?? "Order"}
+      >
+        {selected && (
+          <OrderDetail id={selected.id} showHeading={false} onChanged={load} />
+        )}
       </Modal>
     </div>
   );

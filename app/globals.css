@@ -271,6 +271,24 @@ a, button {
 .reveal-stagger.is-visible > *:nth-child(11) { transition-delay: 900ms; opacity: 1; transform: none; }
 .reveal-stagger.is-visible > *:nth-child(12) { transition-delay: 990ms; opacity: 1; transform: none; }
 
+/* Invoice — discrete A4 sheets (Canva style). JS distributes content across
+   pages; each .invoice-page is one physical A4 sheet (794×1123px = 210×297mm). */
+.invoice-page {
+  width: 794px;
+  height: 1123px;
+  padding: 45px; /* 12mm — matches @page margin so screen ≈ print */
+  overflow: hidden;
+  background: #fff;
+}
+/* Hidden measuring layer: lay out at the real content width, off-screen. */
+.invoice-measure {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* ── Admin print documents ── */
 @media print {
   @page {
@@ -280,6 +298,20 @@ a, button {
   .no-print {
     display: none !important;
   }
+  /* The hidden measuring layer is only `visibility:hidden` on screen, which
+     still occupies layout. Off at left:-9999px it makes Chrome's "Save as PDF"
+     emit a phantom trailing blank page. Remove it from print entirely. */
+  .invoice-measure {
+    display: none !important;
+  }
+  /* Interactive Chrome's "Save as PDF" can add a phantom trailing blank page
+     when html/body retain a min-height or grown height in print. Let them
+     shrink to content so only the document's own pages are emitted. */
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+  }
   .print-doc {
     box-shadow: none !important;
     border-radius: 0 !important;
@@ -288,12 +320,112 @@ a, button {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  /* Itinerary: one day per printed page. */
-  .itin-day {
+  /* Itinerary: each A4 sheet prints as its own page. */
+  .kt-page {
+    break-after: page;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .kt-page:last-child {
+    break-after: auto;
+  }
+  /* Invoice: flow across as many A4 pages as needed. */
+  .invoice-doc {
+    width: auto !important;
+    min-height: 0 !important;
+    background-image: none !important;
+  }
+  /* Paginated sheets (itinerary) must fill the full printable A4 height so
+     sparse pages don't collapse to half a page. 273mm = A4 (297mm) minus the
+     12mm top + bottom @page margins; 272mm leaves a hair of slack so rounding
+     never spills into a blank page. */
+  .kt-page.invoice-doc {
+    min-height: 272mm !important;
+  }
+  /* ── Brochure (catalog) sheets ──
+     Each sheet is an A4 page (210×297mm) with NO @page margin — the brochure
+     print path injects `@page { margin: 0 }` while printing so the cover photo
+     can bleed to the paper edge. The 12mm inset interior pages need comes from
+     each page's own padding (p-10/p-12), which also makes the PDF match the
+     on-screen preview 1:1. A hard height + clip means an over-tall page can
+     never spill onto the next sheet.
+
+     Default height is 296mm — 1mm shy of the A4 page box. Eleven full-height
+     297mm sheets sum to within ~1mm of eleven 297mm pages, so sub-pixel mm→px
+     rounding during print can tip the total just over a page boundary and emit
+     a trailing blank page. The 1mm-per-sheet slack absorbs that rounding. It's
+     invisible: interior pages are white with inset content, so the 1mm strip at
+     the paper edge shows nothing. Only the COVER (first sheet, below) keeps the
+     full 297mm so its hero photo still bleeds to the edge. */
+  .kt-brochure-sheet {
+    width: 210mm !important;
+    height: 296mm !important;
+    min-height: 296mm !important;
+    max-height: 296mm !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Cover bleeds full-height so the hero photo reaches the paper edge. It's the
+     first page, so nothing accumulates before it — a full 297mm here is safe. */
+  .kt-brochure-sheets > div:first-child .kt-brochure-sheet {
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+  }
+  /* Pagination uses break-BEFORE (not break-after): a page break is forced
+     before every sheet except the first. Because nothing carries a break-after,
+     there is structurally no forced break past the final sheet — the classic
+     "trailing blank page" can't happen. Each wrapper holds one sheet, kept
+     whole with break-inside: avoid. */
+  .kt-brochure-sheets > div {
     break-inside: avoid;
   }
-  .itin-day + .itin-day {
+  .kt-brochure-sheets > div:not(:first-child) {
     break-before: page;
+  }
+  /* Repeat the table header on every printed page; never split a row. */
+  .invoice-doc thead {
+    display: table-header-group;
+  }
+  .invoice-doc tr {
+    break-inside: avoid;
+  }
+  /* Canva-style invoice: each pre-paginated sheet prints as its own page.
+     @page margin provides the 12mm inset, so drop the screen sizing. */
+  .invoice-pages {
+    background: none !important;
+    gap: 0 !important;
+    /* Flex column centers children on the cross axis; force full-width sheets
+       so a short last page (narrow content) doesn't shrink-to-fit + center. */
+    align-items: stretch !important;
+  }
+  .invoice-page {
+    width: 100% !important;
+    /* Fixed physical sheet height, a hair under the printable A4 area (297mm −
+       2×12mm @page margin = 273mm; use 272mm for rounding slack) and clip. With
+       height:auto a sheet whose content is even a px too tall gets hard-split by
+       the browser into an extra (often blank) physical page. A fixed, clipped
+       height makes each .invoice-page emit exactly one page — no phantom pages.
+       The JS packer keeps each page's content under this height so nothing clips. */
+    height: 272mm !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    /* Clear the screen ring (ring-1) so it doesn't print as a box edge. */
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .invoice-page:last-child {
+    break-after: auto;
   }
   /* Keep place photos in print. */
   img {

@@ -6,6 +6,7 @@ import OrdersView from "@/components/admin/views/OrdersView";
 import PriceListView from "@/components/admin/views/PriceListView";
 import InvoiceBuilderView from "@/components/admin/views/InvoiceBuilderView";
 import ItineraryBuilderView from "@/components/admin/views/ItineraryBuilderView";
+import BrochureBuilderView from "@/components/admin/views/BrochureBuilderView";
 import PlacesView from "@/components/admin/views/PlacesView";
 import JobOrderBuilderView from "@/components/admin/views/JobOrderBuilderView";
 import CalendarView from "@/components/admin/views/CalendarView";
@@ -37,6 +38,7 @@ const OPERATION_TABS: readonly Tab[] = [
   { id: "places", label: "Tempat", View: PlacesView },
   { id: "invoice", label: "Buat Invoice", View: InvoiceBuilderView },
   { id: "itinerary", label: "Itinerary", View: ItineraryBuilderView },
+  { id: "brochure", label: "Brosur", View: BrochureBuilderView },
   { id: "joborder", label: "Job Order", View: JobOrderBuilderView },
   { id: "calendar", label: "Kalender", View: CalendarView },
   { id: "customers", label: "Customer", View: CustomersView },
@@ -74,7 +76,7 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <div className="hidden flex-wrap gap-1 border-b border-gray-200 sm:flex">
+      <div className="no-print hidden flex-wrap gap-1 border-b border-gray-200 sm:flex">
         {tabs.map((t) => (
           <button
             key={t.id}

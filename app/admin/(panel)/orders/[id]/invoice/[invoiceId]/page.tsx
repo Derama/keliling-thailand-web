@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Invoice, OrderWithCustomer, Payment } from "@/lib/admin/types";
 import InvoiceForm from "@/components/admin/InvoiceForm";
 import InvoiceDoc from "@/components/admin/InvoiceDoc";
+import PrintTracker from "@/components/admin/PrintTracker";
 import { ErrorNote } from "@/components/admin/ui";
 
 export default function InvoicePage({
@@ -56,6 +57,9 @@ export default function InvoicePage({
   return isNew ? (
     <InvoiceForm order={order} />
   ) : (
-    <InvoiceDoc invoice={invoice!} order={order} payments={payments} />
+    <>
+      <PrintTracker orderId={order.id} />
+      <InvoiceDoc invoice={invoice!} order={order} payments={payments} />
+    </>
   );
 }

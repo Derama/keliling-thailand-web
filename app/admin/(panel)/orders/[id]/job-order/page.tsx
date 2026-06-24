@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { OrderWithCustomer } from "@/lib/admin/types";
 import { formatDate } from "@/lib/admin/utils";
 import PrintDoc from "@/components/admin/PrintDoc";
+import PrintTracker from "@/components/admin/PrintTracker";
 import { ErrorNote } from "@/components/admin/ui";
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -47,6 +48,7 @@ export default function JobOrderPage({
 
   return (
     <PrintDoc title="Job Order" docNumber={order.order_number}>
+      <PrintTracker orderId={order.id} />
       <div className="grid gap-x-8 sm:grid-cols-2">
         <div>
           <Row label="Customer" value={order.customers.name} />

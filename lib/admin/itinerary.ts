@@ -129,6 +129,34 @@ export function scheduleFromPlaces(
   return out;
 }
 
+/** AI rows worth keeping in the schedule: meals + logistics. Attraction visits
+ *  are already covered by photo-linked stops, so those are skipped to avoid
+ *  duplicate rows. */
+const KEEP_AI_ROW =
+  /makan|sarapan|brunch|transfer|tiba|berangkat|check.?in|check.?out|bandara|airport|jemput|antar|istirahat|kembali ke hotel/i;
+
+/**
+ * Build a day's schedule on generate: photo-linked attraction stops merged with
+ * the AI's meal/logistics rows, each slotted into its time position. AI rows
+ * get fresh ids so they read as manual rows (deletable, survive photo edits).
+ */
+export function mergeAiSchedule(
+  places: ItineraryPlace[],
+  aiRows: { time?: string; text?: string }[]
+): ItineraryActivity[] {
+  let out = scheduleFromPlaces(places);
+  for (const r of aiRows) {
+    const text = (r.text ?? "").trim();
+    if (!text || !KEEP_AI_ROW.test(text)) continue;
+    out = insertByTime(out, {
+      id: crypto.randomUUID(),
+      time: (r.time ?? "").trim(),
+      text,
+    });
+  }
+  return out;
+}
+
 /** Trip-level meta for the brochure cover + day pills. */
 export interface ItineraryMeta {
   vehicle: string; // e.g. "VAN"

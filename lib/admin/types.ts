@@ -32,6 +32,7 @@ export interface Order {
   cost_thb: number;
   fx_rate: number;
   notes: string | null;
+  last_printed_at: string | null;
   created_at: string;
   updated_at: string;
 }

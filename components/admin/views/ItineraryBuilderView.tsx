@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import { isoLocal } from "@/lib/admin/utils";
 import { uploadPlaceImage } from "@/lib/admin/storage";
+import { loadOrderDoc, saveOrderDoc, clearOrderDoc } from "@/lib/admin/orderDocs";
 import ItineraryDoc from "@/components/admin/ItineraryDoc";
 import {
   type ItineraryDay,
@@ -63,7 +64,12 @@ interface Draft {
   days: ItineraryDay[];
 }
 
-export default function ItineraryBuilderView() {
+export default function ItineraryBuilderView({
+  orderId,
+}: {
+  /** When set, the draft loads from / saves to this order; else localStorage. */
+  orderId?: string;
+} = {}) {
   const [tripTitle, setTripTitle] = useState("");
   const [customer, setCustomer] = useState("");
   const [pax, setPax] = useState("");
@@ -94,26 +100,55 @@ export default function ItineraryBuilderView() {
       .then(({ data }) => setPlaces((data as Place[]) ?? []));
   }, []);
 
-  // Restore draft once on mount.
+  function applyDraft(d: Draft) {
+    setTripTitle(d.tripTitle ?? "");
+    setCustomer(d.customer ?? "");
+    setPax(d.pax ?? "");
+    setStartDate(d.startDate ?? "");
+    setNotes(d.notes ?? "");
+    setVehicle(d.vehicle ?? "VAN");
+    setHeroImage(d.heroImage ?? "");
+    setDays(Array.isArray(d.days) ? d.days : []);
+  }
+
+  // Restore draft once on mount. Per-order → DB (order_documents); else
+  // localStorage. A fresh per-order doc is seeded from the order's basics.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(DRAFT_KEY);
-      if (raw) {
-        const d = JSON.parse(raw) as Draft;
-        setTripTitle(d.tripTitle ?? "");
-        setCustomer(d.customer ?? "");
-        setPax(d.pax ?? "");
-        setStartDate(d.startDate ?? "");
-        setNotes(d.notes ?? "");
-        setVehicle(d.vehicle ?? "VAN");
-        setHeroImage(d.heroImage ?? "");
-        setDays(Array.isArray(d.days) ? d.days : []);
+    let cancelled = false;
+    async function hydrate() {
+      if (orderId) {
+        const saved = await loadOrderDoc<Draft>(orderId, "itinerary");
+        if (cancelled) return;
+        if (saved) {
+          applyDraft(saved);
+        } else {
+          const { data: o } = await createClient()
+            .from("orders")
+            .select("*, customers(*)")
+            .eq("id", orderId)
+            .single();
+          if (!cancelled && o) {
+            setCustomer(o.customers?.name ?? "");
+            setPax(o.pax ? String(o.pax) : "");
+            setStartDate(o.trip_start ?? "");
+            if (o.vehicle) setVehicle(o.vehicle);
+          }
+        }
+      } else {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (raw) applyDraft(JSON.parse(raw) as Draft);
+        } catch {
+          /* ignore corrupt draft */
+        }
       }
-    } catch {
-      /* ignore corrupt draft */
+      if (!cancelled) hydrated.current = true;
     }
-    hydrated.current = true;
-  }, []);
+    hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId]);
 
   // Autosave draft (debounced) after hydration.
   useEffect(() => {
@@ -128,17 +163,23 @@ export default function ItineraryBuilderView() {
       heroImage,
       days,
     };
-    const t = setTimeout(() => {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    const markSaved = () =>
       setSavedAt(
         new Date().toLocaleTimeString("id-ID", {
           hour: "2-digit",
           minute: "2-digit",
         })
       );
+    const t = setTimeout(() => {
+      if (orderId) {
+        saveOrderDoc(orderId, "itinerary", draft).then(markSaved);
+      } else {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        markSaved();
+      }
     }, 600);
     return () => clearTimeout(t);
-  }, [tripTitle, customer, pax, startDate, notes, vehicle, heroImage, days]);
+  }, [orderId, tripTitle, customer, pax, startDate, notes, vehicle, heroImage, days]);
 
   const hasContent =
     days.length > 0 || tripTitle || customer || notes || aiPrompt;
@@ -251,7 +292,8 @@ export default function ItineraryBuilderView() {
     setAiError(null);
     setQDays(3);
     setQDest([]);
-    localStorage.removeItem(DRAFT_KEY);
+    if (orderId) clearOrderDoc(orderId, "itinerary");
+    else localStorage.removeItem(DRAFT_KEY);
   }
 
   // When the start date changes, re-date every day sequentially.

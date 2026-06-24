@@ -11,14 +11,29 @@ export interface JobOrderDay {
   hotel: string;
 }
 
+export interface JobOrderHotel {
+  id: string; // crypto.randomUUID()
+  city: string; // e.g. "Pattaya", "Ayutthaya", "Khao Yai"
+  name: string; // hotel name or "NO"
+}
+
 export interface JobOrderData {
   jobOrderNo: string;
   date: string; // header date
   travelAgent: string;
+  guideName: string;
+  idCard: string;
+  carRegister: string;
+  phone: string;
+  emergencyContact: string;
+  licenseNo: string;
+  urgentCall: string;
+  arrival: string; // Waktu Kedatangan — arrival time in Thailand
+  departure: string; // Waktu Kepulangan — departure time from Thailand
   totalPax: string; // free text, e.g. "8 PAX"; also drives blank passenger rows
+  showPassengers: boolean; // toggle blank passenger table on the printed doc
   bedType: string;
-  hotelPattaya: string;
-  hotelBangkok: string;
+  hotels: JobOrderHotel[]; // one row per city stayed in
   days: JobOrderDay[];
 }
 
@@ -38,6 +53,14 @@ export const LOVE_BANGKOK = {
   seal: "/lovebangkok/seal.png",
 } as const;
 
+/** Operator fields pre-filled from Love Bangkok, but editable in the builder. */
+export const JOB_ORDER_DEFAULTS = {
+  emergencyContact: LOVE_BANGKOK.emergencyContact,
+  licenseNo: LOVE_BANGKOK.licenseNo,
+  phone: LOVE_BANGKOK.phone,
+  urgentCall: LOVE_BANGKOK.urgentCall,
+} as const;
+
 /** Passenger rows to print for handwriting, parsed from totalPax.
  *  First integer found wins ("8 PAX" -> 8); defaults to 1, clamped to [1, 30]. */
 export function passengerRowCount(totalPax: string): number {
@@ -55,4 +78,8 @@ export function newJobOrderDay(): JobOrderDay {
     dinner: "",
     hotel: "",
   };
+}
+
+export function newJobOrderHotel(city = ""): JobOrderHotel {
+  return { id: crypto.randomUUID(), city, name: "" };
 }

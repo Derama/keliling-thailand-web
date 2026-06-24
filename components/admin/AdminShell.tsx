@@ -26,7 +26,7 @@ export default function AdminShell({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen print:min-h-0">
       <header className="no-print sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-[#1B2A4A] px-4 py-3 text-white sm:px-6">
         <Link href="/admin" className="leading-tight">
           <p className="font-bold">Keliling Thailand</p>
@@ -39,7 +39,7 @@ export default function AdminShell({
           Keluar
         </button>
       </header>
-      <main className="mx-auto max-w-6xl p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6 lg:p-8">
+      <main className="mx-auto max-w-7xl p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6 lg:p-8 print:max-w-none print:m-0! print:p-0! print:pb-0!">
         {children}
       </main>
     </div>
