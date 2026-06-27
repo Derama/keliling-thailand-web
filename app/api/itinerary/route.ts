@@ -1,12 +1,9 @@
 import OpenAI from "openai";
+import {
+  resolveGeneratedPlaces,
+  type CatalogPlace,
+} from "@/lib/admin/itineraryGeneration";
 import { createClient } from "@/lib/supabase/server";
-
-interface PlaceRow {
-  city: string;
-  name: string;
-  image_url: string | null;
-  description: string | null;
-}
 
 // JSON shape the model must return (strict structured output).
 const SCHEMA = {
@@ -72,6 +69,11 @@ const SYSTEM = `You are a travel planner for "Keliling Thailand", an Indonesian-
 
 Write a realistic day-by-day itinerary based on the customer's request. Rules:
 - Write all text in Bahasa Indonesia.
+- Every explicitly named destination or attraction is mandatory: never omit it, replace it, or substitute a different place.
+- Preserve the requested number and division of days. Do not merge, remove, or add days unless the customer asks for it.
+- Arrange visits in a realistic geographic order, accounting for Bangkok traffic, attraction opening times, ferry schedules, and travel time between stops.
+- Every attraction activity must begin with the attraction's exact name, followed by a warm 1-2 sentence Indonesian description of the experience, such as family time, photos, culture, or shopping.
+- Include pickup, transfers, meals, hotel check-in, and return trips when relevant to the requested day.
 - For each day provide:
   - "title": a short evocative day title (e.g. "Pattaya — Pantai & Buddha Agung").
   - "theme": a 1-3 word UPPERCASE tag for the day's vibe (e.g. "MENUJU PESISIR", "ONE DAY TRIP", "HARI KEDATANGAN").
@@ -118,14 +120,14 @@ export async function POST(request: Request) {
   }
 
   // Curated attraction catalog (only rows with a photo can become a card).
-  let catalogRows: PlaceRow[] = [];
+  let catalogRows: CatalogPlace[] = [];
   try {
     const { data, error } = await supabase
       .from("places")
       .select("city, name, image_url, description")
       .order("sort", { ascending: true });
     if (error) console.error("itinerary: places fetch failed", error.message);
-    catalogRows = ((data as PlaceRow[]) ?? []).filter((r) => !!r.image_url);
+    catalogRows = ((data as CatalogPlace[]) ?? []).filter((r) => !!r.image_url);
   } catch {
     catalogRows = []; // text-only itinerary if the catalog can't be read
   }
@@ -148,12 +150,14 @@ export async function POST(request: Request) {
     const client = new OpenAI();
     const systemWithCatalog =
       SYSTEM +
-      `\n\nKATALOG ATRAKSI (pilih HANYA dari daftar ini untuk "places"):\n` +
+      `\n\nKATALOG ATRAKSI (sumber untuk atraksi tambahan yang tidak diminta customer):\n` +
       catalogText +
-      `\n\nUntuk setiap hari, isi "places" dengan 3-4 atraksi NYATA dari katalog yang cocok dengan kota hari itu (field "city"), urut sesuai alur kunjungan dari pagi ke sore. Untuk tiap atraksi:
-- "name": salin nama PERSIS seperti di katalog.
-- "activity": satu kalimat deskriptif yang hangat & mengundang dalam Bahasa Indonesia tentang pengalaman di sana (apa yang dilakukan/dirasakan), BUKAN sekadar mengulang nama. Contoh: "Menyusuri tepian pantai Hua Hin yang tenang sambil menikmati semilir angin laut sore."
-Jika kota itu tidak ada di katalog, kembalikan "places": [].`;
+      `\n\nAturan "activities" dan "places":
+- Setiap atraksi atau destinasi yang disebut eksplisit oleh customer WAJIB muncul di "activities" dan "places", meskipun namanya tidak ada di katalog. Jangan hilangkan atau ganti tempat tersebut. Tempat di luar katalog akan tetap ditampilkan tanpa foto.
+- Atraksi tambahan pilihan AI yang tidak diminta customer WAJIB berasal dari katalog dan gunakan nama PERSIS seperti di katalog.
+- Urutkan semua atraksi sesuai alur kunjungan yang realistis dari pagi ke sore. Masukkan semua tempat wajib lebih dulu; tambahkan atraksi katalog hanya jika tidak menggeser tempat wajib dari maksimal empat entri visual.
+- Untuk setiap "places[].activity", awali dengan nama atraksi yang PERSIS sama dengan "places[].name", lalu tulis deskripsi hangat 1-2 kalimat dalam Bahasa Indonesia tentang pengalaman di sana, termasuk momen keluarga, foto, budaya, atau belanja yang relevan.
+- Jika kota tidak ada di katalog, tetap masukkan semua atraksi yang diminta customer ke "places"; jangan menambahkan atraksi pilihan AI.`;
 
     const completion = await client.chat.completions.create({
       model: MODEL,
@@ -178,36 +182,15 @@ Jika kota itu tidak ada di katalog, kembalikan "places": [].`;
       }>;
     };
 
-    // Resolve place names to real cards: exact (case-insensitive) match,
-    // preferring the day's city, else any city. Drop misses. Cap 4/day.
-    const norm = (s: string) => s.trim().toLowerCase();
     const days = (parsed.days ?? []).map((d) => {
-      const cityKey = (d.city ?? "").toUpperCase();
-      const chosen = (d.places ?? [])
-        .map((p) => ({ name: norm(p.name ?? ""), activity: p.activity ?? "" }))
-        .filter((c) => c.name);
-      const cards: {
-        name: string;
-        image: string;
-        desc: string;
-        activity: string;
-      }[] = [];
-      for (const c of chosen) {
-        if (cards.length >= 4) break;
-        const row =
-          catalogRows.find(
-            (r) => (r.city ?? "").toUpperCase() === cityKey && norm(r.name) === c.name
-          ) ?? catalogRows.find((r) => norm(r.name) === c.name);
-        if (row && !cards.some((x) => norm(x.name) === norm(row.name))) {
-          cards.push({
-            name: row.name,
-            image: row.image_url ?? "",
-            desc: row.description ?? "",
-            activity: c.activity,
-          });
-        }
-      }
-      return { ...d, places: cards };
+      return {
+        ...d,
+        places: resolveGeneratedPlaces(
+          d.places ?? [],
+          catalogRows,
+          d.city ?? ""
+        ),
+      };
     });
 
     // Auto cover: an attraction photo from the FIRST city (day 1). Fall back to
