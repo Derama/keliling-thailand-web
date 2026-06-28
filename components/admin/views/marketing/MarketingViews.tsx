@@ -31,15 +31,6 @@ export function BlogView() {
   );
 }
 
-export function LeadsView() {
-  return (
-    <Placeholder
-      title="Leads"
-      desc="Daftar calon pelanggan untuk follow-up marketing."
-    />
-  );
-}
-
 export function InstagramStudioView() {
   return (
     <Placeholder

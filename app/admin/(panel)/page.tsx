@@ -4,18 +4,19 @@ import { useEffect, useState } from "react";
 import DashboardView from "@/components/admin/views/DashboardView";
 import OrdersView from "@/components/admin/views/OrdersView";
 import PriceListView from "@/components/admin/views/PriceListView";
-import InvoiceBuilderView from "@/components/admin/views/InvoiceBuilderView";
-import ItineraryBuilderView from "@/components/admin/views/ItineraryBuilderView";
-import BrochureBuilderView from "@/components/admin/views/BrochureBuilderView";
+import InvoiceLibraryView from "@/components/admin/views/InvoiceLibraryView";
+import ItineraryLibraryView from "@/components/admin/views/ItineraryLibraryView";
+import BrochureLibraryView from "@/components/admin/views/BrochureLibraryView";
 import PlacesView from "@/components/admin/views/PlacesView";
-import JobOrderBuilderView from "@/components/admin/views/JobOrderBuilderView";
+import JobOrderLibraryView from "@/components/admin/views/JobOrderLibraryView";
 import CalendarView from "@/components/admin/views/CalendarView";
 import CustomersView from "@/components/admin/views/CustomersView";
+import PdfTrimmerView from "@/components/admin/views/PdfTrimmerView";
 import {
   BlogView,
-  LeadsView,
   InstagramStudioView,
 } from "@/components/admin/views/marketing/MarketingViews";
+import LeadsView from "@/components/admin/views/LeadsView";
 import { useRole } from "@/components/admin/RoleContext";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
 
@@ -36,12 +37,13 @@ const OPERATION_TABS: readonly Tab[] = [
   { id: "orders", label: "Order", View: OrdersView },
   { id: "prices", label: "Daftar Harga", View: PriceListView },
   { id: "places", label: "Tempat", View: PlacesView },
-  { id: "invoice", label: "Buat Invoice", View: InvoiceBuilderView },
-  { id: "itinerary", label: "Itinerary", View: ItineraryBuilderView },
-  { id: "brochure", label: "Brosur", View: BrochureBuilderView },
-  { id: "joborder", label: "Job Order", View: JobOrderBuilderView },
+  { id: "invoice", label: "Buat Invoice", View: InvoiceLibraryView },
+  { id: "itinerary", label: "Itinerary", View: ItineraryLibraryView },
+  { id: "brochure", label: "Brosur", View: BrochureLibraryView },
+  { id: "joborder", label: "Job Order", View: JobOrderLibraryView },
   { id: "calendar", label: "Kalender", View: CalendarView },
   { id: "customers", label: "Customer", View: CustomersView },
+  { id: "pdftrim", label: "PDF Trimmer", View: PdfTrimmerView },
 ];
 
 const MARKETING_TABS: readonly Tab[] = [
