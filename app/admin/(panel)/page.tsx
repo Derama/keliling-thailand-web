@@ -14,8 +14,8 @@ import CustomersView from "@/components/admin/views/CustomersView";
 import PdfTrimmerView from "@/components/admin/views/PdfTrimmerView";
 import {
   BlogView,
-  InstagramStudioView,
 } from "@/components/admin/views/marketing/MarketingViews";
+import InstagramStudioView from "@/components/admin/views/marketing/InstagramStudioView";
 import LeadsView from "@/components/admin/views/LeadsView";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
 

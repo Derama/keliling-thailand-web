@@ -1,8 +1,7 @@
 "use client";
 
 // Placeholder shells for the Marketing panel. Real functionality lands in
-// follow-up tasks: blog/SEO editor, leads list, and the Instagram studio
-// (content generator + caption generator + content planner).
+// follow-up tasks: blog/SEO editor and leads list.
 
 function Placeholder({
   title,
@@ -31,11 +30,3 @@ export function BlogView() {
   );
 }
 
-export function InstagramStudioView() {
-  return (
-    <Placeholder
-      title="Instagram Studio"
-      desc="Generator konten, caption, dan perencana posting video & foto."
-    />
-  );
-}
