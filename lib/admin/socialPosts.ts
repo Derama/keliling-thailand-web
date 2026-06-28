@@ -7,10 +7,10 @@ import type { SocialPost } from "@/lib/admin/types";
 //   Storage → New bucket → name "social-posts", Public = on.
 export const SOCIAL_BUCKET = "social-posts";
 
-/** Upload a file (photo or exported PNG) and return its public URL. */
+/** Upload a file (guest photo, exported PNG, or brand logo) and return its public URL. */
 export async function uploadPostImage(
   file: Blob,
-  prefix: "photo" | "post",
+  prefix: "photo" | "post" | "logo",
   ext = "png"
 ): Promise<string> {
   const supabase = createClient();

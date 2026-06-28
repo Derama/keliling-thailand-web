@@ -48,10 +48,8 @@ export async function saveBrandLogo(url: string): Promise<void> {
   return saveSetting<string>("brand_logo", url);
 }
 
+// Brand colors currently default to the company palette; loaded (and editable
+// later via the brand_colors key) but no save UI yet — read-only for now.
 export async function loadBrandColors(): Promise<BrandColors> {
   return (await loadSetting<BrandColors>("brand_colors")) ?? DEFAULT_BRAND_COLORS;
-}
-
-export async function saveBrandColors(colors: BrandColors): Promise<void> {
-  return saveSetting<BrandColors>("brand_colors", colors);
 }

@@ -62,7 +62,7 @@ export default function InstagramStudioView() {
     setBusy("logo");
     setError(null);
     try {
-      const url = await uploadPostImage(file, "post", file.name.split(".").pop() || "png");
+      const url = await uploadPostImage(file, "logo", file.name.split(".").pop() || "png");
       await saveBrandLogo(url);
       patch({ logoUrl: url });
     } catch (e) {
@@ -181,10 +181,15 @@ export default function InstagramStudioView() {
       {tab === "gallery" ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {posts.map((p) => (
-            <a key={p.id} href={p.image_url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-lg border border-gray-200">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.image_url} alt="" className="aspect-[4/5] w-full object-cover" />
-            </a>
+            <div key={p.id} className="overflow-hidden rounded-lg border border-gray-200">
+              <a href={p.image_url} download target="_blank" rel="noreferrer" className="block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.image_url} alt="" className="aspect-[4/5] w-full object-cover" />
+              </a>
+              {p.caption && (
+                <p className="line-clamp-3 p-2 text-xs text-gray-600">{p.caption}</p>
+              )}
+            </div>
           ))}
           {posts.length === 0 && <p className="text-sm text-gray-500">Belum ada post.</p>}
         </div>
@@ -225,7 +230,7 @@ export default function InstagramStudioView() {
             <Field label="Ulasan">
               <textarea className={`${inputCls} min-h-24`} value={data.reviewText} onChange={(e) => patch({ reviewText: e.target.value })} />
             </Field>
-            <button className={btnSecondaryCls} onClick={polish} disabled={busy === "polish"}>
+            <button className={btnSecondaryCls} onClick={polish} disabled={busy === "polish" || !data.reviewText.trim()}>
               {busy === "polish" ? "Merapikan…" : "Rapikan dengan AI"}
             </button>
 
