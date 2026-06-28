@@ -1,6 +1,7 @@
 "use client";
 
 import { use } from "react";
+import { useRouter } from "next/navigation";
 import OrderDetail from "@/components/admin/OrderDetail";
 
 export default function OrderDetailPage({
@@ -9,5 +10,8 @@ export default function OrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  return <OrderDetail id={id} />;
+  const router = useRouter();
+  return (
+    <OrderDetail id={id} onDeleted={() => router.push("/admin/orders")} />
+  );
 }

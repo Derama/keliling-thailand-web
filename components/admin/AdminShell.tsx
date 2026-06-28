@@ -3,18 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { AdminRole } from "@/lib/admin/role";
-
-const ROLE_LABEL: Record<AdminRole, string> = {
-  operation: "Operasional",
-  marketing: "Marketing",
-};
 
 export default function AdminShell({
-  role = "operation",
   children,
 }: {
-  role?: AdminRole;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -30,7 +22,7 @@ export default function AdminShell({
       <header className="no-print sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-[#1B2A4A] px-4 py-3 text-white sm:px-6">
         <Link href="/admin" className="leading-tight">
           <p className="font-bold">Keliling Thailand</p>
-          <p className="text-xs text-white/60">Admin · {ROLE_LABEL[role]}</p>
+          <p className="text-xs text-white/60">Admin</p>
         </Link>
         <button
           onClick={logout}

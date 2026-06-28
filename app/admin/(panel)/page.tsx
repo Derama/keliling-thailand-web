@@ -17,14 +17,12 @@ import {
   InstagramStudioView,
 } from "@/components/admin/views/marketing/MarketingViews";
 import LeadsView from "@/components/admin/views/LeadsView";
-import { useRole } from "@/components/admin/RoleContext";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
 
-// Primary tabs shown directly in the phone bottom bar; the rest go in "Lainnya".
-const PRIMARY_TABS: Record<string, readonly string[]> = {
-  operation: ["dashboard", "orders", "joborder", "invoice"],
-  marketing: ["blog", "leads", "instagram"],
-};
+const STORAGE_KEY = "admin-tab";
+
+// Tabs shown directly in the phone bottom bar; the rest go in "Lainnya".
+const PRIMARY_IDS: readonly string[] = ["dashboard", "orders", "joborder", "invoice"];
 
 type Tab = {
   id: string;
@@ -32,7 +30,9 @@ type Tab = {
   View: React.ComponentType;
 };
 
-const OPERATION_TABS: readonly Tab[] = [
+// Single unified admin — operations plus the marketing tools (leads, blog,
+// instagram). The separate marketing role/login was removed.
+const TABS: readonly Tab[] = [
   { id: "dashboard", label: "Dashboard", View: DashboardView },
   { id: "orders", label: "Order", View: OrdersView },
   { id: "prices", label: "Daftar Harga", View: PriceListView },
@@ -44,42 +44,32 @@ const OPERATION_TABS: readonly Tab[] = [
   { id: "calendar", label: "Kalender", View: CalendarView },
   { id: "customers", label: "Customer", View: CustomersView },
   { id: "pdftrim", label: "PDF Trimmer", View: PdfTrimmerView },
-];
-
-const MARKETING_TABS: readonly Tab[] = [
-  { id: "blog", label: "Blog & SEO", View: BlogView },
   { id: "leads", label: "Leads", View: LeadsView },
+  { id: "blog", label: "Blog & SEO", View: BlogView },
   { id: "instagram", label: "Instagram Studio", View: InstagramStudioView },
 ];
 
 export default function AdminPage() {
-  const role = useRole();
-  const tabs = role === "marketing" ? MARKETING_TABS : OPERATION_TABS;
-  const storageKey = `admin-tab-${role}`;
-
-  const [active, setActive] = useState<string>(tabs[0].id);
+  const [active, setActive] = useState<string>(TABS[0].id);
 
   // Restore last-opened tab after mount (avoids hydration mismatch).
   useEffect(() => {
-    const saved = localStorage.getItem(storageKey);
+    const saved = localStorage.getItem(STORAGE_KEY);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount localStorage sync, avoids hydration mismatch
-    if (saved && tabs.some((t) => t.id === saved)) setActive(saved);
-  }, [storageKey, tabs]);
+    if (saved && TABS.some((t) => t.id === saved)) setActive(saved);
+  }, []);
 
   function select(id: string) {
     setActive(id);
-    localStorage.setItem(storageKey, id);
+    localStorage.setItem(STORAGE_KEY, id);
   }
 
-  const ActiveView = tabs.find((t) => t.id === active)?.View ?? tabs[0].View;
-
-  const primaryIds =
-    PRIMARY_TABS[role === "marketing" ? "marketing" : "operation"];
+  const ActiveView = TABS.find((t) => t.id === active)?.View ?? TABS[0].View;
 
   return (
     <div className="space-y-6">
       <div className="no-print hidden flex-wrap gap-1 border-b border-gray-200 sm:flex">
-        {tabs.map((t) => (
+        {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => select(t.id)}
@@ -97,10 +87,10 @@ export default function AdminPage() {
       <ActiveView />
 
       <AdminBottomNav
-        tabs={tabs}
+        tabs={TABS}
         active={active}
         onSelect={select}
-        primaryIds={primaryIds}
+        primaryIds={PRIMARY_IDS}
       />
     </div>
   );
