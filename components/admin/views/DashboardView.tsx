@@ -19,21 +19,14 @@ import { ErrorNote } from "@/components/admin/ui";
 // as pipeline; `cancelled` is excluded everywhere.
 const ACTIVE = ["confirmed", "ongoing", "completed"] as const;
 
-type Period = "month" | "lastMonth" | "year" | "all";
+// Preset periods plus `pickMonth`, which uses an explicit YYYY-MM the user chose.
+type Period = "month" | "lastMonth" | "year" | "all" | "pickMonth";
 
-const PERIOD_LABELS: Record<Period, string> = {
+const PRESET_LABELS: Record<Exclude<Period, "pickMonth">, string> = {
   month: "Bulan ini",
   lastMonth: "Bulan lalu",
   year: "Tahun ini",
   all: "Semua",
-};
-
-// Text for the delta sub-line, naming the period each card is compared against.
-const DELTA_VS: Record<Period, string | null> = {
-  month: "vs bulan lalu",
-  lastMonth: "vs bulan sebelumnya",
-  year: "vs tahun lalu",
-  all: null,
 };
 
 type Range = [string, string] | null; // [startIso, endIso); null = all-time.
@@ -42,8 +35,44 @@ function monthStart(y: number, m: number): string {
   return isoLocal(new Date(y, m, 1));
 }
 
+/** Parse a YYYY-MM into [year, monthIndex]; falls back to the current month. */
+function parseMonth(value: string): [number, number] {
+  const [y, m] = value.split("-").map(Number);
+  if (y && m) return [y, m - 1];
+  const now = new Date();
+  return [now.getFullYear(), now.getMonth()];
+}
+
+/** Human label for the active period (used in card titles). */
+function periodLabel(period: Period, monthValue: string): string {
+  if (period === "pickMonth") {
+    const [y, m] = parseMonth(monthValue);
+    return new Date(y, m, 1).toLocaleDateString("id-ID", {
+      month: "long",
+      year: "numeric",
+    });
+  }
+  return PRESET_LABELS[period];
+}
+
+/** Text for the delta sub-line, naming the period being compared against. */
+function deltaVs(period: Period): string | null {
+  switch (period) {
+    case "month":
+      return "vs bulan lalu";
+    case "lastMonth":
+      return "vs bulan sebelumnya";
+    case "pickMonth":
+      return "vs bulan sebelumnya";
+    case "year":
+      return "vs tahun lalu";
+    case "all":
+      return null;
+  }
+}
+
 /** Date range for the selected period, or null for all-time. */
-function rangeFor(period: Period): Range {
+function rangeFor(period: Period, monthValue: string): Range {
   const now = new Date();
   const y = now.getFullYear();
   const m = now.getMonth();
@@ -54,6 +83,10 @@ function rangeFor(period: Period): Range {
       return [monthStart(y, 0), monthStart(y + 1, 0)];
     case "lastMonth":
       return [monthStart(y, m - 1), monthStart(y, m)];
+    case "pickMonth": {
+      const [py, pm] = parseMonth(monthValue);
+      return [monthStart(py, pm), monthStart(py, pm + 1)];
+    }
     case "month":
     default:
       return [monthStart(y, m), monthStart(y, m + 1)];
@@ -62,7 +95,7 @@ function rangeFor(period: Period): Range {
 
 /** The previous comparable range, for delta. Null when there's nothing to
  *  compare against (all-time). */
-function prevRangeFor(period: Period): Range {
+function prevRangeFor(period: Period, monthValue: string): Range {
   const now = new Date();
   const y = now.getFullYear();
   const m = now.getMonth();
@@ -73,6 +106,10 @@ function prevRangeFor(period: Period): Range {
       return [monthStart(y - 1, 0), monthStart(y, 0)];
     case "lastMonth":
       return [monthStart(y, m - 2), monthStart(y, m - 1)];
+    case "pickMonth": {
+      const [py, pm] = parseMonth(monthValue);
+      return [monthStart(py, pm - 1), monthStart(py, pm)];
+    }
     case "month":
     default:
       return [monthStart(y, m - 1), monthStart(y, m)];
@@ -86,17 +123,23 @@ function inRange(iso: string | null, range: Range): boolean {
 
 interface Stats {
   trips: number;
-  omzet: number;
+  omzet: number; // invoiced revenue (accrual)
+  cash: number; // payments actually received in the period
   profitIdr: number;
   profitThb: number;
   margin: number | null; // profit / omzet, %
+  collected: number | null; // cash / omzet, %
   uninvoiced: number; // active orders with no invoice (price 0)
   costIncomplete: number; // invoiced but no operator cost/rate → profit unknown
   potensiOmzet: number; // inquiry pipeline value
   potensiCount: number;
 }
 
-function computeStats(orders: OrderWithCustomer[], range: Range): Stats {
+function computeStats(
+  orders: OrderWithCustomer[],
+  payments: Payment[],
+  range: Range
+): Stats {
   const active = orders.filter(
     (o) =>
       (ACTIVE as readonly string[]).includes(o.status) &&
@@ -104,6 +147,11 @@ function computeStats(orders: OrderWithCustomer[], range: Range): Stats {
   );
   const omzet = active.reduce((s, o) => s + Number(o.price_idr), 0);
   const uninvoiced = active.filter((o) => Number(o.price_idr) <= 0).length;
+
+  // Cash = money received in the period, by payment date (not trip date).
+  const cash = payments
+    .filter((p) => inRange(p.paid_at, range))
+    .reduce((s, p) => s + Number(p.amount_idr), 0);
 
   // Profit only from orders that carry both an operator cost and an fx rate;
   // otherwise revenue would masquerade as pure profit.
@@ -125,9 +173,11 @@ function computeStats(orders: OrderWithCustomer[], range: Range): Stats {
   return {
     trips: active.length,
     omzet,
+    cash,
     profitIdr,
     profitThb,
     margin: omzet > 0 ? (profitIdr / omzet) * 100 : null,
+    collected: omzet > 0 ? (cash / omzet) * 100 : null,
     uninvoiced,
     costIncomplete,
     potensiOmzet: inquiry.reduce((s, o) => s + Number(o.price_idr), 0),
@@ -189,27 +239,46 @@ function StatCard({
 
 function PeriodSwitcher({
   value,
-  onChange,
+  monthValue,
+  onPreset,
+  onMonth,
 }: {
   value: Period;
-  onChange: (p: Period) => void;
+  monthValue: string;
+  onPreset: (p: Period) => void;
+  onMonth: (m: string) => void;
 }) {
   return (
-    <div className="inline-flex flex-wrap gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
-      {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
-        <button
-          key={p}
-          type="button"
-          onClick={() => onChange(p)}
-          className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
-            value === p
-              ? "bg-[#F5C518] text-[#1B2A4A] shadow-sm"
-              : "text-gray-500 hover:text-[#1B2A4A]"
-          }`}
-        >
-          {PERIOD_LABELS[p]}
-        </button>
-      ))}
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+        {(Object.keys(PRESET_LABELS) as Exclude<Period, "pickMonth">[]).map(
+          (p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => onPreset(p)}
+              className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+                value === p
+                  ? "bg-[#F5C518] text-[#1B2A4A] shadow-sm"
+                  : "text-gray-500 hover:text-[#1B2A4A]"
+              }`}
+            >
+              {PRESET_LABELS[p]}
+            </button>
+          )
+        )}
+      </div>
+      <input
+        type="month"
+        value={value === "pickMonth" ? monthValue : ""}
+        onChange={(e) => onMonth(e.target.value)}
+        aria-label="Pilih bulan tertentu"
+        className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+          value === "pickMonth"
+            ? "border-[#F5C518] text-[#1B2A4A]"
+            : "border-gray-200 text-gray-500"
+        }`}
+      />
     </div>
   );
 }
@@ -255,11 +324,36 @@ function TrendChart({ points }: { points: TrendPoint[] }) {
   );
 }
 
+/** One missing-piece chip on an action-queue row. */
+function MissingTag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+      {children}
+    </span>
+  );
+}
+
 export default function DashboardView() {
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  // order_id → set of builder-doc kinds that exist (for the action queue).
+  const [docKinds, setDocKinds] = useState<Map<string, Set<string>>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [period, setPeriod] = useState<Period>("month");
+  const [monthValue, setMonthValue] = useState<string>("");
+
+  function pickPreset(p: Period) {
+    setPeriod(p);
+  }
+  function pickMonth(m: string) {
+    if (!m) {
+      setPeriod("month");
+      setMonthValue("");
+      return;
+    }
+    setMonthValue(m);
+    setPeriod("pickMonth");
+  }
 
   useEffect(() => {
     const supabase = createClient();
@@ -274,17 +368,30 @@ export default function DashboardView() {
       .from("payments")
       .select("*")
       .then(({ data }) => setPayments(data ?? []));
+    supabase
+      .from("order_documents")
+      .select("order_id, kind")
+      .then(({ data }) => {
+        const map = new Map<string, Set<string>>();
+        for (const row of (data as { order_id: string; kind: string }[]) ?? []) {
+          const set = map.get(row.order_id) ?? new Set<string>();
+          set.add(row.kind);
+          map.set(row.order_id, set);
+        }
+        setDocKinds(map);
+      });
   }, []);
 
   const stats = useMemo(
-    () => computeStats(orders, rangeFor(period)),
-    [orders, period]
+    () => computeStats(orders, payments, rangeFor(period, monthValue)),
+    [orders, payments, period, monthValue]
   );
   const prev = useMemo(
-    () => computeStats(orders, prevRangeFor(period)),
-    [orders, period]
+    () => computeStats(orders, payments, prevRangeFor(period, monthValue)),
+    [orders, payments, period, monthValue]
   );
-  const deltaLabel = DELTA_VS[period];
+  const label = periodLabel(period, monthValue);
+  const deltaLabel = deltaVs(period);
 
   // Last 6 calendar months (oldest → newest), active orders only.
   const trend = useMemo<TrendPoint[]>(() => {
@@ -330,24 +437,53 @@ export default function DashboardView() {
   const outstanding = activeAll.filter(
     (o) => Number(o.price_idr) > (paidByOrder.get(o.id) ?? 0)
   );
+  // Total receivables across every unpaid order (all-time snapshot).
+  const piutang = outstanding.reduce(
+    (s, o) => s + (Number(o.price_idr) - (paidByOrder.get(o.id) ?? 0)),
+    0
+  );
+
+  // Action queue: upcoming confirmed/ongoing trips missing a piece of prep —
+  // an invoice (price 0), an assigned driver, or a job order document.
+  const actionQueue = activeAll
+    .filter(
+      (o) =>
+        o.status !== "completed" && o.trip_start && o.trip_start >= today
+    )
+    .map((o) => {
+      const kinds = docKinds.get(o.id) ?? new Set<string>();
+      const missing: string[] = [];
+      if (Number(o.price_idr) <= 0) missing.push("invoice");
+      if (!o.driver_name?.trim()) missing.push("driver");
+      if (!kinds.has("joborder")) missing.push("job order");
+      return { o, missing };
+    })
+    .filter((row) => row.missing.length > 0)
+    .sort((a, b) => (a.o.trip_start! < b.o.trip_start! ? -1 : 1))
+    .slice(0, 8);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-[#1B2A4A]">Dashboard</h1>
-        <PeriodSwitcher value={period} onChange={setPeriod} />
+        <PeriodSwitcher
+          value={period}
+          monthValue={monthValue}
+          onPreset={pickPreset}
+          onMonth={pickMonth}
+        />
       </div>
       <ErrorNote message={error} />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         <StatCard
-          label={`Trip · ${PERIOD_LABELS[period]}`}
+          label={`Trip · ${label}`}
           value={String(stats.trips)}
           deltaValue={delta(stats.trips, prev.trips)}
           deltaLabel={deltaLabel}
         />
         <StatCard
-          label={`Omzet · ${PERIOD_LABELS[period]}`}
+          label={`Omzet · ${label}`}
           value={formatIDR(stats.omzet)}
           deltaValue={delta(stats.omzet, prev.omzet)}
           deltaLabel={deltaLabel}
@@ -358,7 +494,18 @@ export default function DashboardView() {
           }
         />
         <StatCard
-          label={`Profit · ${PERIOD_LABELS[period]}`}
+          label={`Cash masuk · ${label}`}
+          value={formatIDR(stats.cash)}
+          deltaValue={delta(stats.cash, prev.cash)}
+          deltaLabel={deltaLabel}
+          sub={
+            stats.collected !== null
+              ? `${stats.collected.toFixed(0)}% dari omzet tertagih`
+              : undefined
+          }
+        />
+        <StatCard
+          label={`Profit · ${label}`}
           value={formatIDR(stats.profitIdr)}
           deltaValue={delta(stats.profitIdr, prev.profitIdr)}
           deltaLabel={deltaLabel}
@@ -381,6 +528,77 @@ export default function DashboardView() {
       </div>
 
       <TrendChart points={trend} />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Action queue — upcoming trips missing prep. All-time, ops-focused. */}
+        <section className="rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="mb-3 font-semibold text-[#1B2A4A]">Butuh tindakan</h2>
+          <ul className="divide-y divide-gray-100 text-sm">
+            {actionQueue.map(({ o, missing }) => (
+              <li key={o.id} className="flex items-center justify-between gap-3 py-2">
+                <span className="min-w-0">
+                  <Link
+                    href={`/admin/orders/${o.id}`}
+                    className="font-medium text-[#1B2A4A] hover:underline"
+                  >
+                    {o.order_number}
+                  </Link>{" "}
+                  · {o.customers.name}
+                  <span className="ml-1 text-xs text-gray-400">
+                    {formatDate(o.trip_start)}
+                  </span>
+                </span>
+                <span className="flex shrink-0 flex-wrap justify-end gap-1">
+                  {missing.map((m) => (
+                    <MissingTag key={m}>{m}</MissingTag>
+                  ))}
+                </span>
+              </li>
+            ))}
+            {actionQueue.length === 0 && (
+              <li className="py-4 text-gray-400">
+                Semua trip mendatang sudah siap. 👍
+              </li>
+            )}
+          </ul>
+        </section>
+
+        <section className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="mb-3 flex items-baseline justify-between gap-2">
+            <h2 className="font-semibold text-[#1B2A4A]">Belum lunas</h2>
+            <span className="text-sm font-bold text-red-700">
+              total {formatIDR(piutang)}
+            </span>
+          </div>
+          <ul className="divide-y divide-gray-100 text-sm">
+            {outstanding.map((o) => (
+              <li
+                key={o.id}
+                className="flex items-center justify-between py-2"
+              >
+                <span>
+                  <Link
+                    href={`/admin/orders/${o.id}`}
+                    className="font-medium text-[#1B2A4A] hover:underline"
+                  >
+                    {o.order_number}
+                  </Link>{" "}
+                  · {o.customers.name}
+                </span>
+                <span className="font-medium text-red-700">
+                  sisa{" "}
+                  {formatIDR(
+                    Number(o.price_idr) - (paidByOrder.get(o.id) ?? 0)
+                  )}
+                </span>
+              </li>
+            ))}
+            {outstanding.length === 0 && (
+              <li className="py-4 text-gray-400">Semua order lunas. 🎉</li>
+            )}
+          </ul>
+        </section>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-xl border border-gray-200 bg-white p-5">
@@ -414,37 +632,6 @@ export default function DashboardView() {
               <li className="py-4 text-gray-400">
                 Tidak ada trip mendatang.
               </li>
-            )}
-          </ul>
-        </section>
-
-        <section className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 font-semibold text-[#1B2A4A]">Belum lunas</h2>
-          <ul className="divide-y divide-gray-100 text-sm">
-            {outstanding.map((o) => (
-              <li
-                key={o.id}
-                className="flex items-center justify-between py-2"
-              >
-                <span>
-                  <Link
-                    href={`/admin/orders/${o.id}`}
-                    className="font-medium text-[#1B2A4A] hover:underline"
-                  >
-                    {o.order_number}
-                  </Link>{" "}
-                  · {o.customers.name}
-                </span>
-                <span className="font-medium text-red-700">
-                  sisa{" "}
-                  {formatIDR(
-                    Number(o.price_idr) - (paidByOrder.get(o.id) ?? 0)
-                  )}
-                </span>
-              </li>
-            ))}
-            {outstanding.length === 0 && (
-              <li className="py-4 text-gray-400">Semua order lunas. 🎉</li>
             )}
           </ul>
         </section>
