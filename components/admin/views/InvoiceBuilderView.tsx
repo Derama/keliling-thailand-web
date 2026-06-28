@@ -6,8 +6,17 @@ import { Field, inputCls, btnSecondaryCls } from "@/components/admin/ui";
 import { formatTHB, formatIDR, isoLocal } from "@/lib/admin/utils";
 import BuiltInvoiceDoc from "@/components/admin/BuiltInvoiceDoc";
 import { loadOrderDoc, saveOrderDoc } from "@/lib/admin/orderDocs";
+import { syncOrderPrice } from "@/lib/admin/orderPrice";
 import CatalogPicker from "@/components/admin/invoice/CatalogPicker";
 import { useCatalog, type CatalogItem } from "@/components/admin/invoice/useCatalog";
+import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
+import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
+import {
+  listTemplates,
+  loadTemplate,
+  createTemplate,
+  saveTemplate,
+} from "@/lib/admin/docLibrary";
 import {
   OPERATOR_MARGIN,
   INVOICE_STATUS_LABELS,
@@ -54,13 +63,20 @@ interface InvoiceDraft {
   custEmail: string;
   custAddress: string;
   idrRate: number;
+  /** Payable accounting invoice (invoices table) created from this maker. */
+  savedInvoiceId?: string | null;
+  /** Library mirror row this order's invoice is synced to (document_templates). */
+  libraryId?: string | null;
 }
 
 export default function InvoiceBuilderView({
   orderId,
+  onInvoiceSaved,
 }: {
   /** When set, the invoice loads from / saves to this order. */
   orderId?: string;
+  /** Called after the payable invoice is saved so the order list can refresh. */
+  onInvoiceSaved?: () => void;
 } = {}) {
   const { sections, loading } = useCatalog();
 
@@ -74,6 +90,21 @@ export default function InvoiceBuilderView({
   const [dueDate, setDueDate] = useState(addDays(isoLocal(), 1));
   const [status, setStatus] = useState<InvoiceStatus>("awaiting");
   const [lines, setLines] = useState<InvoiceLine[]>([]);
+
+  // Payable invoice linked to the order. Stored in the draft so re-saving
+  // updates the same `invoices` row instead of creating duplicates.
+  const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">(
+    "idle"
+  );
+  const [saveErr, setSaveErr] = useState<string | null>(null);
+
+  // Library mirror: one document_templates row per order, autosaved in sync.
+  const [libraryId, setLibraryId] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
+  const [pickerLoading, setPickerLoading] = useState(false);
 
   // Customer contact — shown in the "Billed to" block on customer invoices.
   const [custPIC, setCustPIC] = useState("");
@@ -124,6 +155,8 @@ export default function InvoiceBuilderView({
     setCustEmail(d.custEmail ?? "");
     setCustAddress(d.custAddress ?? "");
     if (typeof d.idrRate === "number") setIdrRate(d.idrRate);
+    setSavedInvoiceId(d.savedInvoiceId ?? null);
+    setLibraryId(d.libraryId ?? null);
   }
 
   // Per-order: load saved invoice, else seed billing from the order's customer.
@@ -138,6 +171,13 @@ export default function InvoiceBuilderView({
       if (cancelled) return;
       if (saved) {
         applyDraft(saved);
+        // Order number isn't in the saved draft — fetch it to tag mirrors.
+        const { data: o } = await createClient()
+          .from("orders")
+          .select("order_number")
+          .eq("id", orderId)
+          .single();
+        if (!cancelled && o) setOrderNumber(o.order_number ?? null);
       } else {
         const { data: o } = await createClient()
           .from("orders")
@@ -145,6 +185,7 @@ export default function InvoiceBuilderView({
           .eq("id", orderId)
           .single();
         if (!cancelled && o) {
+          setOrderNumber(o.order_number ?? null);
           setMode("customer");
           setBillTo(o.customers?.name ?? "");
           setCustPIC(o.customers?.name ?? "");
@@ -176,13 +217,31 @@ export default function InvoiceBuilderView({
     custEmail,
     custAddress,
     idrRate,
+    savedInvoiceId,
+    libraryId,
   };
 
-  // Autosave to the order (debounced) once hydrated.
+  // Autosave to the order (debounced) once hydrated; mirror to the library too.
   useEffect(() => {
     if (!orderId || !hydrated.current) return;
-    const t = setTimeout(() => {
-      saveOrderDoc(orderId, "invoice", draft);
+    const t = setTimeout(async () => {
+      await saveOrderDoc(orderId, "invoice", draft);
+      try {
+        const title = invoiceNumber || "Invoice";
+        if (!libraryId) {
+          const id = await createTemplate(
+            "invoice",
+            title,
+            { ...draft, libraryId: null },
+            orderNumber
+          );
+          if (id) setLibraryId(id);
+        } else {
+          await saveTemplate(libraryId, title, { ...draft, libraryId });
+        }
+      } catch {
+        /* mirror is best-effort */
+      }
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,12 +250,99 @@ export default function InvoiceBuilderView({
   function printInvoice() {
     const prev = document.title;
     document.title = `${invoiceNumber} - ${date}`;
+    const style = document.createElement("style");
+    style.dataset.ktInvoicePrint = "true";
+    style.textContent =
+      "@media print { @page { size: A4 !important; margin: 0 !important; } }";
+    document.head.appendChild(style);
     const restore = () => {
       document.title = prev;
+      style.remove();
       window.removeEventListener("afterprint", restore);
     };
     window.addEventListener("afterprint", restore);
     window.print();
+  }
+
+  // Once saved to the order, any further edit re-arms the button to "update".
+  useEffect(() => {
+    setSaveState("idle");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(lines), idrRate]);
+
+  // Create/update the payable accounting invoice (invoices table) for this
+  // order from the customer-facing total, so payment can be requested off it.
+  async function saveToOrder() {
+    if (!orderId) return;
+    const amountIdr = Math.round(totals.customerTotal * idrRate);
+    if (amountIdr <= 0) {
+      setSaveErr("Total customer masih 0 — isi item dulu.");
+      return;
+    }
+    setSaveState("saving");
+    setSaveErr(null);
+    const supabase = createClient();
+    const lineItems = lines.map((l) => ({
+      description: l.desc || "Item",
+      amount_idr: Math.round(lineCustomerTotal(l) * idrRate),
+    }));
+    if (savedInvoiceId) {
+      const { error } = await supabase
+        .from("invoices")
+        .update({ amount_idr: amountIdr, line_items: lineItems })
+        .eq("id", savedInvoiceId);
+      if (error) {
+        setSaveErr(`Gagal menyimpan: ${error.message}`);
+        setSaveState("idle");
+        return;
+      }
+    } else {
+      // invoice_number is assigned by a BEFORE INSERT trigger.
+      const { data, error } = await supabase
+        .from("invoices")
+        .insert({
+          order_id: orderId,
+          type: "full",
+          amount_idr: amountIdr,
+          line_items: lineItems,
+        })
+        .select("id")
+        .single();
+      if (error) {
+        setSaveErr(`Gagal menyimpan: ${error.message}`);
+        setSaveState("idle");
+        return;
+      }
+      setSavedInvoiceId(data.id);
+    }
+    await syncOrderPrice(supabase, orderId);
+    // Cost + margin are derived from the invoice too: cost_thb = what we pay
+    // the tour operator (operatorTotal = base + operator margin); the kurs is
+    // the invoice rate. Company margin = customer total − operator total.
+    await supabase
+      .from("orders")
+      .update({ cost_thb: totals.operatorTotal, fx_rate: idrRate })
+      .eq("id", orderId);
+    setSaveState("saved");
+    onInvoiceSaved?.();
+  }
+
+  async function openPicker() {
+    setPickerOpen(true);
+    setPickerLoading(true);
+    const rows = await listTemplates<InvoiceDraft>("invoice");
+    setPickerRows(rows.map((r) => pickerRow(r)));
+    setPickerLoading(false);
+  }
+
+  async function pickTemplate(id: string) {
+    setPickerOpen(false);
+    const picked = await loadTemplate<InvoiceDraft>(id);
+    if (!picked) return;
+    if (lines.length > 0 && !confirm("Ganti isi invoice dengan yang dipilih?"))
+      return;
+    // Keep this order's own mirror id + payable-invoice link.
+    applyDraft({ ...picked.data, libraryId, savedInvoiceId });
   }
 
   function switchMode(next: InvoiceMode) {
@@ -333,14 +479,51 @@ export default function InvoiceBuilderView({
             preview. Semua THB.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={printInvoice}
-          disabled={lines.length === 0}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50"
-        >
-          Print / Simpan PDF
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {orderId && (
+            <button
+              type="button"
+              onClick={openPicker}
+              className={`${btnSecondaryCls} whitespace-nowrap`}
+            >
+              Pilih dari tersimpan
+            </button>
+          )}
+          {orderId && (
+            <div className="flex flex-col items-end gap-0.5">
+              <button
+                type="button"
+                onClick={saveToOrder}
+                disabled={lines.length === 0 || saveState === "saving"}
+                className={`${btnSecondaryCls} whitespace-nowrap disabled:opacity-50`}
+              >
+                {saveState === "saving"
+                  ? "Menyimpan…"
+                  : savedInvoiceId
+                    ? "Perbarui invoice order"
+                    : "Simpan ke order"}
+              </button>
+              {saveState === "saved" && (
+                <span className="text-xs font-medium text-green-700">
+                  Tersimpan di order ✓
+                </span>
+              )}
+              {saveErr && (
+                <span className="text-xs font-medium text-red-600">
+                  {saveErr}
+                </span>
+              )}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={printInvoice}
+            disabled={lines.length === 0}
+            className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50"
+          >
+            Print / Simpan PDF
+          </button>
+        </div>
       </div>
 
       <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
@@ -738,6 +921,15 @@ export default function InvoiceBuilderView({
           )}
         </div>
       </div>
+
+      <TemplatePickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title="Pilih invoice tersimpan"
+        rows={pickerRows}
+        loading={pickerLoading}
+        onPick={pickTemplate}
+      />
     </div>
   );
 }
