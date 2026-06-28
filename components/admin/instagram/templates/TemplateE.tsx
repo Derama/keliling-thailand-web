@@ -8,7 +8,7 @@ export default function TemplateE({ data, format }: { data: PostData; format: Po
       <div style={{ height: "55%", ...(data.photoUrl ? { backgroundImage: `url(${data.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: "#0f1422" }) }} />
       <div style={{ flex: 1, padding: 56, display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <Stars rating={data.rating} color={data.brandColors.yellow} />
-        <p style={{ fontSize: 48, lineHeight: 1.3, fontWeight: 700, margin: "20px 0" }}>"{data.reviewText}"</p>
+        <p style={{ fontSize: 48, lineHeight: 1.3, fontWeight: 700, margin: "20px 0" }}>{`“${data.reviewText}”`}</p>
         <p style={{ fontSize: 28, color: data.brandColors.yellow, fontWeight: 700 }}>— {data.customerName}{data.city ? `, ${data.city}` : ""}</p>
       </div>
       <div style={{ position: "absolute", top: 40, left: 40 }}><Logo data={data} /></div>

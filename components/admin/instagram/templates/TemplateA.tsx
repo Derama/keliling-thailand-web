@@ -44,7 +44,7 @@ export default function TemplateA({
       <div style={{ position: "absolute", bottom: 0, padding: 56, width: "100%" }}>
         <Stars rating={data.rating} color={data.brandColors.yellow} />
         <p style={{ fontSize: 44, lineHeight: 1.3, fontWeight: 600, margin: "16px 0" }}>
-          "{data.reviewText}"
+          {`“${data.reviewText}”`}
         </p>
         <p style={{ fontSize: 30, opacity: 0.85 }}>
           — {data.customerName}

@@ -10,7 +10,7 @@ export default function TemplateD({ data, format }: { data: PostData; format: Po
       <div style={{ position: "absolute", top: 40, left: 40 }}><Logo data={data} /></div>
       <div style={{ position: "absolute", top: 150, padding: 56, width: "100%" }}>
         <Stars rating={data.rating} color={data.brandColors.yellow} />
-        <p style={{ fontSize: 44, lineHeight: 1.3, fontWeight: 600, margin: "16px 0" }}>"{data.reviewText}"</p>
+        <p style={{ fontSize: 44, lineHeight: 1.3, fontWeight: 600, margin: "16px 0" }}>{`“${data.reviewText}”`}</p>
         <p style={{ fontSize: 30, opacity: 0.85 }}>— {data.customerName}{data.city ? `, ${data.city}` : ""}</p>
       </div>
     </div>
