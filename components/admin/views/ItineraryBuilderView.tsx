@@ -1,21 +1,35 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import { isoLocal } from "@/lib/admin/utils";
 import { uploadPlaceImage } from "@/lib/admin/storage";
 import { loadOrderDoc, saveOrderDoc, clearOrderDoc } from "@/lib/admin/orderDocs";
+import {
+  loadItinerary,
+  saveItinerary,
+  listItineraries,
+  createItinerary,
+} from "@/lib/admin/itineraryLibrary";
+import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
+import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
+import { loadSetting, saveSetting } from "@/lib/admin/settings";
+import DateField from "@/components/admin/DateField";
 import ItineraryDoc from "@/components/admin/ItineraryDoc";
 import {
   type ItineraryDay,
   type ItineraryActivity,
   type ItineraryPlace,
+  type TravelTip,
+  mergeAiSchedule,
   scheduleFromPlaces,
   insertByTime,
   MEAL_STOPS,
+  DEFAULT_TRAVEL_TIPS,
 } from "@/lib/admin/itinerary";
 import type { Place } from "@/lib/admin/places";
+import { composeItineraryPrompt } from "@/lib/admin/itineraryGeneration";
 import {
   type DragPayload,
   DAY_DROP_ATTR,
@@ -32,6 +46,45 @@ const DRAFT_KEY = "kt-itinerary-draft";
 
 function newId() {
   return crypto.randomUUID();
+}
+
+/**
+ * Wait for every <img> in the printed document to load AND decode before opening
+ * the print dialog. Remote photos (cover hero, attractions) can take longer than
+ * a paint frame; printing before they decode bakes a blank into the PDF. Each
+ * image gets a generous per-image cap so one broken/slow photo can't hang the
+ * button, but the cap is long enough that a normal cover always makes it in.
+ */
+async function waitForImages(root: ParentNode, timeoutMs = 8000): Promise<void> {
+  const imgs = Array.from(root.querySelectorAll("img")).filter(
+    (img) => img.currentSrc || img.src
+  );
+  if (imgs.length === 0) return;
+  await Promise.all(
+    imgs.map((img) => {
+      const settled = new Promise<void>((resolve) => {
+        if (img.complete && img.naturalWidth > 0) {
+          // Loaded — still force a decode so it's painted, not just fetched.
+          img.decode().then(() => resolve(), () => resolve());
+          return;
+        }
+        img.addEventListener(
+          "load",
+          () => img.decode().then(() => resolve(), () => resolve()),
+          { once: true }
+        );
+        img.addEventListener("error", () => resolve(), { once: true });
+      });
+      const cap = new Promise<void>((resolve) => setTimeout(resolve, timeoutMs));
+      return Promise.race([settled, cap]);
+    })
+  );
+}
+
+function nextPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
 }
 
 /** Add `n` days to a local YYYY-MM-DD string. Empty in → empty out. */
@@ -62,14 +115,27 @@ interface Draft {
   vehicle: string;
   heroImage: string;
   days: ItineraryDay[];
+  galleryImages: string[];
+  travelTips: TravelTip[];
+  showTravelTips: boolean;
+  /** Library mirror row (itineraries table) this order's itinerary syncs to. */
+  mirrorId?: string | null;
 }
 
 export default function ItineraryBuilderView({
   orderId,
+  libraryId,
+  onExit,
 }: {
-  /** When set, the draft loads from / saves to this order; else localStorage. */
+  /** When set, the draft loads from / saves to this order. */
   orderId?: string;
+  /** When set, the draft loads from / saves to this library itinerary row. */
+  libraryId?: string;
+  /** Shown as a "back to list" affordance in library mode. */
+  onExit?: () => void;
 } = {}) {
+  // Library mode: a manual name for the saved itinerary (column, not in Draft).
+  const [title, setTitle] = useState("");
   const [tripTitle, setTripTitle] = useState("");
   const [customer, setCustomer] = useState("");
   const [pax, setPax] = useState("");
@@ -77,19 +143,41 @@ export default function ItineraryBuilderView({
   const [notes, setNotes] = useState("");
   const [vehicle, setVehicle] = useState("VAN");
   const [heroImage, setHeroImage] = useState("");
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [travelTips, setTravelTips] = useState<TravelTip[]>(DEFAULT_TRAVEL_TIPS);
+  const [showTravelTips, setShowTravelTips] = useState(true);
+  // Global default tips (saved template) — seeds new drafts + the Reset action.
+  const [defaultTips, setDefaultTips] = useState<TravelTip[]>(DEFAULT_TRAVEL_TIPS);
+  const [savingTips, setSavingTips] = useState(false);
+  const [tipsSaved, setTipsSaved] = useState(false);
   const [days, setDays] = useState<ItineraryDay[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
 
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  // AI edit-in-place: refine the existing itinerary without a full rebuild.
+  const [editPrompt, setEditPrompt] = useState("");
+  const [editBusy, setEditBusy] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [qDays, setQDays] = useState(3);
   const [qDest, setQDest] = useState<string[]>([]);
   // True once the admin sets/uploads a cover manually — stops AI from overwriting it.
   const [coverManual, setCoverManual] = useState(false);
+  const [printing, setPrinting] = useState(false);
+
+  // Library mirror (orderId mode): one itineraries row per order, autosaved in
+  // sync. Distinct from the `libraryId` prop, which is the library-edit mode.
+  const [mirrorId, setMirrorId] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerRowsState, setPickerRowsState] = useState<PickerRowData[]>([]);
+  const [pickerLoading, setPickerLoading] = useState(false);
 
   const hydrated = useRef(false);
+  // Wraps the printable doc so we only wait on its images, not the editor gallery.
+  const docRef = useRef<HTMLDivElement>(null);
 
   // Load attractions for the per-day place picker.
   useEffect(() => {
@@ -108,7 +196,13 @@ export default function ItineraryBuilderView({
     setNotes(d.notes ?? "");
     setVehicle(d.vehicle ?? "VAN");
     setHeroImage(d.heroImage ?? "");
+    setGalleryImages(Array.isArray(d.galleryImages) ? d.galleryImages : []);
+    setTravelTips(
+      Array.isArray(d.travelTips) ? d.travelTips : DEFAULT_TRAVEL_TIPS
+    );
+    setShowTravelTips(d.showTravelTips ?? true);
     setDays(Array.isArray(d.days) ? d.days : []);
+    setMirrorId(d.mirrorId ?? null);
   }
 
   // Restore draft once on mount. Per-order → DB (order_documents); else
@@ -116,6 +210,13 @@ export default function ItineraryBuilderView({
   useEffect(() => {
     let cancelled = false;
     async function hydrate() {
+      // Seed tips from the saved global template; a loaded draft overrides below.
+      const storedTips = await loadSetting<TravelTip[]>("itinerary_travel_tips");
+      if (cancelled) return;
+      if (Array.isArray(storedTips) && storedTips.length) {
+        setDefaultTips(storedTips);
+        setTravelTips(storedTips);
+      }
       if (orderId) {
         const saved = await loadOrderDoc<Draft>(orderId, "itinerary");
         if (cancelled) return;
@@ -132,7 +233,34 @@ export default function ItineraryBuilderView({
             setPax(o.pax ? String(o.pax) : "");
             setStartDate(o.trip_start ?? "");
             if (o.vehicle) setVehicle(o.vehicle);
+            // Seed customer-facing days from the itinerary typed on the order:
+            // one day per non-blank line, prefix ("Hari N:") stripped into title.
+            const lines: string[] = (o.itinerary ?? "")
+              .split("\n")
+              .map((l: string) => l.trim())
+              .filter(Boolean);
+            if (lines.length) {
+              setDays(
+                lines.map((line, i) => ({
+                  id: newId(),
+                  title: line.replace(
+                    /^(hari|day)\s*\d+\s*[:.)-]?\s*|^\d+\s*[:.)-]\s*/i,
+                    ""
+                  ),
+                  date: addDaysIso(o.trip_start ?? "", i),
+                  activities: [],
+                  places: [],
+                }))
+              );
+            }
           }
+        }
+      } else if (libraryId) {
+        const saved = await loadItinerary<Draft>(libraryId);
+        if (cancelled) return;
+        if (saved) {
+          setTitle(saved.title);
+          if (saved.data && Object.keys(saved.data).length) applyDraft(saved.data);
         }
       } else {
         try {
@@ -148,12 +276,11 @@ export default function ItineraryBuilderView({
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, libraryId]);
 
-  // Autosave draft (debounced) after hydration.
-  useEffect(() => {
-    if (!hydrated.current) return;
-    const draft: Draft = {
+  // Snapshot the current editor state into a Draft.
+  const buildDraft = useCallback(
+    (): Draft => ({
       tripTitle,
       customer,
       pax,
@@ -162,24 +289,75 @@ export default function ItineraryBuilderView({
       vehicle,
       heroImage,
       days,
-    };
-    const markSaved = () =>
-      setSavedAt(
-        new Date().toLocaleTimeString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    const t = setTimeout(() => {
+      galleryImages,
+      travelTips,
+      showTravelTips,
+      mirrorId,
+    }),
+    [tripTitle, customer, pax, startDate, notes, vehicle, heroImage, days, galleryImages, travelTips, showTravelTips, mirrorId]
+  );
+
+  // Persist a draft to the active target (order doc / library row / localStorage).
+  const persist = useCallback(
+    async (draft: Draft): Promise<void> => {
       if (orderId) {
-        saveOrderDoc(orderId, "itinerary", draft).then(markSaved);
-      } else {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-        markSaved();
+        await saveOrderDoc(orderId, "itinerary", draft);
+        // Mirror into the itinerary library so the order's itinerary is also a
+        // reusable, named entry (appears in the standalone Itinerary tab).
+        try {
+          const mirrorTitle =
+            [tripTitle, customer].filter(Boolean).join(" · ") || "Itinerary";
+          if (!mirrorId) {
+            const id = await createItinerary(mirrorTitle, {
+              ...draft,
+              mirrorId: null,
+            });
+            if (id) setMirrorId(id);
+          } else {
+            await saveItinerary(mirrorId, mirrorTitle, { ...draft, mirrorId });
+          }
+        } catch {
+          /* mirror is best-effort */
+        }
+        return;
       }
+      if (libraryId) return saveItinerary(libraryId, title, draft);
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      return Promise.resolve();
+    },
+    [orderId, libraryId, title, mirrorId, tripTitle, customer]
+  );
+
+  const markSaved = useCallback(() => {
+    setSavedAt(
+      new Date().toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+  }, []);
+
+  // Explicit save — flushes immediately instead of waiting for the debounce.
+  async function saveNow() {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await persist(buildDraft());
+      markSaved();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Autosave draft (debounced) after hydration.
+  useEffect(() => {
+    if (!hydrated.current) return;
+    const draft = buildDraft();
+    const t = setTimeout(() => {
+      persist(draft).then(markSaved);
     }, 600);
     return () => clearTimeout(t);
-  }, [orderId, tripTitle, customer, pax, startDate, notes, vehicle, heroImage, days]);
+  }, [buildDraft, persist, markSaved]);
 
   const hasContent =
     days.length > 0 || tripTitle || customer || notes || aiPrompt;
@@ -192,13 +370,13 @@ export default function ItineraryBuilderView({
 
   async function generateWithAI() {
     if (aiBusy) return;
-    const parts: string[] = [];
-    if (customer) parts.push(`Customer: ${customer}.`);
-    if (pax) parts.push(`Jumlah: ${pax}.`);
-    if (qDays) parts.push(`Durasi: ${qDays} hari.`);
-    if (qDest.length) parts.push(`Tujuan: ${qDest.join(", ")}.`);
-    if (aiPrompt.trim()) parts.push(aiPrompt.trim());
-    const effectivePrompt = parts.join(" ");
+    const effectivePrompt = composeItineraryPrompt({
+      customer,
+      pax,
+      days: qDays,
+      destinations: qDest,
+      request: aiPrompt,
+    });
     if (!effectivePrompt) return;
     setAiBusy(true);
     setAiError(null);
@@ -210,53 +388,56 @@ export default function ItineraryBuilderView({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Gagal generate.");
+      if (!Array.isArray(data.days) || data.days.length === 0) {
+        throw new Error("Respons AI tidak memiliki itinerary harian yang valid.");
+      }
+      const nextDays: ItineraryDay[] = data.days.map(
+        (
+          d: {
+            title?: string;
+            theme?: string;
+            city?: string;
+            route?: string;
+            intro?: string;
+            cityHighlight?: string;
+            activities?: { time?: string; text?: string }[];
+            places?: {
+              name?: string;
+              image?: string;
+              desc?: string;
+              activity?: string;
+            }[];
+          },
+          i: number
+        ) => {
+          const places = (d.places ?? [])
+            .slice(0, MAX_DAY_PHOTOS)
+            .map((p) => ({
+              id: newId(),
+              name: p.name ?? "",
+              image: p.image ?? "",
+              desc: p.desc ?? "",
+              activity: p.activity ?? "",
+            }));
+          return {
+            id: newId(),
+            title: d.title ?? "",
+            theme: d.theme ?? "",
+            city: d.city ?? "",
+            route: d.route ?? "",
+            intro: d.intro ?? "",
+            cityHighlight: d.cityHighlight ?? "",
+            date: addDaysIso(startDate, i),
+            // Timetable is derived from the attractions (one timed stop each).
+            activities: mergeAiSchedule(places, d.activities ?? []),
+            places,
+          };
+        }
+      );
+
       if (data.tripTitle) setTripTitle(data.tripTitle);
       if (typeof data.notes === "string") setNotes(data.notes);
-      setDays(
-        (data.days ?? []).map(
-          (
-            d: {
-              title?: string;
-              theme?: string;
-              city?: string;
-              route?: string;
-              intro?: string;
-              cityHighlight?: string;
-              activities?: { time?: string; text?: string }[];
-              places?: {
-                name?: string;
-                image?: string;
-                desc?: string;
-                activity?: string;
-              }[];
-            },
-            i: number
-          ) => {
-            const places = (d.places ?? [])
-              .slice(0, MAX_DAY_PHOTOS)
-              .map((p) => ({
-                id: newId(),
-                name: p.name ?? "",
-                image: p.image ?? "",
-                desc: p.desc ?? "",
-                activity: p.activity ?? "",
-              }));
-            return {
-              id: newId(),
-              title: d.title ?? "",
-              theme: d.theme ?? "",
-              city: d.city ?? "",
-              route: d.route ?? "",
-              intro: d.intro ?? "",
-              cityHighlight: d.cityHighlight ?? "",
-              date: addDaysIso(startDate, i),
-              // Timetable is derived from the attractions (one timed stop each).
-              activities: scheduleFromPlaces(places),
-              places,
-            };
-          }
-        )
-      );
+      setDays(nextDays);
       // Set cover from a picked attraction unless the admin set one manually.
       if (data.heroImage && !coverManual) setHeroImage(data.heroImage);
     } catch (err) {
@@ -266,15 +447,162 @@ export default function ItineraryBuilderView({
     }
   }
 
-  function printItinerary() {
+  // Refine the existing itinerary with a prompt. The server round-trips ids, so
+  // every day/activity/place the AI leaves alone keeps its identity — manual
+  // edits and uploaded photos survive. Only what the prompt asks for changes.
+  async function editWithAI() {
+    if (editBusy || days.length === 0) return;
+    const instruction = editPrompt.trim();
+    if (!instruction) return;
+    setEditBusy(true);
+    setEditError(null);
+    try {
+      const current = {
+        tripTitle,
+        notes,
+        days: days.map((d) => ({
+          id: d.id,
+          title: d.title,
+          theme: d.theme ?? "",
+          city: d.city ?? "",
+          route: d.route ?? "",
+          intro: d.intro ?? "",
+          cityHighlight: d.cityHighlight ?? "",
+          date: d.date ?? "",
+          activities: d.activities.map((a) => ({
+            id: a.id,
+            time: a.time,
+            text: a.text,
+          })),
+          places: d.places.map((p) => ({
+            id: p.id,
+            name: p.name,
+            activity: p.activity ?? "",
+          })),
+        })),
+      };
+      const res = await fetch("/api/itinerary/edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ current, instruction }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "Gagal mengubah.");
+
+      // Merge by id: preserve existing place photos/descriptions when the id is
+      // unchanged (the AI doesn't know image URLs or our descriptions).
+      const placeById = new Map<string, ItineraryPlace>();
+      for (const d of days) for (const p of d.places) placeById.set(p.id, p);
+
+      const nextDays: ItineraryDay[] = (data.days ?? []).map(
+        (d: {
+          id?: string;
+          title?: string;
+          theme?: string;
+          city?: string;
+          route?: string;
+          intro?: string;
+          cityHighlight?: string;
+          date?: string;
+          activities?: { id?: string; time?: string; text?: string }[];
+          places?: {
+            id?: string;
+            name?: string;
+            activity?: string;
+            image?: string;
+          }[];
+        }) => {
+          const places: ItineraryPlace[] = (d.places ?? [])
+            .slice(0, MAX_DAY_PHOTOS)
+            .map((p) => {
+              const prev = p.id ? placeById.get(p.id) : undefined;
+              return {
+                id: p.id || newId(),
+                name: p.name ?? prev?.name ?? "",
+                image: prev?.image || p.image || "",
+                desc: prev?.desc ?? "",
+                activity: p.activity ?? prev?.activity ?? "",
+              };
+            });
+          const activities: ItineraryActivity[] = (d.activities ?? []).map(
+            (a) => ({ id: a.id || newId(), time: a.time ?? "", text: a.text ?? "" })
+          );
+          return {
+            id: d.id || newId(),
+            title: d.title ?? "",
+            theme: d.theme ?? "",
+            city: d.city ?? "",
+            route: d.route ?? "",
+            intro: d.intro ?? "",
+            cityHighlight: d.cityHighlight ?? "",
+            date: d.date ?? "",
+            activities,
+            places,
+          };
+        }
+      );
+
+      if (typeof data.tripTitle === "string") setTripTitle(data.tripTitle);
+      if (typeof data.notes === "string") setNotes(data.notes);
+      setDays(nextDays);
+      setEditPrompt("");
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : "Gagal mengubah.");
+    } finally {
+      setEditBusy(false);
+    }
+  }
+
+  async function printItinerary() {
+    if (printing) return;
+    setPrinting(true);
     const prev = document.title;
     document.title = [tripTitle || "Itinerary", customer].filter(Boolean).join(" - ");
+
+    // Zero the @page margin for this print only (same as the brochure). With no
+    // margin Chrome has nowhere to put its own header/footer (title, date, URL,
+    // page numbers) so they disappear, and each 297mm sheet maps to exactly one
+    // A4 page. Each interior page supplies its 12mm inset via its own padding.
+    // Removed on afterprint so other docs keep the global 12mm margin.
+    const style = document.createElement("style");
+    style.textContent =
+      "@media print { @page { size: A4 !important; margin: 0 !important; } }";
+    document.head.appendChild(style);
+    await nextPaint();
+
     const restore = () => {
       document.title = prev;
+      style.remove();
+      setPrinting(false);
       window.removeEventListener("afterprint", restore);
     };
     window.addEventListener("afterprint", restore);
+    // Wait only for any still-loading photos in the doc — otherwise Chrome
+    // snapshots mid-load and the cover prints blank.
+    try {
+      if (docRef.current) await waitForImages(docRef.current);
+    } catch {
+      /* print anyway — a missing photo beats a hung button */
+    }
     window.print();
+  }
+
+  async function openPicker() {
+    setPickerOpen(true);
+    setPickerLoading(true);
+    const rows = await listItineraries<Draft>();
+    setPickerRowsState(rows.map((r) => pickerRow(r)));
+    setPickerLoading(false);
+  }
+
+  async function pickFromLibrary(id: string) {
+    setPickerOpen(false);
+    const picked = await loadItinerary<Draft>(id);
+    if (!picked) return;
+    if (days.length > 0 && !confirm("Ganti itinerary dengan yang dipilih?"))
+      return;
+    // Keep this order's own mirror id; load everything else from the source.
+    applyDraft({ ...picked.data, mirrorId });
   }
 
   function resetAll() {
@@ -286,6 +614,9 @@ export default function ItineraryBuilderView({
     setNotes("");
     setVehicle("VAN");
     setHeroImage("");
+    setGalleryImages([]);
+    setTravelTips(defaultTips);
+    setShowTravelTips(true);
     setCoverManual(false);
     setDays([]);
     setAiPrompt("");
@@ -294,6 +625,20 @@ export default function ItineraryBuilderView({
     setQDest([]);
     if (orderId) clearOrderDoc(orderId, "itinerary");
     else localStorage.removeItem(DRAFT_KEY);
+  }
+
+  // Save the current tips as the global template reused by every new itinerary.
+  async function saveTipsAsDefault() {
+    if (savingTips) return;
+    setSavingTips(true);
+    try {
+      await saveSetting("itinerary_travel_tips", travelTips);
+      setDefaultTips(travelTips);
+      setTipsSaved(true);
+      setTimeout(() => setTipsSaved(false), 2000);
+    } finally {
+      setSavingTips(false);
+    }
   }
 
   // When the start date changes, re-date every day sequentially.
@@ -424,10 +769,33 @@ export default function ItineraryBuilderView({
 
   return (
     <div className="space-y-6">
+      {/* Back to library list (library mode only) */}
+      {onExit && (
+        <button
+          type="button"
+          onClick={onExit}
+          className="no-print -mb-2 inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-[#1B2A4A]"
+        >
+          ← Daftar itinerary
+        </button>
+      )}
+
       {/* Header / toolbar */}
       <div className="no-print flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Itinerary</h1>
+        <div className="min-w-0 flex-1">
+          {libraryId ? (
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={
+                [tripTitle, customer].filter(Boolean).join(" · ") ||
+                "Nama itinerary"
+              }
+              className="w-full max-w-md bg-transparent text-2xl font-bold text-[#1B2A4A] outline-none placeholder:text-gray-300 focus:border-b focus:border-[#F5C518]"
+            />
+          ) : (
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Itinerary</h1>
+          )}
           <p className="text-sm text-gray-500">
             Generate dengan AI, sunting tiap hari, lalu Print / Simpan PDF (1
             hari = 1 halaman).
@@ -448,23 +816,40 @@ export default function ItineraryBuilderView({
               Reset
             </button>
           )}
+          {orderId && (
+            <button
+              type="button"
+              onClick={openPicker}
+              className={btnSecondaryCls}
+            >
+              Pilih dari tersimpan
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={saveNow}
+            disabled={saving}
+            className={`${btnSecondaryCls} disabled:opacity-50`}
+          >
+            {saving ? "Menyimpan…" : "Simpan"}
+          </button>
           <button
             type="button"
             onClick={printItinerary}
-            disabled={days.length === 0}
+            disabled={days.length === 0 || printing}
             className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50"
           >
-            Print / Simpan PDF
+            {printing ? "Menyiapkan…" : "Download PDF"}
           </button>
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
+      <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(320px,1fr)_858px] print:block">
         {/* ── Editor column ── */}
         <TouchDragProvider onDrop={handleDropOnDay}>
-        <div className="no-print space-y-5">
+        <div className="no-print space-y-5 min-[1280px]:sticky min-[1280px]:top-6 min-[1280px]:max-h-[calc(100vh-3rem)] min-[1280px]:overflow-y-auto min-[1280px]:pr-1">
           {/* 1 — AI generator */}
-          <section className="space-y-3 rounded-xl border border-[#F5C518]/40 border-t-4 border-t-[#F5C518] bg-[#FFFCEF] p-5">
+          <section className="space-y-4 rounded-xl border border-[#F5C518]/40 border-t-4 border-t-[#F5C518] bg-[#FFFCEF] p-5">
             <StepHead n="AI" title="Generate dengan AI" accent />
             <p className="text-xs text-gray-500">
               Isi Detail trip (customer, pax, jumlah hari) di bawah, pilih
@@ -547,6 +932,40 @@ export default function ItineraryBuilderView({
             </div>
           </section>
 
+          {/* 1b — AI edit-in-place (only once there's something to refine) */}
+          {days.length > 0 && (
+            <section className="space-y-3 rounded-xl border border-[#1B2A4A]/15 border-t-4 border-t-[#1B2A4A] bg-white p-5">
+              <StepHead n="✦" title="Ubah dengan AI" accent />
+              <p className="text-xs text-gray-500">
+                Minta perubahan spesifik tanpa membongkar semuanya. Hari &amp;
+                suntingan lain tetap utuh. Contoh: “tambah satu kuil di hari 2”,
+                “mulai hari 3 lebih siang”, “ganti makan siang hari 1 jadi
+                seafood”.
+              </p>
+              <textarea
+                value={editPrompt}
+                onChange={(e) => setEditPrompt(e.target.value)}
+                rows={2}
+                placeholder="Tulis perubahan yang diinginkan…"
+                className={inputCls}
+              />
+              <ErrorNote message={editError} />
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={editWithAI}
+                  disabled={editBusy || !editPrompt.trim()}
+                  className={`${btnSecondaryCls} disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  {editBusy ? "Mengubah…" : "✦ Terapkan perubahan"}
+                </button>
+                {editBusy && (
+                  <span className="text-sm text-gray-500">Tunggu sebentar…</span>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* 2 — Trip details */}
           <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
             <StepHead n="1" title="Detail trip" />
@@ -571,12 +990,7 @@ export default function ItineraryBuilderView({
                 <span className="mb-1 block text-sm font-medium text-gray-700">
                   Tanggal mulai
                 </span>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => applyStartDate(e.target.value)}
-                  className={inputCls}
-                />
+                <DateField value={startDate} onChange={applyStartDate} />
               </label>
               <LabeledInput label="Kendaraan" value={vehicle} onChange={setVehicle} placeholder="VAN" />
               <CoverSlot
@@ -590,7 +1004,7 @@ export default function ItineraryBuilderView({
           </section>
 
           {/* 3 — Day editor */}
-          <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
+          <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
             <StepHead n="2" title="Rencana per hari" />
 
             {days.length > 0 && places.length > 0 && (
@@ -629,7 +1043,7 @@ export default function ItineraryBuilderView({
           </section>
 
           {/* 4 — Notes */}
-          <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
+          <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
             <StepHead n="3" title="Catatan (inclusions / tips)" />
             <textarea
               value={notes}
@@ -637,6 +1051,27 @@ export default function ItineraryBuilderView({
               rows={4}
               placeholder="Termasuk: transport AC, driver berbahasa Indonesia. Tidak termasuk: tiket masuk."
               className={inputCls}
+            />
+          </section>
+
+          {/* 5 — Free trip photos for the closing gallery */}
+          <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
+            <StepHead n="4" title="Galeri perjalanan (foto bebas)" />
+            <GallerySection images={galleryImages} onChange={setGalleryImages} />
+          </section>
+
+          {/* 6 — Info Perjalanan (editable + toggle) */}
+          <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
+            <StepHead n="5" title="Info perjalanan (halaman penutup)" />
+            <TravelTipsSection
+              tips={travelTips}
+              defaults={defaultTips}
+              show={showTravelTips}
+              saving={savingTips}
+              saved={tipsSaved}
+              onToggle={setShowTravelTips}
+              onChange={setTravelTips}
+              onSaveDefault={saveTipsAsDefault}
             />
           </section>
         </div>
@@ -649,8 +1084,8 @@ export default function ItineraryBuilderView({
               Preview itinerary muncul di sini.
             </div>
           ) : (
-            <div className="overflow-x-auto print:overflow-visible">
-              <div className="print:min-w-0">
+            <div ref={docRef} className="overflow-x-auto print:overflow-visible">
+              <div className="min-w-[858px] print:min-w-0">
                 <ItineraryDoc
                   tripTitle={tripTitle}
                   customer={customer}
@@ -659,12 +1094,24 @@ export default function ItineraryBuilderView({
                   vehicle={vehicle}
                   heroImage={heroImage}
                   days={days}
+                  galleryImages={galleryImages}
+                  travelTips={travelTips}
+                  showTravelTips={showTravelTips}
                 />
               </div>
             </div>
           )}
         </div>
       </div>
+
+      <TemplatePickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title="Pilih itinerary tersimpan"
+        rows={pickerRowsState}
+        loading={pickerLoading}
+        onPick={pickFromLibrary}
+      />
     </div>
   );
 }
@@ -819,6 +1266,219 @@ function CoverSlot({
         </span>
       </div>
       <ErrorNote message={err} />
+    </div>
+  );
+}
+
+// ── Free trip-photo gallery (closing recap page) ──────────────
+
+const MAX_GALLERY_PHOTOS = 8;
+
+function GallerySection({
+  images,
+  onChange,
+}: {
+  images: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const free = Math.max(0, MAX_GALLERY_PHOTOS - images.length);
+
+  async function onUpload(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setErr(null);
+    try {
+      const picked = Array.from(files).slice(0, free);
+      const urls = await Promise.all(
+        picked.map((f) => uploadPlaceImage(f, "gallery"))
+      );
+      onChange([...images, ...urls].slice(0, MAX_GALLERY_PHOTOS));
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Gagal mengunggah foto.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeAt(i: number) {
+    onChange(images.filter((_, idx) => idx !== i));
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-500">
+        Foto bebas (bukan atraksi) untuk halaman penutup “Galeri Perjalanan”.
+        Maksimal {MAX_GALLERY_PHOTOS} foto.
+      </p>
+
+      {images.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {images.map((src, i) => (
+            <div
+              key={src}
+              className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeAt(i)}
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-[10px] text-white hover:bg-black/75"
+                aria-label="Hapus foto"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="flex items-center gap-2">
+        <label
+          className={`${btnSecondaryCls} cursor-pointer ${
+            uploading || free === 0 ? "opacity-60" : ""
+          }`}
+        >
+          {uploading
+            ? "Mengunggah…"
+            : free === 0
+              ? "Galeri penuh"
+              : "Unggah foto"}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            disabled={uploading || free === 0}
+            onChange={(e) => onUpload(e.target.files)}
+          />
+        </label>
+        <span className="text-xs text-gray-400">
+          {images.length}/{MAX_GALLERY_PHOTOS} · bisa pilih banyak sekaligus
+        </span>
+      </div>
+      <ErrorNote message={err} />
+    </div>
+  );
+}
+
+// ── Info Perjalanan editor (closing-page reminders) ───────────
+
+function TravelTipsSection({
+  tips,
+  defaults,
+  show,
+  saving,
+  saved,
+  onToggle,
+  onChange,
+  onSaveDefault,
+}: {
+  tips: TravelTip[];
+  defaults: TravelTip[];
+  show: boolean;
+  saving: boolean;
+  saved: boolean;
+  onToggle: (v: boolean) => void;
+  onChange: (next: TravelTip[]) => void;
+  onSaveDefault: () => void;
+}) {
+  function patch(i: number, p: Partial<TravelTip>) {
+    onChange(tips.map((t, idx) => (idx === i ? { ...t, ...p } : t)));
+  }
+  function remove(i: number) {
+    onChange(tips.filter((_, idx) => idx !== i));
+  }
+  function add() {
+    onChange([...tips, { label: "", text: "" }]);
+  }
+  function reset() {
+    onChange(defaults);
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* Toggle — tidy labeled row, matches the rest of the panel */}
+      <label className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2">
+        <span className="text-sm font-medium text-gray-700">
+          Tampilkan di halaman penutup
+        </span>
+        <input
+          type="checkbox"
+          checked={show}
+          onChange={(e) => onToggle(e.target.checked)}
+          className="h-4 w-4 shrink-0 rounded border-gray-300"
+        />
+      </label>
+
+      <div className={show ? "" : "pointer-events-none opacity-50"}>
+        <div className="space-y-2">
+          {tips.map((t, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 rounded-lg border border-gray-200 p-2"
+            >
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <input
+                  value={t.label}
+                  onChange={(e) => patch(i, { label: e.target.value })}
+                  placeholder="Judul (mis. Mata Uang)"
+                  className={`${inputCls} py-1.5 text-xs font-semibold`}
+                />
+                <input
+                  value={t.text}
+                  onChange={(e) => patch(i, { text: e.target.value })}
+                  placeholder="Isi tips…"
+                  className={`${inputCls} py-1.5 text-xs`}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                aria-label="Hapus tips"
+                className="shrink-0 px-1 text-gray-400 hover:text-red-500"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+          {tips.length === 0 && (
+            <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3 text-center text-xs text-gray-400">
+              Belum ada tips. Tambah di bawah, atau pulihkan bawaan.
+            </p>
+          )}
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button type="button" onClick={add} className={btnSecondaryCls}>
+            + Tambah tips
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            className="text-sm font-medium text-gray-500 hover:underline"
+          >
+            Pulihkan bawaan
+          </button>
+        </div>
+        {/* Persist current tips as the template every new itinerary starts with */}
+        <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-3">
+          <button
+            type="button"
+            onClick={onSaveDefault}
+            disabled={saving}
+            className={`${btnCls} disabled:opacity-50`}
+          >
+            {saving ? "Menyimpan…" : "Simpan sebagai default"}
+          </button>
+          <span className="text-xs text-gray-400">
+            {saved
+              ? "✓ Tersimpan — dipakai untuk itinerary baru."
+              : "Pakai tips ini di semua itinerary baru."}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1272,6 +1932,7 @@ function DayPlaces({
   const [cUrl, setCUrl] = useState("");
   const [cDesc, setCDesc] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [slotUploading, setSlotUploading] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveGallery, setSaveGallery] = useState(true);
   const [cErr, setCErr] = useState<string | null>(null);
@@ -1305,6 +1966,25 @@ function DayPlaces({
     }
   }
 
+  async function onSlotUpload(file: File | undefined, slotIndex: number) {
+    if (!file || full) return;
+    setSlotUploading(slotIndex);
+    setCErr(null);
+    try {
+      const image = await uploadPlaceImage(file, city || "itinerary");
+      const name =
+        file.name
+          .replace(/\.[^.]+$/, "")
+          .replace(/[-_]+/g, " ")
+          .trim() || `Foto ${slotIndex + 1}`;
+      onAdd({ id: newId(), name, image, desc: "" });
+    } catch (e) {
+      setCErr(e instanceof Error ? e.message : "Gagal mengunggah foto.");
+    } finally {
+      setSlotUploading(null);
+    }
+  }
+
   async function addCustom() {
     if (!cName.trim()) return;
     const image = cUrl.trim();
@@ -1312,9 +1992,18 @@ function DayPlaces({
     if (saveGallery && image) {
       setSaving(true);
       setCErr(null);
+      // places.id is a text PK with no DB default — generate a readable, unique slug.
+      const slug =
+        cName
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 40) || "tempat";
       const { error } = await createClient()
         .from("places")
         .insert({
+          id: `${slug}-${Math.random().toString(36).slice(2, 7)}`,
           city: (cCity || city || "Lainnya").trim(),
           name: cName.trim(),
           image_url: image,
@@ -1474,21 +2163,28 @@ function DayPlaces({
           const p = added[i];
           if (!p) {
             return (
-              <div
+              <label
                 key={`empty-${i}`}
-                className={`flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed text-center transition-colors ${
+                className={`flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed text-center transition-colors ${
                   dragActive
                     ? "border-[#F5C518] bg-[#FFFCEF]"
-                    : "border-gray-200 bg-white"
+                    : "border-gray-200 bg-white hover:border-[#1B2A4A]/40 hover:bg-gray-50"
                 }`}
               >
                 <span className="text-lg font-semibold text-gray-300">
                   {i + 1}
                 </span>
                 <span className="px-1 text-[10px] leading-tight text-gray-400">
-                  Tarik / pilih foto
+                  {slotUploading === i ? "Mengunggah…" : "Tarik / unggah foto"}
                 </span>
-              </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={full || slotUploading !== null}
+                  onChange={(e) => onSlotUpload(e.target.files?.[0], i)}
+                />
+              </label>
             );
           }
           return (
