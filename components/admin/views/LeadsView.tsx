@@ -46,6 +46,7 @@ export default function LeadsView() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async load(); state set after await, not during render
     load();
   }, [load]);
 
