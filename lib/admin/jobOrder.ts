@@ -35,6 +35,8 @@ export interface JobOrderData {
   bedType: string;
   hotels: JobOrderHotel[]; // one row per city stayed in
   days: JobOrderDay[];
+  /** Library mirror row this order's job order is synced to (document_templates). */
+  libraryId?: string | null;
 }
 
 /** Licensed entity printed on the job order. Hardcoded — Love Bangkok is the
@@ -82,4 +84,36 @@ export function newJobOrderDay(): JobOrderDay {
 
 export function newJobOrderHotel(city = ""): JobOrderHotel {
   return { id: crypto.randomUUID(), city, name: "" };
+}
+
+/** DATE helper: tripStart (YYYY-MM-DD) + n days → "DD/MM". Blank if no start. */
+function shortDatePlus(tripStartIso: string | null | undefined, n: number): string {
+  if (!tripStartIso) return "";
+  const d = new Date(`${tripStartIso}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return "";
+  d.setDate(d.getDate() + n);
+  const pad = (x: number) => String(x).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
+}
+
+/**
+ * Turn the order's free-text itinerary into job-order day rows. One non-blank
+ * line per day; a leading "Hari N:" / "Day N:" / "N." prefix is stripped into
+ * the itinerary text, and each date is derived from tripStart + dayIndex.
+ * Empty input yields one blank day (preserves the builder's default).
+ */
+export function daysFromItineraryText(
+  text: string | null | undefined,
+  tripStartIso: string | null | undefined
+): JobOrderDay[] {
+  const lines = (text ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (!lines.length) return [newJobOrderDay()];
+  return lines.map((line, i) => ({
+    ...newJobOrderDay(),
+    date: shortDatePlus(tripStartIso, i),
+    itinerary: line.replace(/^(hari|day)\s*\d+\s*[:.)-]?\s*|^\d+\s*[:.)-]\s*/i, ""),
+  }));
 }

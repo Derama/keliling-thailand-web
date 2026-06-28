@@ -4,7 +4,9 @@
 export interface LibraryLike {
   id: string;
   title: string;
-  data: Record<string, unknown> | null | undefined;
+  // Accepts any saved draft shape (itinerary Draft, JobOrderData, InvoiceDraft);
+  // narrowed to a record internally.
+  data: unknown;
   updated_at: string;
   order_number?: string | null;
 }

@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Field, inputCls, btnSecondaryCls } from "@/components/admin/ui";
+import { Field, inputCls, btnCls, btnSecondaryCls } from "@/components/admin/ui";
 import JobOrderDoc from "@/components/admin/JobOrderDoc";
 import { loadOrderDoc, saveOrderDoc } from "@/lib/admin/orderDocs";
+import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
+import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
+import {
+  listTemplates,
+  loadTemplate,
+  createTemplate,
+  saveTemplate,
+} from "@/lib/admin/docLibrary";
 import {
   JOB_ORDER_DEFAULTS,
+  daysFromItineraryText,
   newJobOrderDay,
   newJobOrderHotel,
   passengerRowCount,
@@ -57,6 +66,12 @@ export default function JobOrderBuilderView({
   ]);
   const [days, setDays] = useState<JobOrderDay[]>([newJobOrderDay()]);
 
+  const [libraryId, setLibraryId] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
+  const [pickerLoading, setPickerLoading] = useState(false);
+
   const hydrated = useRef(false);
 
   function applyDraft(d: JobOrderData) {
@@ -77,6 +92,7 @@ export default function JobOrderBuilderView({
     setBedType(d.bedType ?? "");
     if (Array.isArray(d.hotels)) setHotels(d.hotels);
     if (Array.isArray(d.days) && d.days.length) setDays(d.days);
+    setLibraryId(d.libraryId ?? null);
   }
 
   // Per-order: load saved job order, else seed from the order's basics.
@@ -91,6 +107,13 @@ export default function JobOrderBuilderView({
       if (cancelled) return;
       if (saved) {
         applyDraft(saved);
+        // The order number isn't in the saved doc — fetch it to tag mirrors.
+        const { data: o } = await createClient()
+          .from("orders")
+          .select("order_number")
+          .eq("id", orderId)
+          .single();
+        if (!cancelled && o) setOrderNumber(o.order_number ?? null);
       } else {
         const { data: o } = await createClient()
           .from("orders")
@@ -98,11 +121,15 @@ export default function JobOrderBuilderView({
           .eq("id", orderId)
           .single();
         if (!cancelled && o) {
+          setOrderNumber(o.order_number ?? null);
           setJobOrderNo(o.order_number ?? "");
           setDate(isoToShort(o.trip_start) || today());
           setTravelAgent(o.customers?.name ?? "");
           setGuideName(o.driver_name ?? "");
           if (o.pax) setTotalPax(`${o.pax} PAX`);
+          // Seed daily rows from the itinerary the admin typed on the order.
+          const seeded = daysFromItineraryText(o.itinerary, o.trip_start);
+          if (seeded.length) setDays(seeded);
         }
       }
       if (!cancelled) hydrated.current = true;
@@ -145,8 +172,21 @@ export default function JobOrderBuilderView({
   function printJobOrder() {
     const prev = document.title;
     document.title = `${jobOrderNo || "Job Order"} - ${date}`;
+
+    // Zero the @page margin for this print only. With no page margin Chrome has
+    // nowhere to put its own header/footer ("Job Order — date", the BE date,
+    // page numbers), so they vanish — and the freed space stops a near-empty
+    // trailing page. Each sheet supplies its own 12mm inset via padding (see
+    // `.kt-joborder-page` in globals.css). Removed on afterprint so other docs
+    // keep the global 12mm margin.
+    const style = document.createElement("style");
+    style.textContent =
+      "@media print { @page { size: A4 !important; margin: 0 !important; } }";
+    document.head.appendChild(style);
+
     const restore = () => {
       document.title = prev;
+      style.remove();
       window.removeEventListener("afterprint", restore);
     };
     window.addEventListener("afterprint", restore);
@@ -171,18 +211,66 @@ export default function JobOrderBuilderView({
     bedType,
     hotels,
     days,
+    libraryId,
   };
   const paxRows = passengerRowCount(totalPax);
 
-  // Autosave to the order (debounced) once hydrated.
+  // Explicit save to the order. `saved` flips back to false on any edit so the
+  // button reflects unsaved changes.
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
   useEffect(() => {
-    if (!orderId || !hydrated.current) return;
-    const t = setTimeout(() => {
-      saveOrderDoc(orderId, "joborder", data);
-    }, 600);
-    return () => clearTimeout(t);
+    if (hydrated.current) setSaved(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, JSON.stringify(data)]);
+  }, [JSON.stringify(data)]);
+
+  async function save() {
+    if (!orderId) return;
+    setSaving(true);
+    // Mirror to the library, then persist to the order carrying the mirror id.
+    let nextLibraryId = libraryId;
+    try {
+      if (!nextLibraryId) {
+        nextLibraryId = await createTemplate(
+          "joborder",
+          jobOrderNo || "Job Order",
+          { ...data, libraryId: null },
+          orderNumber
+        );
+        if (nextLibraryId) setLibraryId(nextLibraryId);
+      } else {
+        await saveTemplate(nextLibraryId, jobOrderNo || "Job Order", {
+          ...data,
+          libraryId: nextLibraryId,
+        });
+      }
+    } catch {
+      /* mirror is best-effort; the order doc below is the source of truth */
+    }
+    await saveOrderDoc(orderId, "joborder", { ...data, libraryId: nextLibraryId });
+    setSaving(false);
+    setSaved(true);
+  }
+
+  const openPicker = useCallback(async () => {
+    setPickerOpen(true);
+    setPickerLoading(true);
+    const rows = await listTemplates<JobOrderData>("joborder");
+    setPickerRows(rows.map((r) => pickerRow(r)));
+    setPickerLoading(false);
+  }, []);
+
+  async function pickTemplate(id: string) {
+    setPickerOpen(false);
+    const picked = await loadTemplate<JobOrderData>(id);
+    if (!picked) return;
+    const hasContent =
+      days.some((d) => d.itinerary.trim()) || hotels.some((h) => h.name.trim());
+    if (hasContent && !confirm("Ganti isi job order dengan yang dipilih?")) return;
+    // Keep this order's own mirror id — never overwrite it with the source's id.
+    applyDraft({ ...picked.data, libraryId });
+  }
 
   return (
     <div className="space-y-6">
@@ -190,22 +278,45 @@ export default function JobOrderBuilderView({
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Job Order</h1>
           <p className="text-sm text-gray-500">
-            Isi detail, lalu Print / Simpan PDF dari preview. Kolom guide, ID,
-            plat &amp; tanda tangan sengaja kosong untuk diisi tangan.
+            Isi detail, klik Simpan untuk menyimpan ke order, lalu Download PDF
+            dari preview. Kolom guide, ID, plat &amp; tanda tangan sengaja kosong
+            untuk diisi tangan.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={printJobOrder}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95"
-        >
-          Print / Simpan PDF
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {orderId && (
+            <button
+              type="button"
+              onClick={openPicker}
+              className={btnSecondaryCls}
+            >
+              Pilih dari tersimpan
+            </button>
+          )}
+          {orderId && (
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className={btnCls}
+            >
+              {saving ? "Menyimpan…" : saved ? "Tersimpan ✓" : "Simpan"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={printJobOrder}
+            className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95"
+          >
+            Download PDF
+          </button>
+        </div>
       </div>
 
       <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
-        {/* ── Editor ── */}
-        <div className="no-print space-y-5">
+        {/* ── Editor ── Sticky with its own scroll so the long preview on the
+            right scrolls the page while the editor stays in view. */}
+        <div className="no-print space-y-5 min-[1280px]:sticky min-[1280px]:top-0 min-[1280px]:max-h-[85vh] min-[1280px]:self-start min-[1280px]:overflow-y-auto min-[1280px]:pr-2">
           {/* Detail card */}
           <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
             <SectionTitle>Detail job order</SectionTitle>
@@ -494,12 +605,21 @@ export default function JobOrderBuilderView({
         </div>
 
         {/* ── Live preview ── */}
-        <div className="min-[1500px]:sticky min-[1500px]:top-6 min-[1500px]:self-start">
+        <div>
           <div className="overflow-x-auto print:overflow-visible">
             <JobOrderDoc {...data} />
           </div>
         </div>
       </div>
+
+      <TemplatePickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title="Pilih job order tersimpan"
+        rows={pickerRows}
+        loading={pickerLoading}
+        onPick={pickTemplate}
+      />
     </div>
   );
 }
