@@ -1,7 +1,21 @@
--- Migration: social_posts — gallery of generated Instagram review posts.
--- Also create a PUBLIC storage bucket named "social-posts" in the Supabase
--- dashboard (Storage → New bucket → name "social-posts", Public = on).
+-- Migration: social_posts — gallery of generated Instagram review posts,
+-- plus the public "social-posts" storage bucket the studio uploads to.
 -- Run this SQL once in the Supabase SQL Editor.
+
+-- Public storage bucket (holds guest photos, exported posts, brand logos).
+insert into storage.buckets (id, name, public)
+values ('social-posts', 'social-posts', true)
+on conflict (id) do nothing;
+
+-- Storage policies: team can write, anyone can read (bucket is public).
+create policy "social-posts team write" on storage.objects
+  for insert to authenticated with check (bucket_id = 'social-posts');
+
+create policy "social-posts team update" on storage.objects
+  for update to authenticated using (bucket_id = 'social-posts');
+
+create policy "social-posts public read" on storage.objects
+  for select to public using (bucket_id = 'social-posts');
 
 create table social_posts (
   id uuid primary key default gen_random_uuid(),
