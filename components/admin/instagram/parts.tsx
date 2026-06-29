@@ -19,7 +19,7 @@ export function Logo({
         alt="logo"
         crossOrigin="anonymous"
         className={className}
-        style={{ height: 48, width: "auto", objectFit: "contain", ...style }}
+        style={{ height: 104, width: "auto", objectFit: "contain", ...style }}
       />
     );
   }
