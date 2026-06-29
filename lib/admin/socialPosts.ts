@@ -37,3 +37,8 @@ export async function listSocialPosts(): Promise<SocialPost[]> {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function deleteSocialPost(id: string): Promise<void> {
+  const { error } = await createClient().from("social_posts").delete().eq("id", id);
+  if (error) throw error;
+}

@@ -15,7 +15,7 @@ import {
   type TemplateId,
 } from "@/lib/admin/instagram";
 import { loadBrandColors } from "@/lib/admin/settings";
-import { uploadPostImage, saveSocialPost, listSocialPosts } from "@/lib/admin/socialPosts";
+import { uploadPostImage, saveSocialPost, listSocialPosts, deleteSocialPost } from "@/lib/admin/socialPosts";
 import { TEMPLATES } from "@/components/admin/instagram/templates";
 import PostPreview from "@/components/admin/instagram/PostPreview";
 
@@ -179,6 +179,17 @@ export default function InstagramStudioView() {
     }
   }
 
+  async function removePost(id: string) {
+    if (!confirm("Hapus post ini dari galeri?")) return;
+    setError(null);
+    try {
+      await deleteSocialPost(id);
+      setPosts((ps) => ps.filter((p) => p.id !== id));
+    } catch (e) {
+      setError(errMsg(e));
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
@@ -194,7 +205,15 @@ export default function InstagramStudioView() {
       {tab === "gallery" ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {posts.map((p) => (
-            <div key={p.id} className="overflow-hidden rounded-lg border border-gray-200">
+            <div key={p.id} className="relative overflow-hidden rounded-lg border border-gray-200">
+              <button
+                type="button"
+                onClick={() => removePost(p.id)}
+                title="Hapus"
+                className="absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-sm text-white hover:bg-red-600"
+              >
+                ✕
+              </button>
               <a href={p.image_url} download target="_blank" rel="noreferrer" className="block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.image_url} alt="" className="aspect-[4/5] w-full object-cover" />
