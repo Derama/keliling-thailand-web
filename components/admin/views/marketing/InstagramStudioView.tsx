@@ -50,6 +50,15 @@ export default function InstagramStudioView() {
     setData((d) => ({ ...d, ...p }));
   }
 
+  /** Pull a readable message out of Error | Supabase error | anything. */
+  function errMsg(e: unknown): string {
+    if (e instanceof Error) return e.message;
+    if (e && typeof e === "object" && "message" in e) {
+      return String((e as { message: unknown }).message);
+    }
+    return typeof e === "string" ? e : JSON.stringify(e);
+  }
+
   function fileToDataUrl(file: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
       const r = new FileReader();
@@ -69,7 +78,7 @@ export default function InstagramStudioView() {
       const url = await uploadPostImage(file, "photo", file.name.split(".").pop() || "jpg");
       setPhotoPublicUrl(url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload foto gagal");
+      setError(errMsg(e));
     } finally {
       setBusy(null);
     }
@@ -89,7 +98,7 @@ export default function InstagramStudioView() {
       if (!res.ok) throw new Error(json.error || "AI gagal");
       patch({ reviewText: json.text });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "AI gagal");
+      setError(errMsg(e));
     } finally {
       setBusy(null);
     }
@@ -112,7 +121,7 @@ export default function InstagramStudioView() {
       if (!res.ok) throw new Error(json.error || "AI gagal");
       setCaption(json.caption);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "AI gagal");
+      setError(errMsg(e));
     } finally {
       setBusy(null);
     }
@@ -153,7 +162,8 @@ export default function InstagramStudioView() {
       a.download = `post-${Date.now()}.png`;
       a.click();
     } catch (e) {
-      setError(`Export gagal: ${e instanceof Error ? e.message : String(e)}`);
+      console.error("IG export failed:", e);
+      setError(`Export gagal: ${errMsg(e)}`);
     } finally {
       setBusy(null);
     }
@@ -165,7 +175,7 @@ export default function InstagramStudioView() {
     try {
       setPosts(await listSocialPosts());
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal memuat galeri");
+      setError(errMsg(e));
     }
   }
 
