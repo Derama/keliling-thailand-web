@@ -29,6 +29,10 @@ export default function InstagramStudioView() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"make" | "gallery">("make");
   const [posts, setPosts] = useState<SocialPost[]>([]);
+  // Public Supabase URL of the source photo, recorded on the saved post.
+  // (Rendering uses a local data URL instead — see onPhoto — so html-to-image
+  // never taints the canvas with a cross-origin image.)
+  const [photoPublicUrl, setPhotoPublicUrl] = useState<string | null>(null);
   const nodeRef = useRef<HTMLDivElement>(null);
 
   // Load brand assets + customers once.
@@ -46,12 +50,24 @@ export default function InstagramStudioView() {
     setData((d) => ({ ...d, ...p }));
   }
 
+  function fileToDataUrl(file: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = () => reject(r.error ?? new Error("Gagal membaca file"));
+      r.readAsDataURL(file);
+    });
+  }
+
   async function onPhoto(file: File) {
     setBusy("photo");
     setError(null);
     try {
+      // Render from a same-origin data URL so the export canvas isn't tainted.
+      patch({ photoUrl: await fileToDataUrl(file) });
+      // Upload the original to Supabase for the saved record (non-blocking).
       const url = await uploadPostImage(file, "photo", file.name.split(".").pop() || "jpg");
-      patch({ photoUrl: url });
+      setPhotoPublicUrl(url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload foto gagal");
     } finally {
@@ -136,7 +152,7 @@ export default function InstagramStudioView() {
       const imageUrl = await uploadPostImage(blob, "post", "png");
       await saveSocialPost({
         image_url: imageUrl,
-        photo_url: data.photoUrl,
+        photo_url: photoPublicUrl,
         review_text: data.reviewText,
         customer_name: data.customerName,
         city: data.city,
@@ -151,7 +167,7 @@ export default function InstagramStudioView() {
       a.download = `post-${Date.now()}.png`;
       a.click();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Export gagal");
+      setError(`Export gagal: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setBusy(null);
     }
