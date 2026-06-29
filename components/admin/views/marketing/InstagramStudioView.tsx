@@ -18,6 +18,7 @@ import { loadBrandColors } from "@/lib/admin/settings";
 import { uploadPostImage, saveSocialPost, listSocialPosts, deleteSocialPost } from "@/lib/admin/socialPosts";
 import { TEMPLATES } from "@/components/admin/instagram/templates";
 import PostPreview from "@/components/admin/instagram/PostPreview";
+import Modal from "@/components/admin/Modal";
 
 export default function InstagramStudioView() {
   const [data, setData] = useState<PostData>(defaultPostData());
@@ -29,6 +30,7 @@ export default function InstagramStudioView() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"make" | "gallery">("make");
   const [posts, setPosts] = useState<SocialPost[]>([]);
+  const [preview, setPreview] = useState<SocialPost | null>(null);
   // Public Supabase URL of the source photo, recorded on the saved post.
   // (Rendering uses a local data URL instead — see onPhoto — so html-to-image
   // never taints the canvas with a cross-origin image.)
@@ -214,10 +216,10 @@ export default function InstagramStudioView() {
               >
                 ✕
               </button>
-              <a href={p.image_url} download target="_blank" rel="noreferrer" className="block">
+              <button type="button" onClick={() => setPreview(p)} className="block w-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.image_url} alt="" className="aspect-[4/5] w-full object-cover" />
-              </a>
+                <img src={p.image_url} alt="" className="aspect-[4/5] w-full cursor-pointer object-cover" />
+              </button>
               {p.caption && (
                 <p className="line-clamp-3 p-2 text-xs text-gray-600">{p.caption}</p>
               )}
@@ -333,6 +335,41 @@ export default function InstagramStudioView() {
           </section>
         </div>
       )}
+
+      <Modal open={!!preview} onClose={() => setPreview(null)} title="Pratinjau post">
+        {preview && (
+          <div className="space-y-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preview.image_url}
+              alt=""
+              className="mx-auto max-h-[60vh] w-auto rounded-lg"
+            />
+            {preview.caption && (
+              <div>
+                <p className="mb-1 text-sm font-medium text-gray-700">Caption</p>
+                <p className="whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
+                  {preview.caption}
+                </p>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <a href={preview.image_url} download target="_blank" rel="noreferrer" className={btnCls}>
+                Download PNG
+              </a>
+              {preview.caption && (
+                <button
+                  type="button"
+                  className={btnSecondaryCls}
+                  onClick={() => navigator.clipboard?.writeText(preview.caption ?? "")}
+                >
+                  Salin caption
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
