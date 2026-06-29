@@ -35,7 +35,8 @@ export default function InstagramStudioView() {
   useEffect(() => {
     (async () => {
       const [logo, colors] = await Promise.all([loadBrandLogo(), loadBrandColors()]);
-      setData((d) => ({ ...d, logoUrl: logo, brandColors: colors }));
+      // Fall back to the repo's bundled logo when none has been uploaded yet.
+      setData((d) => ({ ...d, logoUrl: logo ?? "/Logo.png", brandColors: colors }));
       const { data: cust } = await createClient().from("customers").select("*").order("name");
       setCustomers(cust ?? []);
     })();
