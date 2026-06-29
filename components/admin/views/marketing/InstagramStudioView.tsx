@@ -199,7 +199,22 @@ export default function InstagramStudioView() {
           {/* Input panel */}
           <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
             <Field label="Foto tamu">
-              <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && onPhoto(e.target.files[0])} className="text-sm" />
+              <label className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center transition hover:border-[#1B2A4A] hover:bg-gray-100">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && onPhoto(e.target.files[0])}
+                />
+                <span className="text-sm font-semibold text-[#1B2A4A]">
+                  {busy === "photo"
+                    ? "Mengunggah…"
+                    : data.photoUrl
+                      ? "✓ Foto terpilih — klik untuk ganti"
+                      : "📷 Klik untuk upload foto tamu"}
+                </span>
+                <span className="text-xs text-gray-500">JPG atau PNG</span>
+              </label>
             </Field>
 
             <Field label="Pilih customer (opsional)">
@@ -265,8 +280,13 @@ export default function InstagramStudioView() {
               </div>
             </div>
 
-            <Field label="Logo brand">
-              <input type="file" accept="image/png" onChange={(e) => e.target.files?.[0] && onLogo(e.target.files[0])} className="text-sm" />
+            <Field label="Logo brand (opsional — default sudah terpasang)">
+              <input
+                type="file"
+                accept="image/png"
+                onChange={(e) => e.target.files?.[0] && onLogo(e.target.files[0])}
+                className="block w-full text-sm text-gray-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#1B2A4A] file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-[#27375c]"
+              />
             </Field>
 
             <div className="flex gap-2 pt-2">
