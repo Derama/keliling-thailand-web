@@ -32,6 +32,12 @@ function newId() {
   return crypto.randomUUID();
 }
 
+/** Short labels for the status dropdown (full labels stamp the PDF). */
+const INVOICE_STATUS_FORM_LABELS: Record<InvoiceStatus, string> = {
+  awaiting: "Belum bayar",
+  paid: "Lunas",
+};
+
 /** Fisher–Yates copy — used to draw varied catalog rows. */
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -49,7 +55,11 @@ function addDays(iso: string, n: number): string {
   return isoLocal(d);
 }
 
-interface InvoiceDraft {
+function defaultInvoiceNumber(): string {
+  return `INV-${new Date().getFullYear()}-0001`;
+}
+
+export interface InvoiceDraft {
   mode: InvoiceMode;
   docTitle: string;
   billTo: string;
@@ -72,20 +82,24 @@ interface InvoiceDraft {
 export default function InvoiceBuilderView({
   orderId,
   onInvoiceSaved,
+  templateId,
+  onExit,
 }: {
   /** When set, the invoice loads from / saves to this order. */
   orderId?: string;
   /** Called after the payable invoice is saved so the order list can refresh. */
   onInvoiceSaved?: () => void;
+  /** Standalone saved-template row edited outside an order. */
+  templateId?: string;
+  /** Return to the saved Invoice list. */
+  onExit?: () => void;
 } = {}) {
   const { sections, loading } = useCatalog();
 
   const [mode, setMode] = useState<InvoiceMode>("operator");
   const [docTitle, setDocTitle] = useState("Hotel + Transport");
   const [billTo, setBillTo] = useState("Love Bangkok.Co.Ltd");
-  const [invoiceNumber, setInvoiceNumber] = useState(
-    `INV-${new Date().getFullYear()}-0001`
-  );
+  const [invoiceNumber, setInvoiceNumber] = useState(defaultInvoiceNumber());
   const [date, setDate] = useState(isoLocal());
   const [dueDate, setDueDate] = useState(addDays(isoLocal(), 1));
   const [status, setStatus] = useState<InvoiceStatus>("awaiting");
@@ -101,6 +115,7 @@ export default function InvoiceBuilderView({
 
   // Library mirror: one document_templates row per order, autosaved in sync.
   const [libraryId, setLibraryId] = useState<string | null>(null);
+  const [templateTitle, setTemplateTitle] = useState("");
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
@@ -143,9 +158,9 @@ export default function InvoiceBuilderView({
 
   function applyDraft(d: InvoiceDraft) {
     setMode(d.mode ?? "operator");
-    setDocTitle(d.docTitle ?? "");
-    setBillTo(d.billTo ?? "");
-    setInvoiceNumber(d.invoiceNumber ?? "");
+    setDocTitle(d.docTitle ?? "Hotel + Transport");
+    setBillTo(d.billTo ?? "Love Bangkok.Co.Ltd");
+    setInvoiceNumber(d.invoiceNumber ?? defaultInvoiceNumber());
     setDate(d.date ?? isoLocal());
     setDueDate(d.dueDate ?? addDays(isoLocal(), 1));
     setStatus(d.status ?? "awaiting");
@@ -161,12 +176,31 @@ export default function InvoiceBuilderView({
 
   // Per-order: load saved invoice, else seed billing from the order's customer.
   useEffect(() => {
-    if (!orderId) {
+    if (!orderId && !templateId) {
       hydrated.current = true;
       return;
     }
     let cancelled = false;
     (async () => {
+      if (templateId && !orderId) {
+        const picked = await loadTemplate<InvoiceDraft>(templateId);
+        if (cancelled) return;
+        if (!picked) {
+          setSaveErr("Invoice tersimpan tidak ditemukan.");
+        } else {
+          setTemplateTitle(picked.title);
+          applyDraft({
+            ...picked.data,
+            libraryId: null,
+            savedInvoiceId: null,
+          });
+        }
+        hydrated.current = true;
+        return;
+      }
+
+      if (!orderId) return;
+
       const saved = await loadOrderDoc<InvoiceDraft>(orderId, "invoice");
       if (cancelled) return;
       if (saved) {
@@ -198,7 +232,7 @@ export default function InvoiceBuilderView({
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, templateId]);
 
   const isOperator = mode !== "customer";
   const totals = invoiceTotals(lines);
@@ -220,6 +254,20 @@ export default function InvoiceBuilderView({
     savedInvoiceId,
     libraryId,
   };
+
+  // Latest draft in a ref so the unmount flush sees current values.
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+
+  // Flush on unmount — the debounced autosave below is cancelled when the builder
+  // unmounts (modal close / wizard step change), which would drop a pending edit
+  // so the order reopens stale. Persist the latest draft once on teardown.
+  useEffect(
+    () => () => {
+      if (orderId && hydrated.current) saveOrderDoc(orderId, "invoice", draftRef.current);
+    },
+    [orderId]
+  );
 
   // Autosave to the order (debounced) once hydrated; mirror to the library too.
   useEffect(() => {
@@ -246,6 +294,37 @@ export default function InvoiceBuilderView({
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, JSON.stringify(draft)]);
+
+  async function saveTemplateDraft() {
+    if (!templateId) return;
+    setSaveState("saving");
+    setSaveErr(null);
+    try {
+      await saveTemplate(
+        templateId,
+        templateTitle.trim() || invoiceNumber || "Invoice",
+        { ...draft, libraryId: null, savedInvoiceId: null }
+      );
+      setSaveState("saved");
+    } catch (cause) {
+      setSaveErr(cause instanceof Error ? cause.message : "Gagal menyimpan invoice.");
+      setSaveState("idle");
+    }
+  }
+
+  useEffect(() => {
+    if (!templateId || !hydrated.current) return;
+    const t = setTimeout(() => {
+      void saveTemplateDraft();
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateId, templateTitle, JSON.stringify(draft)]);
+
+  async function exitTemplate() {
+    if (templateId) await saveTemplateDraft();
+    onExit?.();
+  }
 
   function printInvoice() {
     const prev = document.title;
@@ -473,13 +552,41 @@ export default function InvoiceBuilderView({
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Invoice</h1>
+          {onExit && (
+            <button
+              type="button"
+              onClick={() => void exitTemplate()}
+              className="mb-2 text-sm font-medium text-gray-500 hover:text-[#1B2A4A]"
+            >
+              ← Daftar invoice
+            </button>
+          )}
+          {templateId ? (
+            <input
+              value={templateTitle}
+              onChange={(event) => setTemplateTitle(event.target.value)}
+              placeholder={invoiceNumber || "Nama invoice"}
+              className="block w-full max-w-md bg-transparent text-2xl font-bold text-[#1B2A4A] outline-none placeholder:text-gray-300 focus:border-b focus:border-[#F5C518]"
+            />
+          ) : (
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Invoice</h1>
+          )}
           <p className="text-sm text-gray-500">
             Tambah item dari katalog atau manual, lalu Print / Simpan PDF dari
             preview. Semua THB.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {templateId && (
+            <button
+              type="button"
+              onClick={() => void saveTemplateDraft()}
+              disabled={saveState === "saving"}
+              className={`${btnSecondaryCls} whitespace-nowrap disabled:opacity-50`}
+            >
+              {saveState === "saving" ? "Menyimpan…" : "Simpan"}
+            </button>
+          )}
           {orderId && (
             <button
               type="button"
@@ -526,7 +633,7 @@ export default function InvoiceBuilderView({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
+      <div className="grid items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
         {/* ── Editor ── */}
         <div className="no-print space-y-5">
           {/* Mode segmented control */}
@@ -555,7 +662,7 @@ export default function InvoiceBuilderView({
           {/* Detail card */}
           <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
             <SectionTitle>Detail invoice</SectionTitle>
-            <div className="grid gap-x-3 gap-y-3 min-[520px]:grid-cols-2 [&>label>span]:min-h-[2.5rem]">
+            <div className="grid gap-x-3 gap-y-3 min-[520px]:grid-cols-2">
             <Field label="Judul dokumen">
               <input
                 value={docTitle}
@@ -619,12 +726,12 @@ export default function InvoiceBuilderView({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as InvoiceStatus)}
-                className={`${inputCls} h-10`}
+                className={`${inputCls} h-10 pr-8`}
               >
                 {(Object.keys(INVOICE_STATUS_LABELS) as InvoiceStatus[]).map(
                   (s) => (
                     <option key={s} value={s}>
-                      {INVOICE_STATUS_LABELS[s]}
+                      {INVOICE_STATUS_FORM_LABELS[s]}
                     </option>
                   )
                 )}

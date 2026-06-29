@@ -167,6 +167,7 @@ export default function ItineraryBuilderView({
   // True once the admin sets/uploads a cover manually — stops AI from overwriting it.
   const [coverManual, setCoverManual] = useState(false);
   const [printing, setPrinting] = useState(false);
+  const [previewScale, setPreviewScale] = useState(1);
 
   // Library mirror (orderId mode): one itineraries row per order, autosaved in
   // sync. Distinct from the `libraryId` prop, which is the library-edit mode.
@@ -178,6 +179,21 @@ export default function ItineraryBuilderView({
   const hydrated = useRef(false);
   // Wraps the printable doc so we only wait on its images, not the editor gallery.
   const docRef = useRef<HTMLDivElement>(null);
+  const previewHostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const host = previewHostRef.current;
+    if (!host) return;
+
+    const updateScale = () => {
+      setPreviewScale(Math.min(1, host.clientWidth / 858));
+    };
+    updateScale();
+
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, [days.length]);
 
   // Load attractions for the per-day place picker.
   useEffect(() => {
@@ -349,15 +365,34 @@ export default function ItineraryBuilderView({
     }
   }
 
+  // Latest draft + persist, kept in refs so the unmount flush below sees current
+  // values without re-subscribing (which would defeat flush-on-unmount).
+  const draftRef = useRef<Draft | null>(null);
+  const persistRef = useRef(persist);
+  persistRef.current = persist;
+
   // Autosave draft (debounced) after hydration.
   useEffect(() => {
     if (!hydrated.current) return;
     const draft = buildDraft();
+    draftRef.current = draft;
     const t = setTimeout(() => {
       persist(draft).then(markSaved);
     }, 600);
     return () => clearTimeout(t);
   }, [buildDraft, persist, markSaved]);
+
+  // Flush on unmount — the debounced timer above is cancelled when the builder
+  // unmounts (modal close / wizard step change), so a pending edit would be lost
+  // and the order would reopen blank. Persist the latest draft once on teardown.
+  useEffect(
+    () => () => {
+      if (hydrated.current && draftRef.current) {
+        persistRef.current(draftRef.current);
+      }
+    },
+    []
+  );
 
   const hasContent =
     days.length > 0 || tripTitle || customer || notes || aiPrompt;
@@ -566,7 +601,7 @@ export default function ItineraryBuilderView({
     // Removed on afterprint so other docs keep the global 12mm margin.
     const style = document.createElement("style");
     style.textContent =
-      "@media print { @page { size: A4 !important; margin: 0 !important; } }";
+      "@media print { @page { size: A4 !important; margin: 0 !important; } .kt-itinerary-preview { width: auto !important; zoom: 1 !important; } }";
     document.head.appendChild(style);
     await nextPaint();
 
@@ -602,7 +637,13 @@ export default function ItineraryBuilderView({
     if (days.length > 0 && !confirm("Ganti itinerary dengan yang dipilih?"))
       return;
     // Keep this order's own mirror id; load everything else from the source.
-    applyDraft({ ...picked.data, mirrorId });
+    const nextDraft: Draft = { ...picked.data, mirrorId };
+    applyDraft(nextDraft);
+    // Flush immediately — the debounced autosave gets cancelled if the builder
+    // unmounts (modal close / step change) before its 600ms timer fires, which
+    // would drop the pick so the order reopens blank.
+    await persist(nextDraft);
+    markSaved();
   }
 
   function resetAll() {
@@ -844,10 +885,10 @@ export default function ItineraryBuilderView({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(320px,1fr)_858px] print:block">
+      <div className="grid items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
         {/* ── Editor column ── */}
         <TouchDragProvider onDrop={handleDropOnDay}>
-        <div className="no-print space-y-5 min-[1280px]:sticky min-[1280px]:top-6 min-[1280px]:max-h-[calc(100vh-3rem)] min-[1280px]:overflow-y-auto min-[1280px]:pr-1">
+        <div className="no-print space-y-5 min-[1500px]:sticky min-[1500px]:top-6 min-[1500px]:max-h-[calc(100vh-3rem)] min-[1500px]:overflow-y-auto min-[1500px]:pr-1">
           {/* 1 — AI generator */}
           <section className="space-y-4 rounded-xl border border-[#F5C518]/40 border-t-4 border-t-[#F5C518] bg-[#FFFCEF] p-5">
             <StepHead n="AI" title="Generate dengan AI" accent />
@@ -1084,20 +1125,28 @@ export default function ItineraryBuilderView({
               Preview itinerary muncul di sini.
             </div>
           ) : (
-            <div ref={docRef} className="overflow-x-auto print:overflow-visible">
-              <div className="min-w-[858px] print:min-w-0">
-                <ItineraryDoc
-                  tripTitle={tripTitle}
-                  customer={customer}
-                  pax={pax}
-                  notes={notes}
-                  vehicle={vehicle}
-                  heroImage={heroImage}
-                  days={days}
-                  galleryImages={galleryImages}
-                  travelTips={travelTips}
-                  showTravelTips={showTravelTips}
-                />
+            <div ref={docRef} className="print:overflow-visible">
+              <div
+                ref={previewHostRef}
+                className="w-full overflow-hidden print:overflow-visible"
+              >
+                <div
+                  className="kt-itinerary-preview mx-auto w-[858px] print:w-auto"
+                  style={{ zoom: previewScale }}
+                >
+                  <ItineraryDoc
+                    tripTitle={tripTitle}
+                    customer={customer}
+                    pax={pax}
+                    notes={notes}
+                    vehicle={vehicle}
+                    heroImage={heroImage}
+                    days={days}
+                    galleryImages={galleryImages}
+                    travelTips={travelTips}
+                    showTravelTips={showTravelTips}
+                  />
+                </div>
               </div>
             </div>
           )}

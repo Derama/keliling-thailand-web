@@ -39,9 +39,15 @@ function isoToShort(iso: string | null): string {
 
 export default function JobOrderBuilderView({
   orderId,
+  templateId,
+  onExit,
 }: {
   /** When set, the job order loads from / saves to this order. */
   orderId?: string;
+  /** Standalone saved-template row edited outside an order. */
+  templateId?: string;
+  /** Return to the saved Job Order list. */
+  onExit?: () => void;
 } = {}) {
   const [jobOrderNo, setJobOrderNo] = useState("");
   const [date, setDate] = useState(today());
@@ -67,6 +73,7 @@ export default function JobOrderBuilderView({
   const [days, setDays] = useState<JobOrderDay[]>([newJobOrderDay()]);
 
   const [libraryId, setLibraryId] = useState<string | null>(null);
+  const [templateTitle, setTemplateTitle] = useState("");
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
@@ -97,12 +104,24 @@ export default function JobOrderBuilderView({
 
   // Per-order: load saved job order, else seed from the order's basics.
   useEffect(() => {
-    if (!orderId) {
+    if (!orderId && !templateId) {
       hydrated.current = true;
       return;
     }
     let cancelled = false;
     (async () => {
+      if (templateId && !orderId) {
+        const picked = await loadTemplate<JobOrderData>(templateId);
+        if (cancelled) return;
+        if (picked) {
+          setTemplateTitle(picked.title);
+          applyDraft({ ...picked.data, libraryId: null });
+        }
+        hydrated.current = true;
+        return;
+      }
+
+      if (!orderId) return;
       const saved = await loadOrderDoc<JobOrderData>(orderId, "joborder");
       if (cancelled) return;
       if (saved) {
@@ -137,7 +156,7 @@ export default function JobOrderBuilderView({
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, templateId]);
 
   function updateHotel(id: string, patch: Partial<JobOrderHotel>) {
     setHotels((prev) => prev.map((h) => (h.id === id ? { ...h, ...patch } : h)));
@@ -225,9 +244,34 @@ export default function JobOrderBuilderView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(data)]);
 
+  // Flush on unmount — job order has no debounced autosave, so closing the modal
+  // or changing wizard step without clicking Save would lose edits and reopen
+  // stale. Persist the latest data to the order doc once on teardown.
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  useEffect(
+    () => () => {
+      if (orderId && hydrated.current) saveOrderDoc(orderId, "joborder", dataRef.current);
+    },
+    [orderId]
+  );
+
   async function save() {
-    if (!orderId) return;
     setSaving(true);
+    if (templateId) {
+      await saveTemplate(
+        templateId,
+        templateTitle.trim() || jobOrderNo || "Job Order",
+        { ...data, libraryId: null }
+      );
+      setSaving(false);
+      setSaved(true);
+      return;
+    }
+    if (!orderId) {
+      setSaving(false);
+      return;
+    }
     // Mirror to the library, then persist to the order carrying the mirror id.
     let nextLibraryId = libraryId;
     try {
@@ -253,6 +297,11 @@ export default function JobOrderBuilderView({
     setSaved(true);
   }
 
+  async function exitTemplate() {
+    if (templateId) await save();
+    onExit?.();
+  }
+
   const openPicker = useCallback(async () => {
     setPickerOpen(true);
     setPickerLoading(true);
@@ -276,7 +325,25 @@ export default function JobOrderBuilderView({
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Job Order</h1>
+          {onExit && (
+            <button
+              type="button"
+              onClick={() => void exitTemplate()}
+              className="mb-2 text-sm font-medium text-gray-500 hover:text-[#1B2A4A]"
+            >
+              ← Daftar job order
+            </button>
+          )}
+          {templateId ? (
+            <input
+              value={templateTitle}
+              onChange={(event) => setTemplateTitle(event.target.value)}
+              placeholder={jobOrderNo || "Nama job order"}
+              className="block w-full max-w-md bg-transparent text-2xl font-bold text-[#1B2A4A] outline-none placeholder:text-gray-300 focus:border-b focus:border-[#F5C518]"
+            />
+          ) : (
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Job Order</h1>
+          )}
           <p className="text-sm text-gray-500">
             Isi detail, klik Simpan untuk menyimpan ke order, lalu Download PDF
             dari preview. Kolom guide, ID, plat &amp; tanda tangan sengaja kosong
@@ -284,7 +351,7 @@ export default function JobOrderBuilderView({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {orderId && (
+          {(orderId || templateId) && (
             <button
               type="button"
               onClick={openPicker}
@@ -313,10 +380,10 @@ export default function JobOrderBuilderView({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
+      <div className="grid items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
         {/* ── Editor ── Sticky with its own scroll so the long preview on the
             right scrolls the page while the editor stays in view. */}
-        <div className="no-print space-y-5 min-[1280px]:sticky min-[1280px]:top-0 min-[1280px]:max-h-[85vh] min-[1280px]:self-start min-[1280px]:overflow-y-auto min-[1280px]:pr-2">
+        <div className="no-print space-y-5 min-[1500px]:sticky min-[1500px]:top-0 min-[1500px]:max-h-[85vh] min-[1500px]:self-start min-[1500px]:overflow-y-auto min-[1500px]:pr-2">
           {/* Detail card */}
           <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
             <SectionTitle>Detail job order</SectionTitle>
