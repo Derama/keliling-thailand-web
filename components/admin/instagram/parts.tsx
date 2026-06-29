@@ -13,14 +13,29 @@ export function Logo({
   const { logoUrl, brandColors } = data;
   if (logoUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={logoUrl}
-        alt="logo"
-        crossOrigin="anonymous"
+      <div
         className={className}
-        style={{ height: 104, width: "auto", objectFit: "contain", ...style }}
-      />
+        style={{ display: "flex", alignItems: "center", gap: 16, ...style }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logoUrl}
+          alt="logo"
+          crossOrigin="anonymous"
+          style={{ height: 104, width: "auto", objectFit: "contain" }}
+        />
+        <span
+          style={{
+            fontSize: 34,
+            fontWeight: 700,
+            color: "#fff",
+            textShadow: "0 2px 8px rgba(0,0,0,.55)",
+            lineHeight: 1.1,
+          }}
+        >
+          Keliling Thailand
+        </span>
+      </div>
     );
   }
   return (
