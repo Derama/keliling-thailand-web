@@ -14,7 +14,7 @@ import {
   type PostFormat,
   type TemplateId,
 } from "@/lib/admin/instagram";
-import { loadBrandColors, loadBrandLogo, saveBrandLogo } from "@/lib/admin/settings";
+import { loadBrandColors } from "@/lib/admin/settings";
 import { uploadPostImage, saveSocialPost, listSocialPosts } from "@/lib/admin/socialPosts";
 import { TEMPLATES } from "@/components/admin/instagram/templates";
 import PostPreview from "@/components/admin/instagram/PostPreview";
@@ -38,9 +38,9 @@ export default function InstagramStudioView() {
   // Load brand assets + customers once.
   useEffect(() => {
     (async () => {
-      const [logo, colors] = await Promise.all([loadBrandLogo(), loadBrandColors()]);
-      // Fall back to the repo's bundled brand logo when none has been uploaded yet.
-      setData((d) => ({ ...d, logoUrl: logo ?? "/brand-logo.png", brandColors: colors }));
+      const colors = await loadBrandColors();
+      // Logo is the bundled company brand asset — no upload needed.
+      setData((d) => ({ ...d, logoUrl: "/brand-logo.png", brandColors: colors }));
       const { data: cust } = await createClient().from("customers").select("*").order("name");
       setCustomers(cust ?? []);
     })();
@@ -70,20 +70,6 @@ export default function InstagramStudioView() {
       setPhotoPublicUrl(url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload foto gagal");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  async function onLogo(file: File) {
-    setBusy("logo");
-    setError(null);
-    try {
-      const url = await uploadPostImage(file, "logo", file.name.split(".").pop() || "png");
-      await saveBrandLogo(url);
-      patch({ logoUrl: url });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload logo gagal");
     } finally {
       setBusy(null);
     }
@@ -295,15 +281,6 @@ export default function InstagramStudioView() {
                 <button onClick={shuffle} className={btnSecondaryCls}>Acak</button>
               </div>
             </div>
-
-            <Field label="Logo brand (opsional — default sudah terpasang)">
-              <input
-                type="file"
-                accept="image/png"
-                onChange={(e) => e.target.files?.[0] && onLogo(e.target.files[0])}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#1B2A4A] file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-[#27375c]"
-              />
-            </Field>
 
             <div className="flex gap-2 pt-2">
               <button className={btnSecondaryCls} onClick={genCaption} disabled={busy === "caption"}>
