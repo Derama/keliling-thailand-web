@@ -35,6 +35,48 @@ export type CustomRoutePatch = Partial<
   >
 >;
 
+export interface NewTransportRouteDraft {
+  group_name: string;
+  name: string;
+  altis_cost: string;
+  altis_sell: string;
+  suv_cost: string;
+  suv_sell: string;
+  van_cost: string;
+  van_sell: string;
+}
+
+export type NewTransportRouteInput = Omit<
+  NewTransportRouteDraft,
+  CustomRouteNumericField
+> &
+  Record<CustomRouteNumericField, number>;
+
+export function normalizeNewTransportRouteInput(
+  draft: NewTransportRouteDraft
+): NewTransportRouteInput | null {
+  const groupName = draft.group_name.trim();
+  const name = draft.name.trim();
+  if (!groupName || !name) return null;
+
+  const numericFields: CustomRouteNumericField[] = [
+    "altis_cost",
+    "altis_sell",
+    "suv_cost",
+    "suv_sell",
+    "van_cost",
+    "van_sell",
+  ];
+  const prices = {} as Record<CustomRouteNumericField, number>;
+  for (const field of numericFields) {
+    const value = draft[field] === "" ? 0 : Number(draft[field]);
+    if (!Number.isFinite(value) || value < 0) return null;
+    prices[field] = value;
+  }
+
+  return { group_name: groupName, name, ...prices };
+}
+
 export function customRoutePrice(
   route: CustomTransportRoute,
   fleet: FleetKey
