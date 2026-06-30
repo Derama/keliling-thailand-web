@@ -2,6 +2,8 @@
 // All prices in THB and include driver, fuel, and tolls.
 // `cost` = our capital price; `sell` = price charged to the customer.
 
+import type { CustomTransportRoute } from "@/lib/admin/customTransportRoutes";
+
 export type FleetKey = "altis" | "suv" | "van";
 
 export const FLEET_KEYS: FleetKey[] = ["altis", "suv", "van"];
@@ -23,11 +25,21 @@ export interface Service {
   /** When true the route is quote-on-request — no fixed price, not selectable. */
   contact?: boolean;
   prices?: Record<FleetKey, VehiclePrice>;
+  customRoute?: CustomTransportRoute;
 }
 
 export interface ServiceGroup {
   group: string;
   services: Service[];
+}
+
+export interface TransportRate {
+  id: string;
+  service_id: string;
+  fleet: FleetKey;
+  cost: number;
+  sell: number;
+  sort: number;
 }
 
 // Helper: build a price map from cost/sell pairs in [altis, suv, van] order.
@@ -75,19 +87,99 @@ export const PRICE_BOOK: ServiceGroup[] = [
   },
 ];
 
-export interface AddOn {
+export function baseTransportRates(): TransportRate[] {
+  return PRICE_BOOK.flatMap((group, groupIndex) =>
+    group.services.flatMap((service, serviceIndex) =>
+      service.prices
+        ? FLEET_KEYS.map((fleet, fleetIndex) => ({
+            id: `${service.id}-${fleet}`,
+            service_id: service.id,
+            fleet,
+            cost: service.prices![fleet].cost,
+            sell: service.prices![fleet].sell,
+            sort: groupIndex * 1000 + serviceIndex * 10 + fleetIndex,
+          }))
+        : []
+    )
+  );
+}
+
+export function mergeTransportRates(dbRows: TransportRate[]): TransportRate[] {
+  const byId = new Map(dbRows.map((r) => [r.id, r]));
+  return baseTransportRates().map((base) => {
+    const saved = byId.get(base.id);
+    return saved
+      ? {
+          ...base,
+          cost: Number(saved.cost),
+          sell: Number(saved.sell),
+          sort: saved.sort ?? base.sort,
+        }
+      : base;
+  });
+}
+
+export function applyTransportRates(
+  rows: TransportRate[]
+): ServiceGroup[] {
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  return PRICE_BOOK.map((group) => ({
+    ...group,
+    services: group.services.map((service) => {
+      if (!service.prices) return service;
+      return {
+        ...service,
+        prices: Object.fromEntries(
+          FLEET_KEYS.map((fleet) => {
+            const override = byId.get(`${service.id}-${fleet}`);
+            const price = override
+              ? { cost: Number(override.cost), sell: Number(override.sell) }
+              : service.prices![fleet];
+            return [fleet, price];
+          })
+        ) as Record<FleetKey, VehiclePrice>,
+      };
+    }),
+  }));
+}
+
+/** A row of the editable `add_ons` table (Biaya Tambahan). */
+export interface AddOnRate {
+  id: string;
   name: string;
   /** Fixed THB price, or null when it's a pass-through (actual cost). */
   price: number | null;
-  unit?: string;
+  unit: string | null;
+  sort: number;
+  /** Built-in default row — price/unit editable, but cannot be deleted. */
+  base?: boolean;
 }
 
-export const ADD_ONS: AddOn[] = [
-  { name: "Extra hours", price: 300, unit: "/ jam" },
-  { name: "Extra bed", price: null },
-  { name: "Transport tambahan", price: null },
-  { name: "Tur guide", price: null },
+/**
+ * Built-in additional charges. Always shown (price/unit editable, not
+ * deletable). Their saved price/unit override these defaults from the DB.
+ */
+export const BASE_ADD_ONS: AddOnRate[] = [
+  { id: "extra-hours", name: "Extra hours", price: 300, unit: "/ jam", sort: 10, base: true },
+  { id: "extra-bed", name: "Extra bed", price: null, unit: null, sort: 20, base: true },
+  { id: "transport-tambahan", name: "Transport tambahan", price: null, unit: null, sort: 30, base: true },
+  { id: "tur-guide", name: "Tur guide", price: null, unit: null, sort: 40, base: true },
 ];
+
+const BASE_ADD_ON_IDS = new Set(BASE_ADD_ONS.map((b) => b.id));
+
+/** Merge DB rows over the built-in defaults; append custom rows after. */
+export function mergeAddOns(dbRows: AddOnRate[]): AddOnRate[] {
+  const byId = new Map(dbRows.map((r) => [r.id, r]));
+  const base = BASE_ADD_ONS.map((b) => {
+    const saved = byId.get(b.id);
+    return saved ? { ...b, price: saved.price, unit: saved.unit } : b;
+  });
+  const custom = dbRows
+    .filter((r) => !BASE_ADD_ON_IDS.has(r.id))
+    .sort((a, b) => a.sort - b.sort);
+  return [...base, ...custom];
+}
 
 // ── Hotels ─────────────────────────────────────────────────────────────
 // `capital` = our cost per night (room, 2 pax). Customer pays capital + margin.

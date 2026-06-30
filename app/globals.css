@@ -174,6 +174,15 @@ a, button {
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
+@keyframes price-category-panel-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.price-category-panel {
+  animation: price-category-panel-in 220ms var(--ease-out-quart) both;
+}
+
 /* ── Blog article body (rendered from markdown) ── */
 .blog-prose {
   color: #4b5563;
@@ -271,15 +280,293 @@ a, button {
 .reveal-stagger.is-visible > *:nth-child(11) { transition-delay: 900ms; opacity: 1; transform: none; }
 .reveal-stagger.is-visible > *:nth-child(12) { transition-delay: 990ms; opacity: 1; transform: none; }
 
+/* Invoice — discrete A4 sheets (Canva style). JS distributes content across
+   pages; each .invoice-page is one physical A4 sheet (794×1123px = 210×297mm). */
+.invoice-page {
+  width: 794px;
+  height: 1123px;
+  padding: 45px; /* 12mm — matches @page margin so screen ≈ print */
+  overflow: hidden;
+  background: #fff;
+}
+/* Hidden measuring layer: lay out at the real content width, off-screen. */
+.invoice-measure {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* ── Admin print documents ── */
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  @page kt-invoice {
+    size: A4;
+    margin: 0;
+  }
   .no-print {
     display: none !important;
+  }
+  /* Builder opened in a modal: print only the document, not the page behind it
+     (orders table, nav, outer order-detail modal). The modal is portaled to
+     <body>, so its backdrop is a direct body child — hide every OTHER body
+     child with display:none. display:none (not visibility:hidden) removes their
+     layout entirely; visibility:hidden leaves the page behind occupying space in
+     the print flow, which emits stray blank pages. */
+  body:has(.builder-modal-backdrop) > *:not(.builder-modal-backdrop) {
+    display: none !important;
+  }
+  .builder-modal-backdrop {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .builder-modal {
+    position: static !important;
+    display: block !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  /* The scroll wrapper (overflow-y-auto px-5 py-5) is a direct child of the
+     panel. Its padding offsets the doc and its overflow clips tall content —
+     fine under the 12mm invoice margin, but the brochure prints @page margin:0
+     with full-bleed 297mm sheets, so even ~5mm of padding spills the cover onto
+     a trailing blank page. Zero it so builders print like their full-page route. */
+  .builder-modal > div {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .builder-modal-header {
+    display: none !important;
+  }
+  /* The hidden measuring layer is only `visibility:hidden` on screen, which
+     still occupies layout. Off at left:-9999px it makes Chrome's "Save as PDF"
+     emit a phantom trailing blank page. Remove it from print entirely. */
+  .invoice-measure {
+    display: none !important;
+  }
+  /* Interactive Chrome's "Save as PDF" can add a phantom trailing blank page
+     when html/body retain a min-height or grown height in print. Let them
+     shrink to content so only the document's own pages are emitted. */
+  html,
+  body {
+    background: #fff !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
   }
   .print-doc {
     box-shadow: none !important;
     border-radius: 0 !important;
     max-width: none !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* ── Itinerary sheets ──
+     Identical model to the brochure below: printItinerary injects
+     `@page { margin: 0 }`, so each sheet fills the full 210×297mm page box and
+     prints as exactly one page. Interior pages supply their own 12mm inset via
+     their p-10/p-12 padding; the cover bleeds edge-to-edge. Fixed height +
+     overflow clip + break-BEFORE pagination = content never splits across a
+     page boundary and there's no trailing blank page. With no @page margin,
+     Chrome also drops its own header/footer (URL, date, page numbers). */
+  .kt-page.invoice-doc {
+    width: 210mm !important;
+    height: 296mm !important;
+    min-height: 296mm !important;
+    max-height: 296mm !important;
+    overflow: hidden !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Cover (first sheet) keeps the full 297mm so its background reaches the edge. */
+  .kt-itin-sheets > div:first-child .kt-page.invoice-doc {
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+  }
+  .kt-itin-sheets > div {
+    break-inside: avoid;
+  }
+  .kt-itin-sheets > div:not(:first-child) {
+    break-before: page;
+  }
+  /* ── Brochure (catalog) sheets ──
+     The brochure print action injects `@page { size: A4; margin: 0 }`, so the
+     printed sheet should occupy the full page box. Keep pagination on the frame
+     wrapper, then draw each sheet at physical A4 size. Interior pages stay 1mm
+     short to absorb mm→px rounding that can otherwise create a trailing blank
+     page; the cover keeps the full 297mm image bleed. */
+  .kt-brochure-sheets {
+    display: block !important;
+    width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .kt-brochure-page-frame {
+    position: relative !important;
+    width: 210mm !important;
+    height: 296mm !important;
+    overflow: hidden !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .kt-brochure-page-frame:first-child {
+    height: 297mm !important;
+  }
+  .kt-brochure-page-frame:not(:first-child) {
+    break-before: page;
+    page-break-before: always;
+  }
+  .kt-brochure-page-frame:last-child {
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  .kt-brochure-sheet {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 210mm !important;
+    height: 296mm !important;
+    min-height: 296mm !important;
+    max-height: 296mm !important;
+    margin: 0 !important;
+    transform: none !important;
+    transform-origin: top left;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .kt-brochure-page-frame:first-child .kt-brochure-sheet {
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+  }
+  .kt-brochure-page-content {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    transform: none !important;
+  }
+  /* Repeat the table header on every printed page; never split a row. */
+  .invoice-doc thead {
+    display: table-header-group;
+  }
+  .invoice-doc tr {
+    break-inside: avoid;
+  }
+  /* Canva-style invoice: each pre-paginated sheet prints as its own page.
+     @page margin provides the 12mm inset, so drop the screen sizing. */
+  .invoice-pages {
+    display: block !important;
+    background: #fff !important;
+    gap: 0 !important;
+    /* Flex column centers children on the cross axis; force full-width sheets
+       so a short last page (narrow content) doesn't shrink-to-fit + center. */
+    align-items: stretch !important;
+  }
+  .invoice-page {
+    width: 100% !important;
+    background: #fff !important;
+    /* DO NOT fix a near-full-page height here. A fixed height (e.g. 270mm) is
+       taller than the real printable area when the browser's "Headers and
+       footers" print option is ON — Chrome reserves ~12-16mm for its own date/
+       URL strips, dropping the usable height from 273mm to ~257mm. A 270mm sheet
+       then overflows the page box and Chrome spills the clipped remainder onto a
+       blank trailing sheet (the phantom page). Instead let each sheet shrink to
+       its content; the JS packer (BuiltInvoiceDoc / JobOrderDoc) keeps every
+       page's content well under the printable area even with headers on, and
+       break-inside:avoid keeps a sheet whole so it never fragments. */
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    /* Clear the screen ring (ring-1) so it doesn't print as a box edge. */
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    /* Paginate with break-BEFORE (not break-after), exactly like the brochure
+       sheets above. A forced break sits before every sheet except the first, so
+       nothing carries a forced break PAST the final sheet — the classic trailing
+       blank page is structurally impossible. break-inside:avoid keeps each
+       content-sized sheet on a single physical page. */
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .invoice-page:not(:first-child) {
+    break-before: page;
+  }
+  /* Invoice builder prints with @page margin:0 (injected by printInvoice) so
+     Chrome has no margin box for its own date/title/URL/page-number header and
+     footer. Safari's Save as PDF can still keep its "Print headers and footers"
+     option on, which reserves paper margins even when @page says margin:0. Keep
+     the physical sheet inside that smaller printable box so each generated
+     invoice sheet maps to exactly one downloaded PDF page. */
+  .invoice-page.kt-invoice-page {
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 12mm !important;
+    overflow: visible !important;
+  }
+  /* Job Order prints with @page margin:0 (suppresses Chrome's own header/footer
+     and restores the full 297mm printable area, so a content-sized sheet never
+     overflows and spills its footer to a near-empty trailing page). With no page
+     margin the 12mm inset has to come from the sheet's own padding. More
+     specific than .invoice-page above, so it wins the padding:0 reset. */
+  .invoice-page.kt-joborder-page {
+    padding: 12mm !important;
+  }
+  /* Keep place photos in print. */
+  img {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* ── Trailing-blank-page guard (Itinerary / Brochure / Job Order) ──
+     Each doc paginates with break-BEFORE on every sheet past the first, so the
+     final sheet carries no forced break after it. But mm→px rounding (296mm is
+     ~1118.7px; the page box is ~1122.5px) plus any space Chrome/Safari reserve
+     for their own header/footer can still tip the last fixed-height sheet a
+     fraction past the page boundary, emitting a near-empty phantom page. Pin a
+     hard `break-after: avoid` and pull the last sheet's flow bottom up 2mm so
+     the container ends BEFORE the boundary. Negative margin only shrinks the
+     claimed layout height — the sheets are fixed-height + overflow:hidden, so
+     nothing visible is clipped. Container bottoms zeroed so no trailing space
+     re-introduces the spill. */
+  .kt-itin-sheets,
+  .invoice-pages {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .kt-itin-sheets > div:last-child,
+  .kt-brochure-page-frame:last-child,
+  .invoice-page.kt-joborder-page:last-child {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    margin-bottom: -2mm !important;
   }
 }

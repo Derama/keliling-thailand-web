@@ -5,10 +5,18 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Order, InvoiceType, InvoiceLineItem } from "@/lib/admin/types";
 import { INVOICE_TYPES, INVOICE_TYPE_LABELS } from "@/lib/admin/types";
-import { buildDocNumber, formatIDR } from "@/lib/admin/utils";
+import { formatIDR } from "@/lib/admin/utils";
+import { syncOrderPrice } from "@/lib/admin/orderPrice";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 
-export default function InvoiceForm({ order }: { order: Order }) {
+export default function InvoiceForm({
+  order,
+  onCreated,
+}: {
+  order: Order;
+  /** When set, called with the new invoice id instead of navigating to it. */
+  onCreated?: (invoiceId: string) => void;
+}) {
   const router = useRouter();
   const [type, setType] = useState<InvoiceType>("deposit");
   const [items, setItems] = useState<InvoiceLineItem[]>([
@@ -31,15 +39,11 @@ export default function InvoiceForm({ order }: { order: Order }) {
     setBusy(true);
     setError(null);
     const supabase = createClient();
-    const prefix = `KT-INV-${buildDocNumber("KT", 0).split("-")[1]}-`;
-    const { count } = await supabase
-      .from("invoices")
-      .select("id", { count: "exact", head: true })
-      .like("invoice_number", `${prefix}%`);
+    // invoice_number is assigned atomically by a BEFORE INSERT trigger
+    // (assign_invoice_number) — see scripts/migrations/007-doc-numbering.sql.
     const { data, error } = await supabase
       .from("invoices")
       .insert({
-        invoice_number: buildDocNumber("KT-INV", count ?? 0),
         order_id: order.id,
         type,
         amount_idr: total,
@@ -52,7 +56,9 @@ export default function InvoiceForm({ order }: { order: Order }) {
       setBusy(false);
       return;
     }
-    router.push(`/admin/orders/${order.id}/invoice/${data.id}`);
+    await syncOrderPrice(supabase, order.id);
+    if (onCreated) onCreated(data.id);
+    else router.push(`/admin/orders/${order.id}/invoice/${data.id}`);
   }
 
   return (

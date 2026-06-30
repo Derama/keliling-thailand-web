@@ -49,7 +49,7 @@ export default function AddPriceRowForm({
         <h3 className="text-base font-bold text-[#1B2A4A]">{title}</h3>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-[1fr_1.6fr_1fr_auto] sm:items-end">
+      <div className="grid gap-3 md:grid-cols-[1fr_1.6fr_1fr_auto] md:items-end">
         <Field label="Kota">
           <input
             value={city}
@@ -84,7 +84,7 @@ export default function AddPriceRowForm({
         <button
           type="submit"
           disabled={!valid || busy}
-          className={`${btnCls} h-[42px] disabled:cursor-not-allowed disabled:opacity-50`}
+          className={`${btnCls} min-h-11 justify-center disabled:cursor-not-allowed disabled:opacity-50 md:h-[42px]`}
         >
           {busy ? "…" : "Tambah"}
         </button>

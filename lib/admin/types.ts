@@ -32,6 +32,7 @@ export interface Order {
   cost_thb: number;
   fx_rate: number;
   notes: string | null;
+  last_printed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -97,3 +98,18 @@ export const INVOICE_TYPE_LABELS: Record<InvoiceType, string> = {
   balance: "Pelunasan",
   full: "Full Payment",
 };
+
+export interface SocialPost {
+  id: string;
+  image_url: string;
+  photo_url: string | null;
+  review_text: string | null;
+  customer_name: string | null;
+  city: string | null;
+  destination: string | null;
+  rating: number | null;
+  caption: string | null;
+  template: string | null;
+  format: string | null;
+  created_at: string;
+}

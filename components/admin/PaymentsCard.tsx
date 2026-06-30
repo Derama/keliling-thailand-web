@@ -11,11 +11,13 @@ export default function PaymentsCard({
   priceIdr,
   payments,
   onChanged,
+  className = "",
 }: {
   orderId: string;
   priceIdr: number;
   payments: Payment[];
   onChanged: () => void;
+  className?: string;
 }) {
   const [amount, setAmount] = useState("");
   const [paidAt, setPaidAt] = useState(() => isoLocal());
@@ -56,11 +58,15 @@ export default function PaymentsCard({
   }
 
   return (
-    <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
+    <section
+      className={`space-y-3 rounded-xl border border-gray-200 bg-white p-5 ${className}`}
+    >
       <h2 className="font-semibold text-[#1B2A4A]">Pembayaran</h2>
       <p className="text-sm">
         Dibayar <strong>{formatIDR(paid)}</strong> dari {formatIDR(priceIdr)} —{" "}
-        {balance <= 0 ? (
+        {priceIdr <= 0 ? (
+          <span className="font-semibold text-gray-400">harga belum diisi</span>
+        ) : balance <= 0 ? (
           <span className="font-semibold text-green-700">LUNAS</span>
         ) : (
           <span className="font-semibold text-red-700">

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderWithCustomer, OrderStatus } from "@/lib/admin/types";
 import {
@@ -11,14 +10,19 @@ import {
 } from "@/lib/admin/types";
 import { formatIDR, formatDate } from "@/lib/admin/utils";
 import { inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import Modal from "@/components/admin/Modal";
+import OrderForm from "@/components/admin/OrderForm";
+import OrderDetail from "@/components/admin/OrderDetail";
 
 export default function OrdersView() {
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
   const [status, setStatus] = useState<OrderStatus | "all">("all");
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [selected, setSelected] = useState<OrderWithCustomer | null>(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     createClient()
       .from("orders")
       .select("*, customers(*)")
@@ -28,6 +32,26 @@ export default function OrdersView() {
         else setOrders((data as OrderWithCustomer[]) ?? []);
       });
   }, []);
+
+  useEffect(load, [load]);
+
+  async function onDelete(o: OrderWithCustomer) {
+    if (
+      !confirm(
+        `Hapus order ${o.order_number}? Pembayaran, invoice, dan dokumen terkait ikut terhapus. Tindakan ini permanen.`
+      )
+    )
+      return;
+    const { error } = await createClient()
+      .from("orders")
+      .delete()
+      .eq("id", o.id);
+    if (error) {
+      setError(`Gagal menghapus: ${error.message}`);
+      return;
+    }
+    load();
+  }
 
   const filtered = orders.filter(
     (o) =>
@@ -41,9 +65,13 @@ export default function OrdersView() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-[#1B2A4A]">Order</h1>
-        <Link href="/admin/orders/new" className={btnCls}>
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          className={btnCls}
+        >
           + Order baru
-        </Link>
+        </button>
       </div>
       <div className="flex flex-wrap gap-3">
         <select
@@ -66,32 +94,94 @@ export default function OrdersView() {
         />
       </div>
       <ErrorNote message={error} />
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+
+      {/* Phone: card list */}
+      <div className="space-y-2 sm:hidden">
+        {filtered.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => setSelected(o)}
+            className="block w-full rounded-xl border border-gray-200 bg-white p-4 text-left"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-semibold text-[#1B2A4A]">
+                {o.order_number}
+              </span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[o.status]}`}
+              >
+                {STATUS_LABELS[o.status]}
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-gray-700">
+              {o.customers.name}
+              {o.customers.phone && (
+                <span className="text-gray-400"> · {o.customers.phone}</span>
+              )}
+            </p>
+            <div className="mt-2 flex items-center justify-between text-sm text-gray-500">
+              <span>
+                {formatDate(o.trip_start)}
+                {o.trip_end && o.trip_end !== o.trip_start
+                  ? ` – ${formatDate(o.trip_end)}`
+                  : ""}
+              </span>
+              <span className="font-semibold text-[#1B2A4A]">
+                {formatIDR(Number(o.price_idr))}
+              </span>
+            </div>
+          </button>
+        ))}
+        {filtered.length === 0 && (
+          <p className="rounded-xl border border-gray-200 bg-white px-4 py-8 text-center text-gray-400">
+            Tidak ada order.
+          </p>
+        )}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden overflow-x-auto rounded-xl border border-gray-200 bg-white sm:block">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-gray-500">
             <tr>
               <th className="px-4 py-3">Order</th>
               <th className="px-4 py-3">Customer</th>
+              <th className="px-4 py-3">Telepon</th>
               <th className="px-4 py-3">Trip</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3 text-right">Harga</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((o) => (
               <tr
                 key={o.id}
-                className="border-t border-gray-100 hover:bg-gray-50"
+                onClick={() => setSelected(o)}
+                className="cursor-pointer border-t border-gray-100 hover:bg-gray-50"
               >
                 <td className="px-4 py-3">
-                  <Link
-                    href={`/admin/orders/${o.id}`}
-                    className="font-medium text-[#1B2A4A] hover:underline"
-                  >
+                  <span className="font-medium text-[#1B2A4A] hover:underline">
                     {o.order_number}
-                  </Link>
+                  </span>
                 </td>
                 <td className="px-4 py-3">{o.customers.name}</td>
+                <td className="px-4 py-3">
+                  {o.customers.phone ? (
+                    <a
+                      href={`https://wa.me/${o.customers.phone.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-medium text-[#25D366] hover:underline"
+                    >
+                      {o.customers.phone}
+                    </a>
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   {formatDate(o.trip_start)}
                   {o.trip_end && o.trip_end !== o.trip_start
@@ -108,12 +198,24 @@ export default function OrdersView() {
                 <td className="px-4 py-3 text-right">
                   {formatIDR(Number(o.price_idr))}
                 </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(o);
+                    }}
+                    className="text-sm font-medium text-red-600 hover:underline"
+                  >
+                    Hapus
+                  </button>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-gray-400"
                 >
                   Tidak ada order.
@@ -123,6 +225,43 @@ export default function OrdersView() {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        open={creating}
+        onClose={() => setCreating(false)}
+        title="Order baru"
+        expanded
+        printIsolate
+      >
+        <OrderForm
+          order={null}
+          onCreated={() => {
+            setCreating(false);
+            load();
+          }}
+        />
+      </Modal>
+
+      <Modal
+        open={selected !== null}
+        onClose={() => setSelected(null)}
+        title={selected?.order_number ?? "Order"}
+        wide
+        expanded
+        printIsolate
+      >
+        {selected && (
+          <OrderDetail
+            id={selected.id}
+            showHeading={false}
+            onChanged={load}
+            onDeleted={() => {
+              setSelected(null);
+              load();
+            }}
+          />
+        )}
+      </Modal>
     </div>
   );
 }
