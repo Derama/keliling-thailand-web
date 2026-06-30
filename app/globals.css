@@ -311,6 +311,12 @@ a, button {
   .no-print {
     display: none !important;
   }
+  /* Phone preview shrink-to-fit must never carry into print output. */
+  .kt-invoice-fit,
+  .kt-brochure-fit {
+    width: auto !important;
+    zoom: 1 !important;
+  }
   /* Builder opened in a modal: print only the document, not the page behind it
      (orders table, nav, outer order-detail modal). The modal is portaled to
      <body>, so its backdrop is a direct body child — hide every OTHER body

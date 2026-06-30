@@ -144,6 +144,9 @@ export default function InvoiceBuilderView({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const editorPaneRef = useRef<HTMLDivElement>(null);
+  // Shrink the A4 preview to fit narrow (phone) screens. Print resets it to 1.
+  const [previewScale, setPreviewScale] = useState(1);
+  const previewHostRef = useRef<HTMLDivElement>(null);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
   const [pickerLoading, setPickerLoading] = useState(false);
 
@@ -267,6 +270,17 @@ export default function InvoiceBuilderView({
   const isOperator = mode !== "customer";
   const totals = invoiceTotals(lines);
 
+  // Fit the 842px-wide invoice doc into the preview column on small screens.
+  useEffect(() => {
+    const host = previewHostRef.current;
+    if (!host) return;
+    const update = () => setPreviewScale(Math.min(1, host.clientWidth / 842));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, [lines.length]);
+
   const draft: InvoiceDraft = {
     mode,
     docTitle,
@@ -372,7 +386,7 @@ export default function InvoiceBuilderView({
     const style = document.createElement("style");
     style.dataset.ktInvoicePrint = "true";
     style.textContent =
-      "@media print { @page { size: A4 !important; margin: 0 !important; } }";
+      "@media print { @page { size: A4 !important; margin: 0 !important; } .kt-invoice-fit { width: auto !important; zoom: 1 !important; } }";
     document.head.appendChild(style);
     const restore = () => {
       document.title = prev;
@@ -1106,7 +1120,14 @@ export default function InvoiceBuilderView({
               Preview invoice muncul di sini.
             </div>
           ) : (
-            <div className="overflow-x-auto print:overflow-visible">
+            <div
+              ref={previewHostRef}
+              className="w-full overflow-hidden print:overflow-visible"
+            >
+              <div
+                className="kt-invoice-fit mx-auto w-[842px] print:w-auto"
+                style={{ zoom: previewScale }}
+              >
               <BuiltInvoiceDoc
                 mode={mode}
                 billTo={billTo}
@@ -1122,6 +1143,7 @@ export default function InvoiceBuilderView({
                 custEmail={custEmail}
                 custAddress={custAddress}
               />
+              </div>
             </div>
           )}
         </div>

@@ -256,6 +256,19 @@ export default function BrochureBuilderView({
 
   const [printing, setPrinting] = useState(false);
   const [coverPickerOpen, setCoverPickerOpen] = useState(false);
+  // Shrink the A4 preview to fit narrow (phone) screens. Print resets it to 1.
+  const [previewScale, setPreviewScale] = useState(1);
+  const previewHostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const host = previewHostRef.current;
+    if (!host) return;
+    const update = () => setPreviewScale(Math.min(1, host.clientWidth / 794));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
 
   // Every place photo (across all cities) the admin can pick as the brochure
   // cover, grouped by city. Sourced from the same `places` data that fills the
@@ -301,7 +314,7 @@ export default function BrochureBuilderView({
     // caused each sheet to leave a ~27mm blank strip and overflow onto a second
     // page, doubling the page count — removed.)
     style.textContent =
-      "@media print { @page { size: A4 !important; margin: 0 !important; } }";
+      "@media print { @page { size: A4 !important; margin: 0 !important; } .kt-brochure-fit { width: auto !important; zoom: 1 !important; } }";
     document.head.appendChild(style);
 
     const restore = () => {
@@ -620,8 +633,14 @@ export default function BrochureBuilderView({
 
         {/* Preview column */}
         <div>
-          <div className="overflow-x-auto print:overflow-visible">
-            <div className="print:min-w-0">
+          <div
+            ref={previewHostRef}
+            className="w-full overflow-hidden print:overflow-visible"
+          >
+            <div
+              className="kt-brochure-fit mx-auto w-[794px] print:w-auto print:min-w-0"
+              style={{ zoom: previewScale }}
+            >
               <BrochureDoc
                 meta={meta}
                 cities={docCities}
