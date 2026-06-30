@@ -1,9 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { btnCls, ErrorNote } from "@/components/admin/ui";
+import { btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import { formatDate } from "@/lib/admin/utils";
 import ItineraryBuilderView from "@/components/admin/views/ItineraryBuilderView";
+import {
+  useRowSelection,
+  SelectionBar,
+} from "@/components/admin/RowSelection";
 import {
   listItineraries,
   createItinerary,
@@ -47,6 +51,23 @@ export default function ItineraryLibraryView() {
   const [busy, setBusy] = useState(false);
   // null = list; otherwise the open itinerary's id.
   const [openId, setOpenId] = useState<string | null>(null);
+  const sel = useRowSelection();
+
+  async function removeSelected() {
+    if (sel.selected.size === 0) return;
+    if (!confirm(`Hapus ${sel.selected.size} itinerary terpilih?`)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      for (const id of sel.selected) await deleteItinerary(id);
+      sel.reset();
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Gagal menghapus itinerary.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -120,15 +141,37 @@ export default function ItineraryLibraryView() {
             Itinerary tersimpan. Buka untuk lanjut menyunting, atau buat baru.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={newItinerary}
-          disabled={busy}
-          className={`${btnCls} disabled:opacity-50`}
-        >
-          + Itinerary baru
-        </button>
+        <div className="flex items-center gap-2">
+          {rows.length > 0 && !sel.active && (
+            <button
+              type="button"
+              onClick={() => sel.setActive(true)}
+              className={btnSecondaryCls}
+            >
+              Pilih
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={newItinerary}
+            disabled={busy}
+            className={`${btnCls} disabled:opacity-50`}
+          >
+            + Itinerary baru
+          </button>
+        </div>
       </div>
+
+      {sel.active && (
+        <SelectionBar
+          count={sel.selected.size}
+          total={rows.length}
+          busy={busy}
+          onSelectAll={(on) => sel.setAll(rows.map((r) => r.id), on)}
+          onDelete={removeSelected}
+          onCancel={sel.reset}
+        />
+      )}
 
       <ErrorNote message={error} />
 
@@ -155,9 +198,19 @@ export default function ItineraryLibraryView() {
                 key={row.id}
                 className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-50"
               >
+                {sel.active && (
+                  <input
+                    type="checkbox"
+                    checked={sel.selected.has(row.id)}
+                    onChange={() => sel.toggle(row.id)}
+                    className="h-4 w-4 shrink-0 accent-[#1B2A4A]"
+                  />
+                )}
                 <button
                   type="button"
-                  onClick={() => setOpenId(row.id)}
+                  onClick={() =>
+                    sel.active ? sel.toggle(row.id) : setOpenId(row.id)
+                  }
                   className="min-w-0 flex-1 text-left"
                 >
                   <p className="truncate font-semibold text-[#1B2A4A]">
@@ -167,7 +220,11 @@ export default function ItineraryLibraryView() {
                     {dayCount} hari · disimpan {savedLabel(row.updated_at)}
                   </p>
                 </button>
-                <div className="flex shrink-0 items-center gap-3 text-sm">
+                <div
+                  className={`flex shrink-0 items-center gap-3 text-sm ${
+                    sel.active ? "hidden" : ""
+                  }`}
+                >
                   <button
                     type="button"
                     onClick={() => setOpenId(row.id)}
