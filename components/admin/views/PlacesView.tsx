@@ -41,8 +41,6 @@ export default function PlacesView() {
   const [rows, setRows] = useState<Place[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
-  const [tidying, setTidying] = useState(false);
-  const [filling, setFilling] = useState(false);
   // Editing an existing place, adding a new one (with optional preset city),
   // or closed.
   const [editing, setEditing] = useState<Place | null>(null);
@@ -102,82 +100,6 @@ export default function PlacesView() {
     else load();
   }
 
-  // Hard reset: delete every place row and re-import the full seed clean.
-  // Guarantees no duplicates and that every attraction uses its local photo,
-  // regardless of how older rows were named or imaged.
-  async function resetGallery() {
-    if (
-      !confirm(
-        "Hapus SEMUA tempat lalu impor ulang dari daftar bawaan?\n\nIni menghilangkan duplikat & memperbaiki foto kosong. Foto yang sudah Anda unggah sendiri akan hilang."
-      )
-    )
-      return;
-    setTidying(true);
-    setError(null);
-    const supabase = createClient();
-
-    // Delete all rows (Supabase requires a filter; this matches everything).
-    const { error: delErr } = await supabase
-      .from("places")
-      .delete()
-      .not("id", "is", null);
-    if (delErr) {
-      setError(delErr.message);
-      setTidying(false);
-      return;
-    }
-
-    // Re-insert the full seed with local photo paths.
-    let sort = 0;
-    const payload = seedPlaces().map((s) => ({
-      id: crypto.randomUUID(),
-      city: s.city,
-      name: s.name,
-      image_url: s.image_url,
-      description: s.description,
-      sort: (sort += 10),
-    }));
-    const { error: insErr } = await supabase.from("places").insert(payload);
-    setTidying(false);
-    if (insErr) {
-      setError(insErr.message);
-      return;
-    }
-    alert(`Selesai. ${payload.length} tempat diimpor ulang tanpa duplikat.`);
-    load();
-  }
-
-  // Non-destructive: fill empty descriptions from the seed by city+name.
-  // Leaves photos and existing descriptions untouched.
-  async function fillDescriptions() {
-    setFilling(true);
-    setError(null);
-    const supabase = createClient();
-    const { data, error: readErr } = await supabase.from("places").select("*");
-    if (readErr) {
-      setError(readErr.message);
-      setFilling(false);
-      return;
-    }
-    const seedDesc = new Map(
-      seedPlaces().map((s) => [placeKey(s.city, s.name), s.description])
-    );
-    let filled = 0;
-    for (const r of (data as Place[]) ?? []) {
-      if (r.description && r.description.trim()) continue;
-      const desc = seedDesc.get(placeKey(r.city, r.name));
-      if (!desc) continue;
-      const { error } = await supabase
-        .from("places")
-        .update({ description: desc })
-        .eq("id", r.id);
-      if (!error) filled++;
-    }
-    setFilling(false);
-    alert(`Selesai. ${filled} deskripsi terisi.`);
-    load();
-  }
-
   const cities = groupPlaces(rows);
   const existingCities = Array.from(new Set(rows.map((r) => r.city)));
 
@@ -190,39 +112,13 @@ export default function PlacesView() {
             Galeri atraksi per kota. Klik foto untuk ubah / unggah foto asli.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={fillDescriptions}
-            disabled={filling}
-            className={`${btnSecondaryCls} disabled:opacity-50`}
-          >
-            {filling ? "Mengisi…" : "Isi deskripsi"}
-          </button>
-          <button
-            type="button"
-            onClick={resetGallery}
-            disabled={tidying}
-            className={`${btnSecondaryCls} disabled:opacity-50`}
-          >
-            {tidying ? "Mereset…" : "Reset & impor ulang"}
-          </button>
-          <button
-            type="button"
-            onClick={importSeed}
-            disabled={importing}
-            className={`${btnSecondaryCls} disabled:opacity-50`}
-          >
-            {importing ? "Mengimpor…" : "Impor atraksi bawaan"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setAdding({ city: "" })}
-            className={btnCls}
-          >
-            + Tambah tempat
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setAdding({ city: "" })}
+          className={btnCls}
+        >
+          + Tambah tempat
+        </button>
       </div>
 
       <ErrorNote message={error} />
@@ -272,9 +168,18 @@ export default function PlacesView() {
 
       {rows.length === 0 && !error && (
         <div className="rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">
-          Belum ada tempat. Klik{" "}
-          <span className="font-semibold">“Impor atraksi bawaan”</span> untuk
-          mulai dari daftar atraksi, lalu unggah foto asli.
+          <p>
+            Belum ada tempat. Mulai dari daftar atraksi bawaan, lalu unggah foto
+            asli — atau tambah satu per satu.
+          </p>
+          <button
+            type="button"
+            onClick={importSeed}
+            disabled={importing}
+            className={`${btnSecondaryCls} mt-4 disabled:opacity-50`}
+          >
+            {importing ? "Mengimpor…" : "Impor atraksi bawaan"}
+          </button>
         </div>
       )}
 

@@ -4,7 +4,7 @@
 import { createClient } from "@/lib/supabase/client";
 
 /** Document kinds that use the generic template table. */
-export type TemplateKind = "invoice" | "joborder";
+export type TemplateKind = "invoice" | "joborder" | "brochure";
 
 /** A row in the document_templates table. */
 export interface TemplateRow<T = unknown> {

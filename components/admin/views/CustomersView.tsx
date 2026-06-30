@@ -26,6 +26,28 @@ export default function CustomersView() {
 
   useEffect(load, [load]);
 
+  async function onDelete(c: Customer) {
+    if (
+      !confirm(
+        `Hapus customer "${c.name}"? Tindakan ini tidak bisa dibatalkan.`
+      )
+    )
+      return;
+    setError(null);
+    const { error } = await createClient()
+      .from("customers")
+      .delete()
+      .eq("id", c.id);
+    if (error) {
+      // Most likely an FK violation: the customer still has orders.
+      setError(
+        `Gagal menghapus: ${error.message}. Customer dengan order tidak bisa dihapus.`
+      );
+      return;
+    }
+    setCustomers((prev) => prev.filter((x) => x.id !== c.id));
+  }
+
   const filtered = customers.filter((c) =>
     c.name.toLowerCase().includes(query.toLowerCase())
   );
@@ -57,12 +79,21 @@ export default function CustomersView() {
             key={c.id}
             className="rounded-xl border border-gray-200 bg-white p-4"
           >
-            <Link
-              href={`/admin/customers/${c.id}`}
-              className="font-semibold text-[#1B2A4A] hover:underline"
-            >
-              {c.name}
-            </Link>
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/admin/customers/${c.id}`}
+                className="font-semibold text-[#1B2A4A] hover:underline"
+              >
+                {c.name}
+              </Link>
+              <button
+                type="button"
+                onClick={() => onDelete(c)}
+                className="text-sm font-medium text-red-600 hover:underline"
+              >
+                Hapus
+              </button>
+            </div>
             <div className="mt-1 flex items-center justify-between gap-2 text-sm text-gray-500">
               <span>{c.origin_city ?? "—"}</span>
               {c.phone ? (
@@ -95,6 +126,7 @@ export default function CustomersView() {
               <th className="px-4 py-3">Nama</th>
               <th className="px-4 py-3">WhatsApp</th>
               <th className="px-4 py-3">Kota asal</th>
+              <th className="px-4 py-3 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -126,12 +158,21 @@ export default function CustomersView() {
                   )}
                 </td>
                 <td className="px-4 py-3">{c.origin_city ?? "—"}</td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={() => onDelete(c)}
+                    className="font-medium text-red-600 hover:underline"
+                  >
+                    Hapus
+                  </button>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
                 <td
-                  colSpan={3}
+                  colSpan={4}
                   className="px-4 py-8 text-center text-gray-400"
                 >
                   Belum ada customer. Customer dibuat dari form order.

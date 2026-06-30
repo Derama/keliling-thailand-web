@@ -17,6 +17,37 @@ export interface ResolvedGeneratedPlace {
   activity: string;
 }
 
+export interface ItineraryPromptInput {
+  customer: string;
+  pax: string;
+  days: number;
+  destinations: readonly string[];
+  request: string;
+}
+
+const EXPLICIT_DURATION = /\b(?:\d+\s*(?:days?|hari)|\d+\s*d\s*\d+\s*n)\b/i;
+
+export function composeItineraryPrompt({
+  customer,
+  pax,
+  days,
+  destinations,
+  request,
+}: ItineraryPromptInput): string {
+  const parts: string[] = [];
+  const trimmedRequest = request.trim();
+
+  if (customer) parts.push(`Customer: ${customer}.`);
+  if (pax) parts.push(`Jumlah: ${pax}.`);
+  if (days && !EXPLICIT_DURATION.test(trimmedRequest)) {
+    parts.push(`Durasi: ${days} hari.`);
+  }
+  if (destinations.length) parts.push(`Tujuan: ${destinations.join(", ")}.`);
+  if (trimmedRequest) parts.push(trimmedRequest);
+
+  return parts.join(" ");
+}
+
 const normalize = (value: string) => value.trim().toLowerCase();
 
 export function resolveGeneratedPlaces(

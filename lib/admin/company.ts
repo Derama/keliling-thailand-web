@@ -14,6 +14,7 @@ export const KELILING_THAILAND = {
   location: "Bangkok, Thailand",
   email: "sales@kelilingthailand.com",
   instagram: "@kelilingthailand",
+  facebook: "Keliling Thailand",
   whatsapp: "+62 857-5092-3934",
   contacts: [
     { name: "Riddhan Fawwaz", phone: "+62 857-5092-3934" },

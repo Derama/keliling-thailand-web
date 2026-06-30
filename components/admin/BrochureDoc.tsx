@@ -117,7 +117,7 @@ function Sheet({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="kt-brochure-page-frame">
       <p className="no-print mb-1 text-center text-xs font-medium text-gray-400">
         Halaman {pageNo} / {totalPages}
       </p>
@@ -125,7 +125,9 @@ function Sheet({
           `kt-brochure-sheet` rule in globals.css turns each into a full,
           margin-free A4 page. */}
       <article className="kt-brochure-sheet mx-auto flex min-h-[1123px] w-full max-w-[794px] flex-col overflow-hidden bg-white text-[#1B2A4A] shadow-lg ring-1 ring-gray-200 print:shadow-none print:ring-0">
-        {children}
+        <div className="kt-brochure-page-content flex flex-1 flex-col">
+          {children}
+        </div>
       </article>
     </div>
   );
@@ -774,12 +776,18 @@ function ClosingPage({
         </p>
       </div>
 
-      {/* Parting photo band — grid-stacked so it prints reliably. */}
+      {/* Parting photo band — grid-stacked so it prints reliably. Height is a
+          deliberate compromise: tall enough that the landscape photos read
+          clearly (h-24 cropped them to a thin strip), but not so tall that the
+          contact/brand bar below gets pushed against the page edge — when the
+          closing page's bottom slack drops too low, the GUI print renderer
+          (Chrome/Safari "Save as PDF") rounds it over and emits a blank 12th
+          page. h-32 keeps ~85px of slack. */}
       <div className="mt-4 grid grid-cols-2 gap-3">
         {CLOSING_PHOTOS.map((g) => (
           <div
             key={g.src}
-            className="h-24 overflow-hidden rounded-xl bg-gray-100"
+            className="h-32 overflow-hidden rounded-xl bg-gray-100"
             style={{
               display: "grid",
               gridTemplateColumns: "minmax(0, 1fr)",

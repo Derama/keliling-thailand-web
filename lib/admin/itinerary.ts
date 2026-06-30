@@ -129,16 +129,36 @@ export function scheduleFromPlaces(
   return out;
 }
 
-/** AI rows worth keeping in the schedule: meals + logistics. Attraction visits
- *  are already covered by photo-linked stops, so those are skipped to avoid
- *  duplicate rows. */
-const KEEP_AI_ROW =
-  /makan|sarapan|brunch|transfer|tiba|berangkat|check.?in|check.?out|bandara|airport|jemput|antar|istirahat|kembali ke hotel/i;
+function normalizeActivityText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+function matchingPlace(
+  places: ItineraryPlace[],
+  activityText: string
+): ItineraryPlace | undefined {
+  const normalizedActivity = normalizeActivityText(activityText);
+  const matches = places.flatMap((place) => {
+    const normalizedName = normalizeActivityText(place.name);
+    const matchesActivity =
+      normalizedName !== "" &&
+      ` ${normalizedActivity} `.includes(` ${normalizedName} `);
+    return matchesActivity ? [{ place, normalizedName }] : [];
+  });
+  matches.sort((a, b) => b.normalizedName.length - a.normalizedName.length);
+  return matches[0]?.place;
+}
 
 /**
  * Build a day's schedule on generate: photo-linked attraction stops merged with
- * the AI's meal/logistics rows, each slotted into its time position. AI rows
- * get fresh ids so they read as manual rows (deletable, survive photo edits).
+ * the complete AI schedule. A matching AI attraction updates its linked stop's
+ * time without duplicating it; unmatched rows are slotted by time with fresh ids
+ * so meals, logistics, and requested attractions survive as manual rows.
  */
 export function mergeAiSchedule(
   places: ItineraryPlace[],
@@ -147,7 +167,22 @@ export function mergeAiSchedule(
   let out = scheduleFromPlaces(places);
   for (const r of aiRows) {
     const text = (r.text ?? "").trim();
-    if (!text || !KEEP_AI_ROW.test(text)) continue;
+    if (!text) continue;
+
+    const place = matchingPlace(places, text);
+    if (place) {
+      const index = out.findIndex((activity) => activity.id === place.id);
+      if (index >= 0) {
+        const existing = out[index];
+        out[index] = {
+          ...existing,
+          time: (r.time ?? "").trim() || existing.time,
+          text: place.activity || existing.text || text,
+        };
+      }
+      continue;
+    }
+
     out = insertByTime(out, {
       id: crypto.randomUUID(),
       time: (r.time ?? "").trim(),
@@ -156,6 +191,22 @@ export function mergeAiSchedule(
   }
   return out;
 }
+
+/** One practical reminder shown on the itinerary closing page. */
+export interface TravelTip {
+  label: string;
+  text: string;
+}
+
+/** Default "Info Perjalanan" reminders — seeded into each new draft, editable. */
+export const DEFAULT_TRAVEL_TIPS: TravelTip[] = [
+  { label: "Mata Uang", text: "Baht Thailand (THB). Tukar di money changer (mis. SuperRich) untuk kurs terbaik." },
+  { label: "Listrik", text: "220V, soket tipe A/B/C. Bawa universal adapter." },
+  { label: "Cuaca & Pakaian", text: "Panas & lembap. Baju ringan, sunblock, dan payung lipat." },
+  { label: "Etika Kuil", text: "Tutup bahu & lutut saat memasuki kuil." },
+  { label: "Nomor Darurat", text: "Polisi 191 · Turis 1155 · Ambulans 1669." },
+  { label: "Selama Perjalanan", text: "Ada kendala? Hubungi tim kami via WhatsApp kapan saja." },
+];
 
 /** Trip-level meta for the brochure cover + day pills. */
 export interface ItineraryMeta {

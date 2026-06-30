@@ -6,9 +6,17 @@ import { createClient } from "@/lib/supabase/client";
 import type { Order, InvoiceType, InvoiceLineItem } from "@/lib/admin/types";
 import { INVOICE_TYPES, INVOICE_TYPE_LABELS } from "@/lib/admin/types";
 import { formatIDR } from "@/lib/admin/utils";
+import { syncOrderPrice } from "@/lib/admin/orderPrice";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 
-export default function InvoiceForm({ order }: { order: Order }) {
+export default function InvoiceForm({
+  order,
+  onCreated,
+}: {
+  order: Order;
+  /** When set, called with the new invoice id instead of navigating to it. */
+  onCreated?: (invoiceId: string) => void;
+}) {
   const router = useRouter();
   const [type, setType] = useState<InvoiceType>("deposit");
   const [items, setItems] = useState<InvoiceLineItem[]>([
@@ -48,7 +56,9 @@ export default function InvoiceForm({ order }: { order: Order }) {
       setBusy(false);
       return;
     }
-    router.push(`/admin/orders/${order.id}/invoice/${data.id}`);
+    await syncOrderPrice(supabase, order.id);
+    if (onCreated) onCreated(data.id);
+    else router.push(`/admin/orders/${order.id}/invoice/${data.id}`);
   }
 
   return (

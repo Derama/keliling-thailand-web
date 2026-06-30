@@ -35,6 +35,24 @@ export default function OrdersView() {
 
   useEffect(load, [load]);
 
+  async function onDelete(o: OrderWithCustomer) {
+    if (
+      !confirm(
+        `Hapus order ${o.order_number}? Pembayaran, invoice, dan dokumen terkait ikut terhapus. Tindakan ini permanen.`
+      )
+    )
+      return;
+    const { error } = await createClient()
+      .from("orders")
+      .delete()
+      .eq("id", o.id);
+    if (error) {
+      setError(`Gagal menghapus: ${error.message}`);
+      return;
+    }
+    load();
+  }
+
   const filtered = orders.filter(
     (o) =>
       (status === "all" || o.status === status) &&
@@ -96,7 +114,12 @@ export default function OrdersView() {
                 {STATUS_LABELS[o.status]}
               </span>
             </div>
-            <p className="mt-1 text-sm text-gray-700">{o.customers.name}</p>
+            <p className="mt-1 text-sm text-gray-700">
+              {o.customers.name}
+              {o.customers.phone && (
+                <span className="text-gray-400"> · {o.customers.phone}</span>
+              )}
+            </p>
             <div className="mt-2 flex items-center justify-between text-sm text-gray-500">
               <span>
                 {formatDate(o.trip_start)}
@@ -124,9 +147,11 @@ export default function OrdersView() {
             <tr>
               <th className="px-4 py-3">Order</th>
               <th className="px-4 py-3">Customer</th>
+              <th className="px-4 py-3">Telepon</th>
               <th className="px-4 py-3">Trip</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3 text-right">Harga</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -143,6 +168,21 @@ export default function OrdersView() {
                 </td>
                 <td className="px-4 py-3">{o.customers.name}</td>
                 <td className="px-4 py-3">
+                  {o.customers.phone ? (
+                    <a
+                      href={`https://wa.me/${o.customers.phone.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-medium text-[#25D366] hover:underline"
+                    >
+                      {o.customers.phone}
+                    </a>
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
                   {formatDate(o.trip_start)}
                   {o.trip_end && o.trip_end !== o.trip_start
                     ? ` – ${formatDate(o.trip_end)}`
@@ -158,12 +198,24 @@ export default function OrdersView() {
                 <td className="px-4 py-3 text-right">
                   {formatIDR(Number(o.price_idr))}
                 </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(o);
+                    }}
+                    className="text-sm font-medium text-red-600 hover:underline"
+                  >
+                    Hapus
+                  </button>
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-gray-400"
                 >
                   Tidak ada order.
@@ -178,6 +230,8 @@ export default function OrdersView() {
         open={creating}
         onClose={() => setCreating(false)}
         title="Order baru"
+        expanded
+        printIsolate
       >
         <OrderForm
           order={null}
@@ -192,9 +246,20 @@ export default function OrdersView() {
         open={selected !== null}
         onClose={() => setSelected(null)}
         title={selected?.order_number ?? "Order"}
+        wide
+        expanded
+        printIsolate
       >
         {selected && (
-          <OrderDetail id={selected.id} showHeading={false} onChanged={load} />
+          <OrderDetail
+            id={selected.id}
+            showHeading={false}
+            onChanged={load}
+            onDeleted={() => {
+              setSelected(null);
+              load();
+            }}
+          />
         )}
       </Modal>
     </div>

@@ -55,8 +55,24 @@ function addDays(iso: string, n: number): string {
   return isoLocal(d);
 }
 
+// Customer / operator invoices get a real sequential number (INV-YYYY-NNNN)
+// allocated by the server when first saved to the order. Until then there is no
+// number; personal invoices may type their own.
 function defaultInvoiceNumber(): string {
-  return `INV-${new Date().getFullYear()}-0001`;
+  return "";
+}
+
+// Personal invoices are not part of the order's INV-YYYY-NNNN sequence — they
+// get their own standalone, unique number. Timestamp (to the second) + a short
+// random suffix guarantees a different value on every generation.
+function personalInvoiceNumber(): string {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  const stamp = `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(
+    d.getHours()
+  )}${p(d.getMinutes())}${p(d.getSeconds())}`;
+  const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `INV-${stamp}-${rand}`;
 }
 
 export interface InvoiceDraft {
@@ -105,6 +121,14 @@ export default function InvoiceBuilderView({
   const [status, setStatus] = useState<InvoiceStatus>("awaiting");
   const [lines, setLines] = useState<InvoiceLine[]>([]);
 
+  // Personal invoices always carry a real, unique number (not just a
+  // placeholder). Fill it the moment we are in personal mode and it's empty.
+  useEffect(() => {
+    if (mode === "personal" && !invoiceNumber.trim()) {
+      setInvoiceNumber(personalInvoiceNumber());
+    }
+  }, [mode, invoiceNumber]);
+
   // Payable invoice linked to the order. Stored in the draft so re-saving
   // updates the same `invoices` row instead of creating duplicates.
   const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
@@ -118,6 +142,8 @@ export default function InvoiceBuilderView({
   const [templateTitle, setTemplateTitle] = useState("");
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const editorPaneRef = useRef<HTMLDivElement>(null);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
   const [pickerLoading, setPickerLoading] = useState(false);
 
@@ -157,10 +183,14 @@ export default function InvoiceBuilderView({
   const hydrated = useRef(false);
 
   function applyDraft(d: InvoiceDraft) {
-    setMode(d.mode ?? "operator");
+    const dMode = d.mode ?? "operator";
+    setMode(dMode);
     setDocTitle(d.docTitle ?? "Hotel + Transport");
     setBillTo(d.billTo ?? "Love Bangkok.Co.Ltd");
-    setInvoiceNumber(d.invoiceNumber ?? defaultInvoiceNumber());
+    setInvoiceNumber(
+      d.invoiceNumber ||
+        (dMode === "personal" ? personalInvoiceNumber() : defaultInvoiceNumber())
+    );
     setDate(d.date ?? isoLocal());
     setDueDate(d.dueDate ?? addDays(isoLocal(), 1));
     setStatus(d.status ?? "awaiting");
@@ -328,7 +358,17 @@ export default function InvoiceBuilderView({
 
   function printInvoice() {
     const prev = document.title;
-    document.title = `${invoiceNumber} - ${date}`;
+    if (mode === "personal") {
+      const now = new Date();
+      const day = now.toLocaleDateString("id-ID", { weekday: "long" });
+      const time = now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      document.title = `${invoiceNumber} - ${date} - ${day} - ${time}`;
+    } else {
+      document.title = `${invoiceNumber} - ${date}`;
+    }
     const style = document.createElement("style");
     style.dataset.ktInvoicePrint = "true";
     style.textContent =
@@ -365,6 +405,24 @@ export default function InvoiceBuilderView({
       description: l.desc || "Item",
       amount_idr: Math.round(lineCustomerTotal(l) * idrRate),
     }));
+
+    // Allocate a unique, sequential document number the first time a customer /
+    // operator invoice is saved. Personal invoices keep their typed number and
+    // never draw from the shared counter.
+    let docNumber = invoiceNumber;
+    if (!savedInvoiceId && mode !== "personal") {
+      const { data, error } = await supabase.rpc("next_invoice_number");
+      if (error || typeof data !== "string") {
+        setSaveErr(
+          `Gagal membuat nomor invoice: ${error?.message ?? "tak terduga"}`
+        );
+        setSaveState("idle");
+        return;
+      }
+      docNumber = data;
+    }
+
+    let invoiceRowId = savedInvoiceId;
     if (savedInvoiceId) {
       const { error } = await supabase
         .from("invoices")
@@ -376,7 +434,6 @@ export default function InvoiceBuilderView({
         return;
       }
     } else {
-      // invoice_number is assigned by a BEFORE INSERT trigger.
       const { data, error } = await supabase
         .from("invoices")
         .insert({
@@ -384,6 +441,8 @@ export default function InvoiceBuilderView({
           type: "full",
           amount_idr: amountIdr,
           line_items: lineItems,
+          // Personal: omit so the BEFORE INSERT trigger assigns a fallback id.
+          ...(mode !== "personal" ? { invoice_number: docNumber } : {}),
         })
         .select("id")
         .single();
@@ -392,8 +451,19 @@ export default function InvoiceBuilderView({
         setSaveState("idle");
         return;
       }
+      invoiceRowId = data.id;
       setSavedInvoiceId(data.id);
     }
+
+    // Persist the assigned number + invoice id into the draft so the doc shows
+    // it and re-saves update the same row instead of allocating a new number.
+    if (docNumber !== invoiceNumber) setInvoiceNumber(docNumber);
+    await saveOrderDoc(orderId, "invoice", {
+      ...draftRef.current,
+      invoiceNumber: docNumber,
+      savedInvoiceId: invoiceRowId,
+    });
+
     await syncOrderPrice(supabase, orderId);
     // Cost + margin are derived from the invoice too: cost_thb = what we pay
     // the tour operator (operatorTotal = base + operator margin); the kurs is
@@ -428,6 +498,10 @@ export default function InvoiceBuilderView({
     setMode(next);
     if (next !== "customer" && !billTo.trim()) setBillTo("Love Bangkok.Co.Ltd");
     if (next === "customer" && billTo === "Love Bangkok.Co.Ltd") setBillTo("");
+    // Personal invoices get their own unique number, prefilled (editable).
+    if (next === "personal" && !invoiceNumber.trim()) {
+      setInvoiceNumber(personalInvoiceNumber());
+    }
   }
 
   function addFromCatalog(item: CatalogItem) {
@@ -576,7 +650,7 @@ export default function InvoiceBuilderView({
             preview. Semua THB.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-start gap-2">
           {templateId && (
             <button
               type="button"
@@ -635,7 +709,10 @@ export default function InvoiceBuilderView({
 
       <div className="grid items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
         {/* ── Editor ── */}
-        <div className="no-print space-y-5">
+        <div
+          ref={editorPaneRef}
+          className="no-print space-y-5 min-[1500px]:sticky min-[1500px]:top-6 min-[1500px]:max-h-[calc(100vh-3rem)] min-[1500px]:overflow-y-auto min-[1500px]:pr-1"
+        >
           {/* Mode segmented control */}
           <div className="grid grid-cols-3 gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
             {(
@@ -719,7 +796,15 @@ export default function InvoiceBuilderView({
               <input
                 value={invoiceNumber}
                 onChange={(e) => setInvoiceNumber(e.target.value)}
-                className={`${inputCls} h-10`}
+                readOnly={mode !== "personal"}
+                placeholder={
+                  mode !== "personal"
+                    ? "Otomatis saat disimpan"
+                    : "INV-20260630-143205-A1B"
+                }
+                className={`${inputCls} h-10 ${
+                  mode !== "personal" ? "bg-gray-50 text-gray-600" : ""
+                }`}
               />
             </Field>
             <Field label="Status">
@@ -826,12 +911,14 @@ export default function InvoiceBuilderView({
                 Item{lines.length > 0 ? ` (${lines.length})` : ""}
               </SectionTitle>
               <div className="flex items-center gap-2">
-                <CatalogPicker
-                  sections={sections}
-                  loading={loading}
-                  mode={mode}
-                  onPick={addFromCatalog}
-                />
+                <button
+                  type="button"
+                  onClick={() => setCatalogOpen((v) => !v)}
+                  aria-pressed={catalogOpen}
+                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#1B2A4A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#27375c]"
+                >
+                  <span className="text-base leading-none">+</span> Katalog
+                </button>
                 <button
                   type="button"
                   onClick={addBlank}
@@ -841,6 +928,17 @@ export default function InvoiceBuilderView({
                 </button>
               </div>
             </div>
+
+            {catalogOpen && (
+              <CatalogPicker
+                sections={sections}
+                loading={loading}
+                mode={mode}
+                onPick={addFromCatalog}
+                onClose={() => setCatalogOpen(false)}
+                anchorRef={editorPaneRef}
+              />
+            )}
 
           {/* Line editor */}
           {lines.length === 0 ? (

@@ -3,33 +3,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
-  PRICE_BOOK,
-  FLEET_KEYS,
-  FLEET_LABELS,
-  isContact,
   mergeAddOns,
+  mergeTransportRates,
+  applyTransportRates,
   type HotelRate,
   type Attraction,
   type AddOnRate,
+  type TransportRate,
 } from "@/lib/admin/priceBook";
+import {
+  mergeCustomTransportRoutes,
+  type CustomTransportRoute,
+} from "@/lib/admin/customTransportRoutes";
+import {
+  buildRouteCatalogSections,
+  type CatalogItem,
+  type CatalogSection,
+} from "@/lib/admin/invoiceCatalog";
 
-/** A single pickable catalog entry, already priced per unit. */
-export interface CatalogItem {
-  key: string;
-  /** Section heading the item is filed under. */
-  group: string;
-  label: string;
-  capital: number;
-  sell: number;
-  /** Tag shown in the invoice "Service Type" column. */
-  serviceType: string;
-  unit?: string;
-}
-
-export interface CatalogSection {
-  group: string;
-  items: CatalogItem[];
-}
+export type { CatalogItem, CatalogSection } from "@/lib/admin/invoiceCatalog";
 
 /**
  * Build the unified invoice catalog: fixed routes (expanded per fleet),
@@ -39,20 +31,34 @@ export function useCatalog() {
   const [hotels, setHotels] = useState<HotelRate[]>([]);
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [addOns, setAddOns] = useState<AddOnRate[]>([]);
+  const [transportRates, setTransportRates] = useState<TransportRate[]>(() =>
+    mergeTransportRates([])
+  );
+  const [customRoutes, setCustomRoutes] = useState<CustomTransportRoute[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
     let alive = true;
     Promise.all([
+      supabase
+        .from("transport_rates")
+        .select("*")
+        .order("sort", { ascending: true }),
+      supabase
+        .from("custom_transport_routes")
+        .select("*")
+        .order("sort", { ascending: true }),
       supabase.from("hotel_rates").select("*").order("sort", { ascending: true }),
       supabase
         .from("attraction_rates")
         .select("*")
         .order("sort", { ascending: true }),
       supabase.from("add_ons").select("*").order("sort", { ascending: true }),
-    ]).then(([h, a, ao]) => {
+    ]).then(([t, custom, h, a, ao]) => {
       if (!alive) return;
+      setTransportRates(mergeTransportRates((t.data as TransportRate[]) ?? []));
+      setCustomRoutes((custom.data as CustomTransportRoute[]) ?? []);
       setHotels((h.data as HotelRate[]) ?? []);
       setAttractions((a.data as Attraction[]) ?? []);
       setAddOns(mergeAddOns((ao.data as AddOnRate[]) ?? []));
@@ -64,27 +70,11 @@ export function useCatalog() {
   }, []);
 
   const sections = useMemo<CatalogSection[]>(() => {
-    const out: CatalogSection[] = [];
-
-    // Routes — one entry per fleet, skipping quote-on-request services.
-    for (const g of PRICE_BOOK) {
-      const items: CatalogItem[] = [];
-      for (const s of g.services) {
-        if (isContact(s) || !s.prices) continue;
-        for (const k of FLEET_KEYS) {
-          const p = s.prices[k];
-          items.push({
-            key: `route-${s.id}-${k}`,
-            group: g.group,
-            label: `${s.name} · ${FLEET_LABELS[k]}`,
-            capital: p.cost,
-            sell: p.sell,
-            serviceType: FLEET_LABELS[k],
-          });
-        }
-      }
-      if (items.length) out.push({ group: g.group, items });
-    }
+    const routeGroups = mergeCustomTransportRoutes(
+      applyTransportRates(transportRates),
+      customRoutes
+    );
+    const out = buildRouteCatalogSections(routeGroups);
 
     // Hotels grouped by city.
     const hotelByCity = new Map<string, CatalogItem[]>();
@@ -139,7 +129,7 @@ export function useCatalog() {
       });
 
     return out;
-  }, [hotels, attractions, addOns]);
+  }, [transportRates, customRoutes, hotels, attractions, addOns]);
 
   return { sections, loading };
 }

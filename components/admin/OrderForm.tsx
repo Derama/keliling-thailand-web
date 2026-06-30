@@ -46,6 +46,8 @@ export default function OrderForm({
   order,
   onSaved,
   onCreated,
+  formId,
+  hideSubmit = false,
 }: {
   order: Order | null;
   /** Called after a successful update so the parent page can refetch. */
@@ -55,6 +57,10 @@ export default function OrderForm({
    * parent closes the modal instead of the form routing to the order detail.
    */
   onCreated?: () => void;
+  /** Edit mode: id on the <form> so a button elsewhere can submit it. */
+  formId?: string;
+  /** Edit mode: hide the built-in submit (the parent renders its own). */
+  hideSubmit?: boolean;
 }) {
   const router = useRouter();
   const [draft, setDraft] = useState<Draft>(() => toDraft(order));
@@ -76,9 +82,12 @@ export default function OrderForm({
   // mounted (just hidden) so stepping back shows the in-memory draft — not a
   // freshly reseeded builder that drops an unflushed library pick.
   const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set());
-  useEffect(() => {
-    if (step >= 1) setVisitedSteps((prev) => (prev.has(step) ? prev : new Set(prev).add(step)));
-  }, [step]);
+  // Navigate + mark the target visited in one go (no effect → no cascading render).
+  function goToStep(n: number) {
+    setStep(n);
+    if (n >= 1)
+      setVisitedSteps((prev) => (prev.has(n) ? prev : new Set(prev).add(n)));
+  }
   const isCreate = !order;
   // The order id that builders + the final save should target.
   const activeId = order?.id ?? createdId;
@@ -186,7 +195,7 @@ export default function OrderForm({
     setBusy(true);
     const id = await commitDetails();
     setBusy(false);
-    if (id) setStep(1);
+    if (id) goToStep(1);
   }
 
   // Finish the wizard from any builder step.
@@ -198,7 +207,7 @@ export default function OrderForm({
   // Edit mode: a flat trip form that updates the existing order in place.
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!activeId) return;
+    if (!activeId || busy) return;
     setBusy(true);
     setError(null);
     const supabase = createClient();
@@ -287,7 +296,7 @@ export default function OrderForm({
   );
 
   const tripSection = (
-    <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
+    <section className="h-full space-y-3 rounded-xl border border-gray-200 bg-white p-5">
       <h2 className="font-semibold text-[#1B2A4A]">Trip</h2>
       <Field label="Status">
         <div className="flex flex-wrap gap-2">
@@ -367,12 +376,14 @@ export default function OrderForm({
   // ── Edit mode: flat trip form ─────────────────────────────────
   if (!isCreate) {
     return (
-      <form onSubmit={onSubmit} className="max-w-3xl space-y-6">
+      <form id={formId} onSubmit={onSubmit} className="h-full max-w-3xl space-y-6">
         {tripSection}
         <ErrorNote message={error} />
-        <button type="submit" disabled={busy} className={btnCls}>
-          {busy ? "Menyimpan…" : "Simpan perubahan"}
-        </button>
+        {!hideSubmit && (
+          <button type="submit" disabled={busy} className={btnCls}>
+            {busy ? "Menyimpan…" : "Simpan perubahan"}
+          </button>
+        )}
       </form>
     );
   }
@@ -383,7 +394,7 @@ export default function OrderForm({
       steps={WIZARD_STEPS}
       current={step}
       canJump={(i) => i === 0 || !!activeId}
-      onJump={setStep}
+      onJump={goToStep}
     />
   );
 
@@ -435,7 +446,7 @@ export default function OrderForm({
           <div className="no-print flex items-center justify-between gap-3 border-t border-gray-200 pt-4">
             <button
               type="button"
-              onClick={() => setStep(step - 1)}
+              onClick={() => goToStep(step - 1)}
               className={btnSecondaryCls}
             >
               ← {WIZARD_STEPS[step - 1]}
@@ -444,7 +455,7 @@ export default function OrderForm({
               {step < WIZARD_STEPS.length - 1 && (
                 <button
                   type="button"
-                  onClick={() => setStep(step + 1)}
+                  onClick={() => goToStep(step + 1)}
                   className={btnSecondaryCls}
                 >
                   Lanjut → {WIZARD_STEPS[step + 1]}

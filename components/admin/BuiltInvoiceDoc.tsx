@@ -26,12 +26,13 @@ const MONTHS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-/** Usable content height per A4 sheet, in px (1123 page − 2×45 padding).
- *  The extra −40 is headroom: when the browser print dialog has
- *  "Headers and footers" enabled it steals a few mm top+bottom from the
- *  printable area. Without the buffer a JS-packed sheet overflows that area
- *  and the browser inserts its own ragged split (page 2 ≠ page 1). */
-const PAGE_CONTENT_H = 1123 - 45 * 2 - 40;
+/** Gross usable height per printed sheet, in CSS px. Print sheets are height:auto
+ *  (see `.invoice-page` in globals.css) so a sheet is exactly as tall as
+ *  header + packed content + footer; that total must fit ONE physical page even
+ *  when the browser's "Headers and footers" print option is on, which drops the
+ *  A4 printable area from ~273mm to ~257mm (≈971px). 930px ≈ 246mm keeps a full
+ *  sheet comfortably inside that, so no sheet ever fragments onto a blank page. */
+const PAGE_CONTENT_H = 930;
 
 /** "2026-06-18" -> "18 Jun 2026"; falls back to the raw string. */
 function longDate(iso: string): string {
@@ -169,7 +170,7 @@ export default function BuiltInvoiceDoc(props: Props) {
         {pages.map((page, pi) => (
           <div
             key={pi}
-            className="invoice-page print-doc relative shadow-md ring-1 ring-gray-200"
+            className="invoice-page kt-invoice-page print-doc relative shadow-md ring-1 ring-gray-200"
           >
             <div className="flex h-full flex-col text-[#1B2A4A]">
               <RunningHeader {...props} />

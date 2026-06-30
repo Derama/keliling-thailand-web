@@ -2,6 +2,8 @@
 // All prices in THB and include driver, fuel, and tolls.
 // `cost` = our capital price; `sell` = price charged to the customer.
 
+import type { CustomTransportRoute } from "@/lib/admin/customTransportRoutes";
+
 export type FleetKey = "altis" | "suv" | "van";
 
 export const FLEET_KEYS: FleetKey[] = ["altis", "suv", "van"];
@@ -23,11 +25,21 @@ export interface Service {
   /** When true the route is quote-on-request — no fixed price, not selectable. */
   contact?: boolean;
   prices?: Record<FleetKey, VehiclePrice>;
+  customRoute?: CustomTransportRoute;
 }
 
 export interface ServiceGroup {
   group: string;
   services: Service[];
+}
+
+export interface TransportRate {
+  id: string;
+  service_id: string;
+  fleet: FleetKey;
+  cost: number;
+  sell: number;
+  sort: number;
 }
 
 // Helper: build a price map from cost/sell pairs in [altis, suv, van] order.
@@ -74,6 +86,62 @@ export const PRICE_BOOK: ServiceGroup[] = [
     ],
   },
 ];
+
+export function baseTransportRates(): TransportRate[] {
+  return PRICE_BOOK.flatMap((group, groupIndex) =>
+    group.services.flatMap((service, serviceIndex) =>
+      service.prices
+        ? FLEET_KEYS.map((fleet, fleetIndex) => ({
+            id: `${service.id}-${fleet}`,
+            service_id: service.id,
+            fleet,
+            cost: service.prices![fleet].cost,
+            sell: service.prices![fleet].sell,
+            sort: groupIndex * 1000 + serviceIndex * 10 + fleetIndex,
+          }))
+        : []
+    )
+  );
+}
+
+export function mergeTransportRates(dbRows: TransportRate[]): TransportRate[] {
+  const byId = new Map(dbRows.map((r) => [r.id, r]));
+  return baseTransportRates().map((base) => {
+    const saved = byId.get(base.id);
+    return saved
+      ? {
+          ...base,
+          cost: Number(saved.cost),
+          sell: Number(saved.sell),
+          sort: saved.sort ?? base.sort,
+        }
+      : base;
+  });
+}
+
+export function applyTransportRates(
+  rows: TransportRate[]
+): ServiceGroup[] {
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  return PRICE_BOOK.map((group) => ({
+    ...group,
+    services: group.services.map((service) => {
+      if (!service.prices) return service;
+      return {
+        ...service,
+        prices: Object.fromEntries(
+          FLEET_KEYS.map((fleet) => {
+            const override = byId.get(`${service.id}-${fleet}`);
+            const price = override
+              ? { cost: Number(override.cost), sell: Number(override.sell) }
+              : service.prices![fleet];
+            return [fleet, price];
+          })
+        ) as Record<FleetKey, VehiclePrice>,
+      };
+    }),
+  }));
+}
 
 /** A row of the editable `add_ons` table (Biaya Tambahan). */
 export interface AddOnRate {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderWithCustomer, Payment } from "@/lib/admin/types";
@@ -20,11 +20,18 @@ import { ErrorNote } from "@/components/admin/ui";
 const ACTIVE = ["confirmed", "ongoing", "completed"] as const;
 
 // Preset periods plus `pickMonth`, which uses an explicit YYYY-MM the user chose.
-type Period = "month" | "lastMonth" | "year" | "all" | "pickMonth";
+type Period =
+  | "month"
+  | "lastMonth"
+  | "nextMonth"
+  | "year"
+  | "all"
+  | "pickMonth";
 
 const PRESET_LABELS: Record<Exclude<Period, "pickMonth">, string> = {
-  month: "Bulan ini",
   lastMonth: "Bulan lalu",
+  month: "Bulan ini",
+  nextMonth: "Bulan depan",
   year: "Tahun ini",
   all: "Semua",
 };
@@ -62,6 +69,8 @@ function deltaVs(period: Period): string | null {
       return "vs bulan lalu";
     case "lastMonth":
       return "vs bulan sebelumnya";
+    case "nextMonth":
+      return "vs bulan ini";
     case "pickMonth":
       return "vs bulan sebelumnya";
     case "year":
@@ -83,6 +92,8 @@ function rangeFor(period: Period, monthValue: string): Range {
       return [monthStart(y, 0), monthStart(y + 1, 0)];
     case "lastMonth":
       return [monthStart(y, m - 1), monthStart(y, m)];
+    case "nextMonth":
+      return [monthStart(y, m + 1), monthStart(y, m + 2)];
     case "pickMonth": {
       const [py, pm] = parseMonth(monthValue);
       return [monthStart(py, pm), monthStart(py, pm + 1)];
@@ -106,6 +117,8 @@ function prevRangeFor(period: Period, monthValue: string): Range {
       return [monthStart(y - 1, 0), monthStart(y, 0)];
     case "lastMonth":
       return [monthStart(y, m - 2), monthStart(y, m - 1)];
+    case "nextMonth":
+      return [monthStart(y, m), monthStart(y, m + 1)];
     case "pickMonth": {
       const [py, pm] = parseMonth(monthValue);
       return [monthStart(py, pm - 1), monthStart(py, pm)];
@@ -237,6 +250,130 @@ function StatCard({
   );
 }
 
+const MONTHS_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+];
+
+/** Custom month picker popover — year stepper + 3×4 month grid. */
+function MonthPicker({
+  active,
+  monthValue,
+  onPick,
+}: {
+  active: boolean;
+  monthValue: string;
+  onPick: (m: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const [selY, selM] = parseMonth(monthValue);
+  const [viewYear, setViewYear] = useState(selY);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const now = new Date();
+  const label = active
+    ? new Date(selY, selM, 1).toLocaleDateString("id-ID", {
+        month: "long",
+        year: "numeric",
+      })
+    : "Pilih bulan";
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => {
+          setViewYear(parseMonth(monthValue)[0]);
+          setOpen((o) => !o);
+        }}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+          active
+            ? "bg-[#F5C518] text-[#1B2A4A] shadow-sm"
+            : "text-gray-500 hover:text-[#1B2A4A]"
+        }`}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        {label}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-3 shadow-lg">
+          <div className="mb-2 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setViewYear((y) => y - 1)}
+              aria-label="Tahun sebelumnya"
+              className="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A]"
+            >
+              ‹
+            </button>
+            <span className="text-sm font-bold text-[#1B2A4A]">{viewYear}</span>
+            <button
+              type="button"
+              onClick={() => setViewYear((y) => y + 1)}
+              aria-label="Tahun berikutnya"
+              className="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A]"
+            >
+              ›
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            {MONTHS_SHORT.map((mLabel, i) => {
+              const isSelected = active && selY === viewYear && selM === i;
+              const isCurrent =
+                now.getFullYear() === viewYear && now.getMonth() === i;
+              return (
+                <button
+                  key={mLabel}
+                  type="button"
+                  onClick={() => {
+                    onPick(
+                      `${viewYear}-${String(i + 1).padStart(2, "0")}`
+                    );
+                    setOpen(false);
+                  }}
+                  className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
+                    isSelected
+                      ? "bg-[#F5C518] text-[#1B2A4A]"
+                      : isCurrent
+                      ? "text-[#1B2A4A] ring-1 ring-inset ring-[#F5C518]"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {mLabel}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PeriodSwitcher({
   value,
   monthValue,
@@ -249,35 +386,27 @@ function PeriodSwitcher({
   onMonth: (m: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
-        {(Object.keys(PRESET_LABELS) as Exclude<Period, "pickMonth">[]).map(
-          (p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => onPreset(p)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
-                value === p
-                  ? "bg-[#F5C518] text-[#1B2A4A] shadow-sm"
-                  : "text-gray-500 hover:text-[#1B2A4A]"
-              }`}
-            >
-              {PRESET_LABELS[p]}
-            </button>
-          )
-        )}
-      </div>
-      <input
-        type="month"
-        value={value === "pickMonth" ? monthValue : ""}
-        onChange={(e) => onMonth(e.target.value)}
-        aria-label="Pilih bulan tertentu"
-        className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
-          value === "pickMonth"
-            ? "border-[#F5C518] text-[#1B2A4A]"
-            : "border-gray-200 text-gray-500"
-        }`}
+    <div className="inline-flex flex-wrap items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+      {(Object.keys(PRESET_LABELS) as Exclude<Period, "pickMonth">[]).map(
+        (p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => onPreset(p)}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+              value === p
+                ? "bg-[#F5C518] text-[#1B2A4A] shadow-sm"
+                : "text-gray-500 hover:text-[#1B2A4A]"
+            }`}
+          >
+            {PRESET_LABELS[p]}
+          </button>
+        )
+      )}
+      <MonthPicker
+        active={value === "pickMonth"}
+        monthValue={monthValue}
+        onPick={onMonth}
       />
     </div>
   );

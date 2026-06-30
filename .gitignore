@@ -53,3 +53,9 @@ next-env.d.ts
 outputs/
 skills-lock.json
 .gstack/
+
+# Playwright MCP scratch output
+.playwright-mcp/
+
+# Design tooling scratch
+.impeccable.md

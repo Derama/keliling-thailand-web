@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderWithCustomer, OrderStatus } from "@/lib/admin/types";
 import { ErrorNote, btnSecondaryCls } from "@/components/admin/ui";
 import { isoLocal } from "@/lib/admin/utils";
+import Modal from "@/components/admin/Modal";
+import OrderDetail from "@/components/admin/OrderDetail";
 
 const BAR_COLORS: Record<OrderStatus, string> = {
   inquiry: "bg-gray-300 text-gray-800",
@@ -22,8 +23,9 @@ export default function CalendarView() {
   });
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<OrderWithCustomer | null>(null);
 
-  useEffect(() => {
+  function load() {
     createClient()
       .from("orders")
       .select("*, customers(*)")
@@ -33,7 +35,9 @@ export default function CalendarView() {
         if (error) setError(error.message);
         else setOrders((data as OrderWithCustomer[]) ?? []);
       });
-  }, []);
+  }
+
+  useEffect(load, []);
 
   const year = month.getFullYear();
   const mon = month.getMonth();
@@ -104,14 +108,15 @@ export default function CalendarView() {
                 </p>
                 <div className="mt-1 space-y-1">
                   {tripsOn(day).map((o) => (
-                    <Link
+                    <button
                       key={o.id}
-                      href={`/admin/orders/${o.id}`}
-                      className={`block truncate rounded px-1.5 py-0.5 text-xs ${BAR_COLORS[o.status]}`}
+                      type="button"
+                      onClick={() => setSelected(o)}
+                      className={`block w-full truncate rounded px-1.5 py-0.5 text-left text-xs ${BAR_COLORS[o.status]}`}
                       title={`${o.order_number} · ${o.customers.name}`}
                     >
                       {o.customers.name}
-                    </Link>
+                    </button>
                   ))}
                 </div>
               </>
@@ -119,6 +124,27 @@ export default function CalendarView() {
           </div>
         ))}
       </div>
+
+      <Modal
+        open={selected !== null}
+        onClose={() => setSelected(null)}
+        title={selected?.order_number ?? "Order"}
+        wide
+        expanded
+        printIsolate
+      >
+        {selected && (
+          <OrderDetail
+            id={selected.id}
+            showHeading={false}
+            onChanged={load}
+            onDeleted={() => {
+              setSelected(null);
+              load();
+            }}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

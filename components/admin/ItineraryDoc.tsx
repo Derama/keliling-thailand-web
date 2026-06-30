@@ -3,11 +3,18 @@
 import Image from "next/image";
 import { formatDate } from "@/lib/admin/utils";
 import { KELILING_THAILAND } from "@/lib/admin/company";
-import type { ItineraryDay, ItineraryPlace } from "@/lib/admin/itinerary";
+import type { ItineraryDay, ItineraryPlace, TravelTip } from "@/lib/admin/itinerary";
 
 const NAVY = "#1B2A4A";
 const GOLD = "#F5C518";
 const RUST = "#B95A33"; // editorial accent for display type
+
+// wa.me link from the company WhatsApp number (digits only).
+const WA_DIGITS = KELILING_THAILAND.whatsapp.replace(/\D/g, "");
+const WA_LINK = `https://wa.me/${WA_DIGITS}`;
+const WA_QR_SRC = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(
+  WA_LINK
+)}`;
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -52,6 +59,9 @@ export default function ItineraryDoc({
   vehicle,
   heroImage,
   days,
+  galleryImages = [],
+  travelTips = [],
+  showTravelTips = true,
 }: {
   tripTitle: string;
   customer: string;
@@ -60,6 +70,12 @@ export default function ItineraryDoc({
   vehicle: string;
   heroImage: string;
   days: ItineraryDay[];
+  /** Free trip photos (not tied to a day) for the closing recap gallery. */
+  galleryImages?: string[];
+  /** Editable "Info Perjalanan" reminders for the closing page. */
+  travelTips?: TravelTip[];
+  /** Whether to render the Info Perjalanan block. */
+  showTravelTips?: boolean;
 }) {
   const dated = days.map((d) => d.date).filter(Boolean);
   const dateRange =
@@ -74,9 +90,13 @@ export default function ItineraryDoc({
   ) as string[];
   const withPhoto = days.flatMap((d) => d.places).filter((p) => p.image);
   const hero = heroImage || withPhoto[0]?.image || "";
-  // Trip recap gallery for the closing page — dedupe by image, cap at 8.
+  // Trip recap gallery for the closing page — free trip photos first, then the
+  // day attractions. Dedupe by image, cap at 8.
+  const freePhotos: ItineraryPlace[] = galleryImages
+    .filter(Boolean)
+    .map((image) => ({ id: image, name: "", image, desc: "" }));
   const gallery = Array.from(
-    new Map(withPhoto.map((p) => [p.image, p])).values()
+    new Map([...freePhotos, ...withPhoto].map((p) => [p.image, p])).values()
   ).slice(0, 8);
   const pill = [vehicle, pax].filter(Boolean).join(" · ").toUpperCase();
   const totalPages = 1 + days.length + 1;
@@ -87,7 +107,7 @@ export default function ItineraryDoc({
         {totalPages} halaman A4 · 1 hari = 1 halaman
       </p>
 
-      <div className="space-y-8 rounded-xl bg-gray-200/70 p-4 sm:p-8 print:space-y-0 print:rounded-none print:bg-white print:p-0">
+      <div className="kt-itin-sheets space-y-8 rounded-xl bg-gray-200/70 p-4 sm:p-8 print:space-y-0 print:rounded-none print:bg-white print:p-0">
         <Sheet pageNo={1} totalPages={totalPages}>
           <CoverPage
             tripTitle={tripTitle}
@@ -108,7 +128,11 @@ export default function ItineraryDoc({
         ))}
 
         <Sheet pageNo={totalPages} totalPages={totalPages}>
-          <ClosingPage notes={notes} gallery={gallery} />
+          <ClosingPage
+            notes={notes}
+            gallery={gallery}
+            travelTips={showTravelTips ? travelTips : []}
+          />
         </Sheet>
       </div>
     </div>
@@ -129,7 +153,7 @@ function Sheet({
       <p className="no-print mb-1 text-center text-xs font-medium text-gray-400">
         Halaman {pageNo} / {totalPages}
       </p>
-      <article className="kt-page invoice-doc mx-auto flex min-h-[1123px] w-full max-w-[794px] flex-col overflow-hidden bg-white text-[#1B2A4A] shadow-lg ring-1 ring-gray-200 print:min-h-0 print:shadow-none print:ring-0">
+      <article className="kt-page invoice-doc mx-auto flex min-h-[1123px] w-full max-w-[794px] flex-col overflow-hidden bg-white text-[#1B2A4A] shadow-lg ring-1 ring-gray-200 print:shadow-none print:ring-0">
         {children}
       </article>
     </div>
@@ -172,9 +196,16 @@ function CoverPage({
   hero: string;
 }) {
   return (
-    <div className="relative flex flex-1 flex-col" style={{ backgroundColor: NAVY }}>
+    <div
+      className="relative flex flex-1 flex-col overflow-hidden"
+      style={{
+        background: hero
+          ? NAVY
+          : `radial-gradient(130% 90% at 50% -10%, #2a3f6b 0%, ${NAVY} 58%)`,
+      }}
+    >
       {hero && <Img src={hero} className="absolute inset-0 h-full w-full object-cover" />}
-      {/* navy scrim for legible text */}
+      {/* navy scrim for legible text over a photo */}
       <div
         className="absolute inset-0"
         style={{
@@ -183,6 +214,20 @@ function CoverPage({
             : "none",
         }}
       />
+
+      {/* No-photo cover: inset gold frame + oversized destination watermark so
+          the page reads as an editorial cover, not an empty navy block. */}
+      {!hero && (
+        <>
+          <div className="pointer-events-none absolute inset-6 rounded-sm border border-[#F5C518]/20" />
+          <span
+            className="pointer-events-none absolute -bottom-12 -right-6 select-none font-serif uppercase leading-none text-white/[0.05]"
+            style={{ fontSize: "12rem" }}
+          >
+            {cities[0] || "Thailand"}
+          </span>
+        </>
+      )}
 
       {/* Top brand bar */}
       <div className="relative flex items-center justify-between p-10 sm:p-12">
@@ -199,8 +244,9 @@ function CoverPage({
         </span>
       </div>
 
-      {/* Bottom title block */}
-      <div className="relative mt-auto p-10 sm:p-12">
+      {/* Title block — pinned to the bottom over a photo, vertically centered
+          without one so the cover never leaves a dead navy void. */}
+      <div className={`relative p-10 sm:p-12 ${hero ? "mt-auto" : "my-auto"}`}>
         <Eyebrow light>Itinerary · {days} Hari {nights} Malam</Eyebrow>
         <h1 className="mt-3 max-w-2xl font-serif text-6xl leading-[1.0] text-white">
           {tripTitle || "Itinerary Perjalanan"}
@@ -278,10 +324,13 @@ function DayPage({
   return (
     <div className="flex flex-1 flex-col p-10 sm:p-12">
       {/* Running brand header */}
-      <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-3">
+      <div
+        className="mb-6 flex items-center justify-between pb-3"
+        style={{ borderBottom: `2px solid ${GOLD}` }}
+      >
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5C518]">
-            <Image src="/Logo.png" alt="" width={18} height={14} />
+            <Image src="/Logo.png" alt="" width={18} height={14} priority />
           </span>
           <span
             className="text-[11px] font-extrabold tracking-tight"
@@ -408,7 +457,10 @@ function DayPage({
         </section>
       )}
 
-      <footer className="mt-4 flex items-center justify-between border-t border-gray-200 pt-2.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+      <footer
+        className="mt-4 flex items-center justify-between pt-2.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-gray-500"
+        style={{ borderTop: `2px solid ${GOLD}` }}
+      >
         <span style={{ color: NAVY }}>Keliling Thailand</span>
         <span>Hari {dayNo}</span>
         <span>{KELILING_THAILAND.website}</span>
@@ -422,16 +474,28 @@ function DayPage({
 function ClosingPage({
   notes,
   gallery,
+  travelTips,
 }: {
   notes: string;
   gallery: ItineraryPlace[];
+  travelTips: TravelTip[];
 }) {
   const k = KELILING_THAILAND;
+  // The main WhatsApp line belongs to a named contact — show that name instead
+  // of a bare "WhatsApp" label. Drop that contact from the extra list so the
+  // number isn't printed twice.
+  const waDigits = k.whatsapp.replace(/\D/g, "");
+  const waContact = k.contacts.find(
+    (c) => c.phone.replace(/\D/g, "") === waDigits
+  );
+  const extraContacts = k.contacts.filter(
+    (c) => c.phone.replace(/\D/g, "") !== waDigits
+  );
   return (
     <div className="flex flex-1 flex-col p-10 sm:p-12">
       <div className="flex items-center gap-2.5">
         <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F5C518] shadow-sm">
-          <Image src="/Logo.png" alt="" width={30} height={23} />
+          <Image src="/Logo.png" alt="" width={30} height={23} priority />
         </span>
         <div className="leading-tight">
           <p className="text-base font-extrabold tracking-tight">KELILING THAILAND</p>
@@ -445,6 +509,29 @@ function ClosingPage({
           Siap menemani perjalanan Anda di Negeri Gajah Putih.
         </h2>
       </div>
+
+      {/* Practical travel reminders — editable + toggleable from the builder */}
+      {travelTips.length > 0 && (
+        <div className="mt-8">
+        <Eyebrow>Info Perjalanan</Eyebrow>
+        <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2.5">
+          {travelTips.map((t) => (
+            <div key={t.label} className="flex gap-2.5">
+              <span
+                className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+                style={{ backgroundColor: GOLD }}
+              />
+              <p className="text-[11px] leading-snug text-gray-600">
+                <span className="font-semibold" style={{ color: NAVY }}>
+                  {t.label}.
+                </span>{" "}
+                {t.text}
+              </p>
+            </div>
+          ))}
+        </div>
+        </div>
+      )}
 
       {gallery.length > 0 && (
         <div className="mt-8">
@@ -473,14 +560,37 @@ function ClosingPage({
 
       <div className="mt-auto">
         <Eyebrow>Hubungi Tim Kami</Eyebrow>
-        <div className="mt-2 grid gap-x-8 text-xs sm:grid-cols-2">
-          <ContactRow label="WhatsApp" value={k.whatsapp} />
-          <ContactRow label="Email" value={k.email} />
-          <ContactRow label="Instagram" value={k.instagram} />
-          <ContactRow label="Website" value={k.website} />
-          {k.contacts.map((c) => (
-            <ContactRow key={c.name} label={c.name} value={c.phone} />
-          ))}
+        <div className="mt-2 flex items-start gap-10">
+          <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-8 text-xs">
+            <ContactRow
+              label={waContact ? waContact.name : "WhatsApp"}
+              value={k.whatsapp}
+              wide
+              singleLine
+            />
+            {extraContacts.map((c) => (
+              <ContactRow
+                key={c.name}
+                label={c.name}
+                value={c.phone}
+                wide
+                singleLine
+              />
+            ))}
+            <ContactRow label="Instagram" value={k.instagram} singleLine />
+            <ContactRow label="Facebook" value={k.facebook} singleLine />
+            <ContactRow label="Email" value={k.email} wide />
+            <ContactRow label="Website" value={k.website} wide />
+          </div>
+          {/* WhatsApp QR — scan to chat / rebook */}
+          <div className="ml-2 shrink-0 text-center">
+            <div className="mx-auto h-24 w-24 overflow-hidden rounded-lg border border-gray-200 bg-white p-1">
+              <Img src={WA_QR_SRC} className="h-full w-full object-contain" />
+            </div>
+            <p className="mt-1.5 text-[8.5px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+              Scan · Chat WhatsApp
+            </p>
+          </div>
         </div>
 
         <div
@@ -499,13 +609,33 @@ function ClosingPage({
   );
 }
 
-function ContactRow({ label, value }: { label: string; value: string }) {
+function ContactRow({
+  label,
+  value,
+  wide,
+  singleLine,
+}: {
+  label: string;
+  value: string;
+  wide?: boolean;
+  singleLine?: boolean;
+}) {
   return (
-    <div className="flex items-baseline gap-3 border-b border-gray-100 py-1.5">
-      <span className="w-24 shrink-0 text-[10px] font-bold uppercase tracking-wide text-gray-400">
+    <div
+      className={`grid min-w-0 grid-cols-[6rem_minmax(0,1fr)] items-baseline gap-3 border-b border-gray-100 py-1.5 ${
+        wide ? "col-span-2" : ""
+      }`}
+    >
+      <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
         {label}
       </span>
-      <span className="font-medium text-[#1B2A4A]">{value}</span>
+      <span
+        className={`min-w-0 font-medium text-[#1B2A4A] ${
+          singleLine ? "whitespace-nowrap tabular-nums" : "break-words"
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }

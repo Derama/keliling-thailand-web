@@ -1,10 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Modal from "@/components/admin/Modal";
+import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
 import { inputCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import { uploadPlaceImage } from "@/lib/admin/storage";
 import { loadOrderDoc, saveOrderDoc, clearOrderDoc } from "@/lib/admin/orderDocs";
+import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
+import {
+  createTemplate,
+  listTemplates,
+  loadTemplate,
+  saveTemplate,
+} from "@/lib/admin/docLibrary";
 import { groupPlaces, type Place } from "@/lib/admin/places";
 import {
   groupHotels,
@@ -32,20 +41,28 @@ function newId() {
   return crypto.randomUUID();
 }
 
-interface Draft {
+export interface BrochureDraft {
   meta: BrochureMeta;
   cities: BrochureCity[];
   fleet: FleetItem[];
   hotels: CatalogItem[];
   attractions: CatalogItem[];
   notes: string;
+  /** Library mirror row this order's brochure is synced to. */
+  libraryId?: string | null;
 }
 
 export default function BrochureBuilderView({
   orderId,
+  templateId,
+  onExit,
 }: {
   /** When set, the brochure loads from / saves to this order. */
   orderId?: string;
+  /** Standalone saved-template row edited outside an order. */
+  templateId?: string;
+  /** Return to the saved Brochure list. */
+  onExit?: () => void;
 } = {}) {
   const [meta, setMeta] = useState<BrochureMeta>(DEFAULT_META);
   const [cities, setCities] = useState<BrochureCity[]>([]);
@@ -54,20 +71,52 @@ export default function BrochureBuilderView({
   const [attractions, setAttractions] = useState<CatalogItem[]>([]);
   const [notes, setNotes] = useState(DEFAULT_NOTES);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [libraryId, setLibraryId] = useState<string | null>(null);
+  const [templateTitle, setTemplateTitle] = useState("");
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
+  const [pickerLoading, setPickerLoading] = useState(false);
   const hydrated = useRef(false);
+
+  function applyDraft(draft: Partial<BrochureDraft>) {
+    setMeta({ ...DEFAULT_META, ...(draft.meta ?? {}) });
+    setCities(Array.isArray(draft.cities) ? draft.cities : []);
+    setFleet(
+      Array.isArray(draft.fleet) && draft.fleet.length
+        ? draft.fleet
+        : DEFAULT_FLEET
+    );
+    setHotels(Array.isArray(draft.hotels) ? draft.hotels : []);
+    setAttractions(Array.isArray(draft.attractions) ? draft.attractions : []);
+    setNotes(typeof draft.notes === "string" ? draft.notes : DEFAULT_NOTES);
+    setLibraryId(draft.libraryId ?? null);
+  }
 
   // Restore draft once, then load fresh data and merge in saved overrides.
   // Per-order → order_documents; else localStorage.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      let draft: Draft | null = null;
+      let draft: Partial<BrochureDraft> | null = null;
       if (orderId) {
-        draft = await loadOrderDoc<Draft>(orderId, "brochure");
+        draft = await loadOrderDoc<BrochureDraft>(orderId, "brochure");
+        const { data: order } = await createClient()
+          .from("orders")
+          .select("order_number")
+          .eq("id", orderId)
+          .maybeSingle();
+        if (!cancelled) setOrderNumber(order?.order_number ?? null);
+      } else if (templateId) {
+        const picked = await loadTemplate<BrochureDraft>(templateId);
+        if (picked) {
+          setTemplateTitle(picked.title);
+          draft = { ...picked.data, libraryId: null };
+        }
       } else {
         try {
           const raw = localStorage.getItem(DRAFT_KEY);
-          if (raw) draft = JSON.parse(raw) as Draft;
+          if (raw) draft = JSON.parse(raw) as BrochureDraft;
         } catch {
           /* ignore corrupt draft */
         }
@@ -75,12 +124,7 @@ export default function BrochureBuilderView({
       if (cancelled) return;
 
       if (draft) {
-        setMeta({ ...DEFAULT_META, ...draft.meta });
-        setCities(Array.isArray(draft.cities) ? draft.cities : []);
-        setFleet(Array.isArray(draft.fleet) && draft.fleet.length ? draft.fleet : DEFAULT_FLEET);
-        setHotels(Array.isArray(draft.hotels) ? draft.hotels : []);
-        setAttractions(Array.isArray(draft.attractions) ? draft.attractions : []);
-        if (typeof draft.notes === "string") setNotes(draft.notes);
+        applyDraft(draft);
       }
 
       const supabase = createClient();
@@ -141,28 +185,100 @@ export default function BrochureBuilderView({
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, templateId]);
 
-  // Autosave (debounced).
-  useEffect(() => {
-    if (!hydrated.current) return;
-    const draft: Draft = { meta, cities, fleet, hotels, attractions, notes };
+  async function persistDraft() {
+    const draft: BrochureDraft = {
+      meta,
+      cities,
+      fleet,
+      hotels,
+      attractions,
+      notes,
+      libraryId,
+    };
     const markSaved = () =>
       setSavedAt(
         new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
       );
-    const t = setTimeout(() => {
-      if (orderId) {
-        saveOrderDoc(orderId, "brochure", draft).then(markSaved);
-      } else {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-        markSaved();
+
+    if (orderId) {
+      let nextLibraryId = libraryId;
+      try {
+        if (!nextLibraryId) {
+          nextLibraryId = await createTemplate(
+            "brochure",
+            meta.title || "Brosur",
+            { ...draft, libraryId: null },
+            orderNumber
+          );
+          if (nextLibraryId) setLibraryId(nextLibraryId);
+        } else {
+          await saveTemplate(nextLibraryId, meta.title || "Brosur", {
+            ...draft,
+            libraryId: nextLibraryId,
+          });
+        }
+      } catch {
+        /* order_documents remains the source of truth if mirroring fails */
       }
+      await saveOrderDoc(orderId, "brochure", {
+        ...draft,
+        libraryId: nextLibraryId,
+      });
+      markSaved();
+      return;
+    }
+
+    if (templateId) {
+      await saveTemplate(
+        templateId,
+        templateTitle.trim() || meta.title || "Brosur",
+        { ...draft, libraryId: null }
+      );
+      markSaved();
+      return;
+    }
+
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    markSaved();
+  }
+
+  // Autosave (debounced).
+  useEffect(() => {
+    if (!hydrated.current) return;
+    const t = setTimeout(() => {
+      void persistDraft();
     }, 600);
     return () => clearTimeout(t);
-  }, [orderId, meta, cities, fleet, hotels, attractions, notes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, templateId, templateTitle, orderNumber, libraryId, meta, cities, fleet, hotels, attractions, notes]);
 
   const [printing, setPrinting] = useState(false);
+  const [coverPickerOpen, setCoverPickerOpen] = useState(false);
+
+  // Every place photo (across all cities) the admin can pick as the brochure
+  // cover, grouped by city. Sourced from the same `places` data that fills the
+  // city pages, so the gallery always mirrors the Tempat page. Deduped by URL.
+  const photoGroups = useMemo(() => {
+    const seen = new Set<string>();
+    const groups: { city: string; photos: { image: string; name: string }[] }[] = [];
+    for (const c of cities) {
+      const photos: { image: string; name: string }[] = [];
+      for (const d of c.destinations) {
+        if (d.image && !seen.has(d.image)) {
+          seen.add(d.image);
+          photos.push({ image: d.image, name: d.name });
+        }
+      }
+      if (photos.length) groups.push({ city: c.city, photos });
+    }
+    return groups;
+  }, [cities]);
+  const photoCount = useMemo(
+    () => photoGroups.reduce((n, g) => n + g.photos.length, 0),
+    [photoGroups]
+  );
 
   async function printBrochure() {
     if (printing) return;
@@ -176,9 +292,14 @@ export default function BrochureBuilderView({
     // afterprint.
     const style = document.createElement("style");
     // Pin A4 + zero margin so the 210×297mm sheets match the page box exactly.
-    // Without an explicit `size`, Chrome falls back to the OS default paper
+    // Without an explicit `size`, the browser falls back to the OS default paper
     // (often US Letter, 279mm) — shorter than the sheets, which clips content
-    // and can emit a stray trailing page.
+    // and can emit a stray trailing page. The sheet sizing + per-page break
+    // rules live in globals.css (.kt-brochure-sheet / .kt-brochure-page-frame),
+    // identical to the itinerary print path — one full-height 296mm sheet per
+    // page, no scaling. (An earlier Safari-targeted scale-into-270mm-frame hack
+    // caused each sheet to leave a ~27mm blank strip and overflow onto a second
+    // page, doubling the page count — removed.)
     style.textContent =
       "@media print { @page { size: A4 !important; margin: 0 !important; } }";
     document.head.appendChild(style);
@@ -202,10 +323,42 @@ export default function BrochureBuilderView({
     window.print();
   }
 
+  async function openPicker() {
+    setPickerOpen(true);
+    setPickerLoading(true);
+    const rows = await listTemplates<BrochureDraft>("brochure");
+    setPickerRows(rows.map((row) => pickerRow(row)));
+    setPickerLoading(false);
+  }
+
+  async function pickTemplate(id: string) {
+    setPickerOpen(false);
+    const picked = await loadTemplate<BrochureDraft>(id);
+    if (!picked) return;
+    if (!confirm("Ganti isi brosur dengan yang dipilih?")) return;
+    applyDraft({ ...picked.data, libraryId });
+  }
+
+  async function exitTemplate() {
+    if (templateId) await persistDraft();
+    onExit?.();
+  }
+
   function resetAll() {
     if (!confirm("Reset brosur ke data terbaru dan hapus perubahan?")) return;
-    if (orderId) clearOrderDoc(orderId, "brochure").then(() => window.location.reload());
-    else {
+    if (orderId) {
+      clearOrderDoc(orderId, "brochure").then(() => window.location.reload());
+    } else if (templateId) {
+      applyDraft({
+        meta: DEFAULT_META,
+        cities: [],
+        fleet: DEFAULT_FLEET,
+        hotels: [],
+        attractions: [],
+        notes: DEFAULT_NOTES,
+        libraryId: null,
+      });
+    } else {
       localStorage.removeItem(DRAFT_KEY);
       window.location.reload();
     }
@@ -266,13 +419,40 @@ export default function BrochureBuilderView({
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Brosur</h1>
+          {onExit && (
+            <button
+              type="button"
+              onClick={() => void exitTemplate()}
+              className="mb-2 text-sm font-medium text-gray-500 hover:text-[#1B2A4A]"
+            >
+              ← Daftar brosur
+            </button>
+          )}
+          {templateId ? (
+            <input
+              value={templateTitle}
+              onChange={(event) => setTemplateTitle(event.target.value)}
+              placeholder={meta.title || "Nama brosur"}
+              className="block w-full max-w-md bg-transparent text-2xl font-bold text-[#1B2A4A] outline-none placeholder:text-gray-300 focus:border-b focus:border-[#F5C518]"
+            />
+          ) : (
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">Buat Brosur</h1>
+          )}
           <p className="text-sm text-gray-500">
             Katalog perusahaan: kota &amp; destinasi unggulan, armada, hotel, dan
             tiket. Atur isi, lalu Print / Simpan PDF.
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {orderId && (
+            <button
+              type="button"
+              onClick={openPicker}
+              className={btnSecondaryCls}
+            >
+              Pilih dari tersimpan
+            </button>
+          )}
           {savedAt && (
             <span className="hidden text-xs text-gray-400 sm:inline">
               Tersimpan · {savedAt}
@@ -285,6 +465,15 @@ export default function BrochureBuilderView({
           >
             Reset
           </button>
+          {templateId && (
+            <button
+              type="button"
+              onClick={() => void persistDraft()}
+              className={btnSecondaryCls}
+            >
+              Simpan
+            </button>
+          )}
           <button
             type="button"
             onClick={printBrochure}
@@ -297,8 +486,10 @@ export default function BrochureBuilderView({
       </div>
 
       <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
-        {/* Editor column */}
-        <div className="no-print space-y-5">
+        {/* Editor column — sticks to the top so the controls stay in view while
+            scrolling the tall multi-page preview. Scrolls within itself if the
+            form is taller than the viewport. */}
+        <div className="no-print space-y-5 min-[1280px]:sticky min-[1280px]:top-6 min-[1280px]:self-start min-[1280px]:max-h-[calc(100vh-3rem)] min-[1280px]:overflow-y-auto min-[1280px]:pr-1">
           {/* 1 — Cover */}
           <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
             <StepHead n="1" title="Sampul" />
@@ -332,7 +523,30 @@ export default function BrochureBuilderView({
                   aspect="aspect-[16/7]"
                   onChange={(v) => setMeta((m) => ({ ...m, coverImage: v }))}
                   droppable
+                  hoverUpload
                 />
+                <button
+                  type="button"
+                  onClick={() => setCoverPickerOpen(true)}
+                  className="group mt-2 flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-left transition-colors hover:border-[#1B2A4A]/40 hover:bg-[#F8FAFF]"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#1B2A4A]/5 text-base transition-colors group-hover:bg-[#F5C518]">
+                    🖼
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-[#1B2A4A]">
+                      Pilih dari galeri tempat
+                    </span>
+                    <span className="block text-xs text-gray-400">
+                      {photoCount > 0
+                        ? `${photoCount} foto tersedia dari halaman Tempat`
+                        : "Belum ada foto tempat"}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-gray-300 transition-colors group-hover:text-[#1B2A4A]">
+                    →
+                  </span>
+                </button>
               </div>
             </div>
           </section>
@@ -405,7 +619,7 @@ export default function BrochureBuilderView({
         </div>
 
         {/* Preview column */}
-        <div className="min-[1500px]:sticky min-[1500px]:top-6 min-[1500px]:self-start">
+        <div>
           <div className="overflow-x-auto print:overflow-visible">
             <div className="print:min-w-0">
               <BrochureDoc
@@ -420,6 +634,94 @@ export default function BrochureBuilderView({
           </div>
         </div>
       </div>
+
+      <Modal
+        open={coverPickerOpen}
+        onClose={() => setCoverPickerOpen(false)}
+        title="Pilih foto sampul dari galeri tempat"
+        wide
+      >
+        {photoCount === 0 ? (
+          <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-10 text-center">
+            <p className="text-3xl">🏞️</p>
+            <p className="mt-2 text-sm font-medium text-[#1B2A4A]">Belum ada foto tempat</p>
+            <p className="mt-1 text-xs text-gray-400">
+              Tambah foto destinasi di tab Tempat, lalu pilih di sini.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <p className="text-xs text-gray-400">
+              Klik foto untuk menjadikannya sampul brosur.
+            </p>
+            {photoGroups.map((g) => (
+              <section
+                key={g.city}
+                className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/60"
+              >
+                <div className="flex items-center gap-2 border-b border-gray-200 bg-[#1B2A4A] px-4 py-2.5">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F5C518] text-[11px]">
+                    📍
+                  </span>
+                  <h3 className="text-sm font-bold tracking-tight text-white">{g.city}</h3>
+                  <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-medium text-white/80">
+                    {g.photos.length} foto
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4">
+                  {g.photos.map((p) => {
+                    const selected = meta.coverImage === p.image;
+                    return (
+                      <button
+                        key={p.image}
+                        type="button"
+                        onClick={() => {
+                          setMeta((m) => ({ ...m, coverImage: p.image }));
+                          setCoverPickerOpen(false);
+                        }}
+                        title={`Jadikan sampul: ${p.name}`}
+                        className={`group relative aspect-[4/3] overflow-hidden rounded-xl ring-2 transition-all ${
+                          selected
+                            ? "ring-[#F5C518]"
+                            : "ring-transparent hover:ring-[#1B2A4A]/20"
+                        }`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.image}
+                          alt=""
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <span className="pointer-events-none absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/75 via-black/25 to-transparent px-2.5 pb-1.5 pt-5 text-left text-[11px] font-medium text-white">
+                          {p.name}
+                        </span>
+                        {selected ? (
+                          <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#F5C518] text-[12px] font-bold text-[#1B2A4A] shadow">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="absolute inset-0 flex items-center justify-center bg-[#1B2A4A]/0 text-xs font-semibold text-white opacity-0 transition-opacity group-hover:bg-[#1B2A4A]/35 group-hover:opacity-100">
+                            Jadikan sampul
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </Modal>
+
+      <TemplatePickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title="Pilih brosur tersimpan"
+        rows={pickerRows}
+        loading={pickerLoading}
+        onPick={pickTemplate}
+      />
     </div>
   );
 }
@@ -807,6 +1109,7 @@ function ImageSlot({
   onChange,
   compact,
   droppable,
+  hoverUpload,
 }: {
   label: string;
   folder: string;
@@ -816,6 +1119,9 @@ function ImageSlot({
   compact?: boolean;
   /** Accept dropped image files (from desktop) or a dragged photo URL. */
   droppable?: boolean;
+  /** Drop the "Ganti"/URL row; upload by hovering the photo and clicking the
+   *  "Unggah foto baru" overlay (or clicking the empty placeholder). */
+  hoverUpload?: boolean;
 }) {
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -873,7 +1179,7 @@ function ImageSlot({
           if (!e.currentTarget.contains(e.relatedTarget as Node)) setOver(false);
         }}
         onDrop={onDrop}
-        className={`relative flex ${aspect} items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors ${
+        className={`group relative flex ${aspect} items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors ${
           over
             ? "border-[#F5C518] bg-[#FFFCEF]"
             : value
@@ -889,15 +1195,46 @@ function ImageSlot({
               alt=""
               className={`h-full w-full ${compact ? "object-contain p-1" : "object-cover"}`}
             />
+            {hoverUpload && (
+              // Hover the photo → reveal a full-cover upload label. Click anywhere
+              // on the photo opens the file picker and replaces the cover.
+              <label
+                className={`absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-1 bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100 ${
+                  uploading ? "opacity-100" : ""
+                }`}
+              >
+                <span className="text-lg">⬆</span>
+                <span className="text-xs font-semibold">
+                  {uploading ? "Mengunggah…" : "Unggah foto baru"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onUpload(e.target.files?.[0])}
+                />
+              </label>
+            )}
             <button
               type="button"
               onClick={() => onChange("")}
-              className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75"
+              className="absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75"
               aria-label="Hapus foto"
             >
               ✕
             </button>
           </>
+        ) : hoverUpload ? (
+          // Empty: the whole box is the upload trigger.
+          <label className="flex h-full w-full cursor-pointer items-center justify-center px-2 text-center text-xs text-gray-400 hover:text-[#1B2A4A]">
+            {uploading ? "Mengunggah…" : "Unggah foto sampul, atau tarik foto ke sini"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => onUpload(e.target.files?.[0])}
+            />
+          </label>
         ) : (
           <span className="px-2 text-center text-xs text-gray-400">
             {compact
@@ -908,29 +1245,31 @@ function ImageSlot({
           </span>
         )}
       </div>
-      <div className="mt-1.5 flex items-center gap-2">
-        <label
-          className={`${btnSecondaryCls} cursor-pointer ${compact ? "px-2 py-1 text-xs" : ""} ${
-            uploading ? "opacity-60" : ""
-          }`}
-        >
-          {uploading ? "Mengunggah…" : value ? "Ganti" : "Unggah"}
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => onUpload(e.target.files?.[0])}
-          />
-        </label>
-        {!compact && (
-          <input
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="atau tempel URL"
-            className={`${inputCls} flex-1`}
-          />
-        )}
-      </div>
+      {!hoverUpload && (
+        <div className="mt-1.5 flex items-center gap-2">
+          <label
+            className={`${btnSecondaryCls} cursor-pointer ${compact ? "px-2 py-1 text-xs" : ""} ${
+              uploading ? "opacity-60" : ""
+            }`}
+          >
+            {uploading ? "Mengunggah…" : value ? "Ganti" : "Unggah"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => onUpload(e.target.files?.[0])}
+            />
+          </label>
+          {!compact && (
+            <input
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder="atau tempel URL"
+              className={`${inputCls} flex-1`}
+            />
+          )}
+        </div>
+      )}
       <ErrorNote message={err} />
     </div>
   );

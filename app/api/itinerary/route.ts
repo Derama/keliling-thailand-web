@@ -119,7 +119,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Curated attraction catalog (only rows with a photo can become a card).
+  // Curated attraction catalog. Rows without photos still provide canonical
+  // names and descriptions; the resolver emits an empty image for those rows.
   let catalogRows: CatalogPlace[] = [];
   try {
     const { data, error } = await supabase
@@ -127,7 +128,7 @@ export async function POST(request: Request) {
       .select("city, name, image_url, description")
       .order("sort", { ascending: true });
     if (error) console.error("itinerary: places fetch failed", error.message);
-    catalogRows = ((data as CatalogPlace[]) ?? []).filter((r) => !!r.image_url);
+    catalogRows = (data as CatalogPlace[]) ?? [];
   } catch {
     catalogRows = []; // text-only itinerary if the catalog can't be read
   }
