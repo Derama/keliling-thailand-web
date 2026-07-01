@@ -36,7 +36,22 @@ export default function CatalogPicker({
   anchorRef: RefObject<HTMLElement | null>;
 }) {
   const [query, setQuery] = useState("");
+  // Key of the row that was just tapped — flashes green + shows ✓ so the admin
+  // gets feedback the item landed on the invoice (the picker stays open).
+  const [flashKey, setFlashKey] = useState<string | null>(null);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  function pick(item: CatalogItem) {
+    onPick(item);
+    setFlashKey(item.key);
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setFlashKey(null), 900);
+  }
+
+  useEffect(() => () => {
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+  }, []);
   const [box, setBox] = useState<{
     top: number;
     left: number;
@@ -49,7 +64,12 @@ export default function CatalogPicker({
   // so below 640px the picker fills the screen as a near-fullscreen sheet.
   useLayoutEffect(() => {
     function place() {
-      if (window.innerWidth < 640) {
+      // Touch devices → fullscreen sheet. Detect via coarse pointer, not
+      // innerWidth: a page with horizontal overflow inflates the layout viewport
+      // past 640, which would wrongly fall back to the anchored desktop popup.
+      const coarse =
+        window.matchMedia?.("(pointer: coarse)").matches || window.innerWidth < 640;
+      if (coarse) {
         setBox({
           top: 8,
           left: 8,
@@ -148,24 +168,35 @@ export default function CatalogPicker({
                 <p className="sticky top-0 z-10 border-y border-gray-100 bg-gray-100/95 px-4 py-2 text-[11px] font-bold uppercase tracking-wide text-gray-500 backdrop-blur">
                   {s.group}
                 </p>
-                {s.items.map((i) => (
-                  <button
-                    key={i.key}
-                    type="button"
-                    onClick={() => onPick(i)}
-                    className="flex w-full items-center justify-between gap-3 border-b border-gray-100 px-4 py-3 text-left hover:bg-[#F5C518]/15 active:bg-[#F5C518]/25"
-                  >
-                    <span className="text-[15px] leading-snug text-[#1B2A4A]">
-                      {i.label}
-                      {i.unit ? (
-                        <span className="text-gray-400"> / {i.unit}</span>
-                      ) : null}
-                    </span>
-                    <span className="shrink-0 text-sm font-semibold tabular-nums text-gray-600">
-                      {formatTHB(priceOf(i))}
-                    </span>
-                  </button>
-                ))}
+                {s.items.map((i) => {
+                  const added = flashKey === i.key;
+                  return (
+                    <button
+                      key={i.key}
+                      type="button"
+                      onClick={() => pick(i)}
+                      className={`flex w-full items-center justify-between gap-3 border-b border-gray-100 px-4 py-3 text-left transition-colors duration-150 active:bg-[#F5C518]/25 ${
+                        added ? "bg-green-50" : "hover:bg-[#F5C518]/15"
+                      }`}
+                    >
+                      <span className="text-[15px] leading-snug text-[#1B2A4A]">
+                        {i.label}
+                        {i.unit ? (
+                          <span className="text-gray-400"> / {i.unit}</span>
+                        ) : null}
+                      </span>
+                      {added ? (
+                        <span className="shrink-0 animate-[addPop_0.25s_ease-out] text-sm font-semibold text-green-600">
+                          ✓ Ditambah
+                        </span>
+                      ) : (
+                        <span className="shrink-0 text-sm font-semibold tabular-nums text-gray-600">
+                          {formatTHB(priceOf(i))}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             ))
           )}
