@@ -31,7 +31,7 @@ export default function AdminShell({
           Keluar
         </button>
       </header>
-      <main className="mx-auto max-w-7xl p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6 lg:p-8 print:max-w-none print:m-0! print:p-0! print:pb-0!">
+      <main className="mx-auto max-w-7xl overflow-x-clip p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-6 lg:p-8 print:max-w-none print:m-0! print:p-0! print:overflow-x-visible print:pb-0!">
         {children}
       </main>
     </div>

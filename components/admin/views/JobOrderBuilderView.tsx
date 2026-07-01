@@ -394,7 +394,7 @@ export default function JobOrderBuilderView({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
+      <div className="grid grid-cols-1 items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
         {/* ── Editor ── Sticky with its own scroll so the long preview on the
             right scrolls the page while the editor stays in view. */}
         <div className="no-print space-y-5 min-[1500px]:sticky min-[1500px]:top-0 min-[1500px]:max-h-[85vh] min-[1500px]:self-start min-[1500px]:overflow-y-auto min-[1500px]:pr-2">

@@ -721,7 +721,7 @@ export default function InvoiceBuilderView({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
+      <div className="grid grid-cols-1 items-start gap-6 min-[1500px]:grid-cols-[minmax(360px,440px)_minmax(858px,1fr)] print:block">
         {/* ── Editor ── */}
         <div
           ref={editorPaneRef}

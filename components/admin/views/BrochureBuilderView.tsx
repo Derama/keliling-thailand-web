@@ -498,7 +498,7 @@ export default function BrochureBuilderView({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
+      <div className="grid grid-cols-1 items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
         {/* Editor column — sticks to the top so the controls stay in view while
             scrolling the tall multi-page preview. Scrolls within itself if the
             form is taller than the viewport. */}
