@@ -81,6 +81,20 @@ export default function JobOrderBuilderView({
 
   const hydrated = useRef(false);
 
+  // Shrink the 794px-wide A4 job-order preview to fit narrow (phone) screens,
+  // mirroring the itinerary/invoice/brochure builders. Print resets zoom to 1.
+  const [previewScale, setPreviewScale] = useState(1);
+  const previewHostRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = previewHostRef.current;
+    if (!host) return;
+    const update = () => setPreviewScale(Math.min(1, host.clientWidth / 794));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
+
   function applyDraft(d: JobOrderData) {
     setJobOrderNo(d.jobOrderNo ?? "");
     setDate(d.date ?? today());
@@ -673,8 +687,16 @@ export default function JobOrderBuilderView({
 
         {/* ── Live preview ── */}
         <div>
-          <div className="overflow-x-auto print:overflow-visible">
-            <JobOrderDoc {...data} />
+          <div
+            ref={previewHostRef}
+            className="w-full overflow-hidden print:overflow-visible"
+          >
+            <div
+              className="kt-joborder-fit mx-auto w-[794px] print:w-auto"
+              style={{ zoom: previewScale }}
+            >
+              <JobOrderDoc {...data} />
+            </div>
           </div>
         </div>
       </div>

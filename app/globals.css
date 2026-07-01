@@ -82,6 +82,16 @@ a, button {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
+  /* iOS Safari auto-zooms the viewport (and never zooms back) when a focused
+     text field has font-size < 16px. The admin builders use text-sm/text-xs
+     inputs, so tapping any field — e.g. adding from the catalog — "zoomed" the
+     whole page out of phone view. Force every editable control to 16px on phones
+     to suppress the focus-zoom; the doc previews are display-only and untouched. */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* ── Accessibility: respect reduced-motion preference ── */
@@ -313,7 +323,8 @@ a, button {
   }
   /* Phone preview shrink-to-fit must never carry into print output. */
   .kt-invoice-fit,
-  .kt-brochure-fit {
+  .kt-brochure-fit,
+  .kt-joborder-fit {
     width: auto !important;
     zoom: 1 !important;
   }
