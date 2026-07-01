@@ -44,9 +44,20 @@ export default function CatalogPicker({
     height: number;
   } | null>(null);
 
-  // Match the popup to the pane's visible box, clamped to the viewport.
+  // Match the popup to the pane's visible box, clamped to the viewport. On
+  // phones the "cover just the editor pane" idea reads as a stray floating card,
+  // so below 640px the picker fills the screen as a near-fullscreen sheet.
   useLayoutEffect(() => {
     function place() {
+      if (window.innerWidth < 640) {
+        setBox({
+          top: 8,
+          left: 8,
+          width: window.innerWidth - 16,
+          height: window.innerHeight - 16,
+        });
+        return;
+      }
       const el = anchorRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
