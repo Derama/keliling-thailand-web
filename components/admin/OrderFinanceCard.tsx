@@ -48,24 +48,33 @@ export default function OrderFinanceCard({
     // when the order's headline totals happen to be unchanged.
   }, [order.id, reloadKey]);
 
-  const fx = Number(order.fx_rate);
-  const customerIdr = Number(order.price_idr);
-  const operatorThb = Number(order.cost_thb);
-
-  const hasFx = fx > 0;
-  const customerThb = hasFx ? customerIdr / fx : null;
-  const operatorIdr = hasFx ? operatorThb * fx : null;
-  const marginThb = customerThb !== null ? customerThb - operatorThb : null;
-  const marginIdr = hasFx && marginThb !== null ? marginThb * fx : null;
-
-  const ready = customerIdr > 0 && operatorThb > 0 && hasFx;
   const lines = draft?.lines ?? [];
   const totals = lines.length ? invoiceTotals(lines) : null;
 
-  // Operator's margin (the per-line "Margin to Love bangkok") comes from the
-  // saved invoice draft, in THB.
+  // Prefer the saved invoice draft — it reflects the invoice the moment it's
+  // saved, without waiting for the separate "Simpan ke order" finance sync that
+  // writes the order's price_idr / cost_thb / fx_rate. Fall back to those order
+  // fields when there's no draft (e.g. an older order).
+  const fx = Number(draft?.idrRate) > 0 ? Number(draft?.idrRate) : Number(order.fx_rate);
+  const hasFx = fx > 0;
+
+  const customerThb = totals
+    ? totals.customerTotal
+    : hasFx
+      ? Number(order.price_idr) / fx
+      : null;
+  const operatorThb = totals ? totals.operatorTotal : Number(order.cost_thb) || null;
   const opMarginThb = totals ? totals.marginTotal : null;
-  const opMarginIdr = hasFx && opMarginThb !== null ? opMarginThb * fx : null;
+  const marginThb =
+    customerThb !== null && operatorThb !== null ? customerThb - operatorThb : null;
+
+  const customerIdr =
+    customerThb !== null && hasFx ? customerThb * fx : Number(order.price_idr) || null;
+  const operatorIdr = operatorThb !== null && hasFx ? operatorThb * fx : null;
+  const opMarginIdr = opMarginThb !== null && hasFx ? opMarginThb * fx : null;
+  const marginIdr = marginThb !== null && hasFx ? marginThb * fx : null;
+
+  const ready = customerThb !== null && operatorThb !== null;
 
   return (
     <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
