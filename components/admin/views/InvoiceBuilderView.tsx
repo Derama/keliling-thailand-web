@@ -7,6 +7,10 @@ import { formatTHB, formatIDR, isoLocal } from "@/lib/admin/utils";
 import BuiltInvoiceDoc from "@/components/admin/BuiltInvoiceDoc";
 import { loadOrderDoc, saveOrderDoc } from "@/lib/admin/orderDocs";
 import { syncOrderPrice } from "@/lib/admin/orderPrice";
+import {
+  downloadSheetsAsPdf,
+  isCoarsePointer,
+} from "@/lib/admin/pdfDownload";
 import CatalogPicker from "@/components/admin/invoice/CatalogPicker";
 import { useCatalog, type CatalogItem } from "@/components/admin/invoice/useCatalog";
 import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
@@ -149,6 +153,7 @@ export default function InvoiceBuilderView({
   // The clip host reserves the scaled height so the layout doesn't collapse.
   const [previewScale, setPreviewScale] = useState(1);
   const [docNaturalH, setDocNaturalH] = useState(0);
+  const [downloading, setDownloading] = useState(false);
   const previewHostRef = useRef<HTMLDivElement>(null);
   const docInnerRef = useRef<HTMLDivElement>(null);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
@@ -386,7 +391,27 @@ export default function InvoiceBuilderView({
     onExit?.();
   }
 
-  function printInvoice() {
+  async function printInvoice() {
+    // Phones/tablets: assemble a real PDF from the pre-paginated sheets — the
+    // mobile print engine re-lays the doc out and rarely matches the preview.
+    if (isCoarsePointer()) {
+      if (downloading) return;
+      setDownloading(true);
+      try {
+        const sheets = Array.from(
+          docInnerRef.current?.querySelectorAll<HTMLElement>(
+            ".invoice-page.kt-invoice-page"
+          ) ?? []
+        );
+        await downloadSheetsAsPdf(sheets, `${invoiceNumber} - ${date}`);
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
+      } finally {
+        setDownloading(false);
+      }
+      return;
+    }
+
     const prev = document.title;
     if (mode === "personal") {
       const now = new Date();
@@ -729,10 +754,10 @@ export default function InvoiceBuilderView({
           <button
             type="button"
             onClick={printInvoice}
-            disabled={lines.length === 0}
+            disabled={lines.length === 0 || downloading}
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50"
           >
-            Print / Simpan PDF
+            {downloading ? "Menyiapkan…" : "Print / Simpan PDF"}
           </button>
         </div>
       </div>

@@ -15,6 +15,10 @@ import {
 import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
 import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
 import { loadSetting, saveSetting } from "@/lib/admin/settings";
+import {
+  downloadSheetsAsPdf,
+  isCoarsePointer,
+} from "@/lib/admin/pdfDownload";
 import DateField from "@/components/admin/DateField";
 import ItineraryDoc from "@/components/admin/ItineraryDoc";
 import {
@@ -606,6 +610,30 @@ export default function ItineraryBuilderView({
 
   async function printItinerary() {
     if (printing) return;
+
+    // Phones/tablets: assemble a real PDF from the pre-paginated sheets — the
+    // mobile print engine re-lays the doc out and rarely matches the preview.
+    if (isCoarsePointer()) {
+      setPrinting(true);
+      try {
+        if (docRef.current) await waitForImages(docRef.current);
+        const sheets = Array.from(
+          docInnerRef.current?.querySelectorAll<HTMLElement>(
+            ".kt-itin-sheets article.kt-page"
+          ) ?? []
+        );
+        await downloadSheetsAsPdf(
+          sheets,
+          [tripTitle || "Itinerary", customer].filter(Boolean).join(" - ")
+        );
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
+      } finally {
+        setPrinting(false);
+      }
+      return;
+    }
+
     setPrinting(true);
     const prev = document.title;
     document.title = [tripTitle || "Itinerary", customer].filter(Boolean).join(" - ");

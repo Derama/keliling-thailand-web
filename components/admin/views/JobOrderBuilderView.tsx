@@ -5,6 +5,10 @@ import { createClient } from "@/lib/supabase/client";
 import { Field, inputCls, btnCls, btnSecondaryCls } from "@/components/admin/ui";
 import JobOrderDoc from "@/components/admin/JobOrderDoc";
 import { loadOrderDoc, saveOrderDoc } from "@/lib/admin/orderDocs";
+import {
+  downloadSheetsAsPdf,
+  isCoarsePointer,
+} from "@/lib/admin/pdfDownload";
 import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
 import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
 import {
@@ -85,6 +89,7 @@ export default function JobOrderBuilderView({
   // a screen-only transform (never `zoom`, which mobile print engines bake into
   // the PDF). The clip host reserves the scaled height.
   const [previewScale, setPreviewScale] = useState(1);
+  const [downloading, setDownloading] = useState(false);
   const [docNaturalH, setDocNaturalH] = useState(0);
   const previewHostRef = useRef<HTMLDivElement>(null);
   const docInnerRef = useRef<HTMLDivElement>(null);
@@ -214,7 +219,30 @@ export default function JobOrderBuilderView({
     });
   }
 
-  function printJobOrder() {
+  async function printJobOrder() {
+    // Phones/tablets: build a real PDF from the pre-paginated sheets — the
+    // mobile print engine re-lays the doc out and rarely matches the preview.
+    if (isCoarsePointer()) {
+      if (downloading) return;
+      setDownloading(true);
+      try {
+        const sheets = Array.from(
+          docInnerRef.current?.querySelectorAll<HTMLElement>(
+            ".invoice-page.kt-joborder-page"
+          ) ?? []
+        );
+        await downloadSheetsAsPdf(
+          sheets,
+          `${jobOrderNo || "Job Order"} - ${date}`
+        );
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
+      } finally {
+        setDownloading(false);
+      }
+      return;
+    }
+
     const prev = document.title;
     document.title = `${jobOrderNo || "Job Order"} - ${date}`;
 
@@ -399,9 +427,10 @@ export default function JobOrderBuilderView({
           <button
             type="button"
             onClick={printJobOrder}
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95"
+            disabled={downloading}
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-60"
           >
-            Download PDF
+            {downloading ? "Menyiapkan…" : "Download PDF"}
           </button>
         </div>
       </div>

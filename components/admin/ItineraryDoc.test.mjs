@@ -61,11 +61,16 @@ test("keeps the order-detail itinerary preview at its A4 design width", () => {
     /Math\.min\(1, host\.clientWidth \/ 858\)/
   );
   assert.match(builderSource, /new ResizeObserver\(updateScale\)/);
+  // Phone preview shrinks with a screen-only transform (never `zoom`, which
+  // mobile print engines bake into the PDF), reset by print utilities.
   assert.match(
     builderSource,
-    /className="w-full overflow-hidden print:overflow-visible"/
+    /className="mx-auto overflow-hidden print:!h-auto print:!w-auto print:overflow-visible"/
   );
-  assert.match(builderSource, /style=\{\{ zoom: previewScale \}\}/);
+  assert.match(
+    builderSource,
+    /style=\{\{ transform: `scale\(\$\{previewScale\}\)` \}\}/
+  );
 });
 
 test("opens the selected-order workspace in an expanded modal", () => {

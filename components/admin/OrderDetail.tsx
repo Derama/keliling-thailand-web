@@ -178,8 +178,9 @@ export default function OrderDetail({
         </div>
       </div>
 
-      {/* Tab bar — hidden when printing. */}
-      <div className="no-print flex flex-wrap gap-1 border-b border-gray-200">
+      {/* Tab bar — hidden when printing. One scrollable row on phones so the
+          four tabs never wrap into a ragged second line. */}
+      <div className="no-print no-scrollbar flex gap-1 overflow-x-auto border-b border-gray-200 sm:flex-wrap">
         {TAB_ORDER.map((t) => {
           const active = tab === t;
           return (
@@ -188,7 +189,7 @@ export default function OrderDetail({
               type="button"
               onClick={() => openTab(t)}
               aria-pressed={active}
-              className={`-mb-px rounded-t-lg border-b-2 px-4 py-2 text-sm font-semibold transition ${
+              className={`-mb-px shrink-0 rounded-t-lg border-b-2 px-4 py-2 text-sm font-semibold whitespace-nowrap transition ${
                 active
                   ? "border-[#1B2A4A] text-[#1B2A4A]"
                   : "border-transparent text-gray-500 hover:text-gray-700"

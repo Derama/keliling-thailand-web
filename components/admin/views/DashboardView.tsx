@@ -320,13 +320,22 @@ function MonthPicker({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-3 shadow-lg">
+        <>
+          {/* Phone: the anchored popover can extend past the viewport edge
+              (and AdminShell's overflow-x-clip hides the overflow), so dock it
+              as a centered dialog over a dimmed backdrop instead. */}
+          <div
+            className="fixed inset-0 z-20 bg-black/30 sm:hidden"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed inset-x-4 top-1/2 z-30 -translate-y-1/2 rounded-xl border border-gray-200 bg-white p-4 shadow-xl sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:z-20 sm:mt-2 sm:w-64 sm:translate-y-0 sm:p-3 sm:shadow-lg">
           <div className="mb-2 flex items-center justify-between">
             <button
               type="button"
               onClick={() => setViewYear((y) => y - 1)}
               aria-label="Tahun sebelumnya"
-              className="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A]"
+              className="rounded-lg px-3 py-2 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A] sm:px-2 sm:py-1"
             >
               ‹
             </button>
@@ -335,7 +344,7 @@ function MonthPicker({
               type="button"
               onClick={() => setViewYear((y) => y + 1)}
               aria-label="Tahun berikutnya"
-              className="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A]"
+              className="rounded-lg px-3 py-2 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A] sm:px-2 sm:py-1"
             >
               ›
             </button>
@@ -355,7 +364,7 @@ function MonthPicker({
                     );
                     setOpen(false);
                   }}
-                  className={`rounded-lg py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-lg py-2.5 text-sm font-medium transition-colors sm:py-1.5 ${
                     isSelected
                       ? "bg-[#F5C518] text-[#1B2A4A]"
                       : isCurrent
@@ -368,7 +377,8 @@ function MonthPicker({
               );
             })}
           </div>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

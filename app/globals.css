@@ -321,6 +321,14 @@ a, button {
   pointer-events: none;
 }
 
+/* Horizontal chip/tab rows on phones scroll without a visible scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Admin print documents ── */
 @media print {
   @page {

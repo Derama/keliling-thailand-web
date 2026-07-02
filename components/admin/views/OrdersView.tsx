@@ -73,24 +73,36 @@ export default function OrdersView() {
           + Order baru
         </button>
       </div>
-      <div className="flex flex-wrap gap-3">
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as OrderStatus | "all")}
-          className={`${inputCls} w-auto`}
-        >
-          <option value="all">Semua status</option>
-          {ORDER_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {STATUS_LABELS[s]}
-            </option>
-          ))}
-        </select>
+      <div className="space-y-3">
+        {/* Status filter as chips — one scrollable row on phones (a native
+            select there is cramped and inconsistent with the status pills). */}
+        <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 sm:mx-0 sm:flex-wrap sm:px-0">
+          {(["all", ...ORDER_STATUSES] as (OrderStatus | "all")[]).map((s) => {
+            const active = status === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatus(s)}
+                aria-pressed={active}
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap transition ${
+                  active
+                    ? s === "all"
+                      ? "bg-[#1B2A4A] text-white"
+                      : `${STATUS_COLORS[s]} ring-2 ring-[#1B2A4A]/25`
+                    : "bg-white text-gray-500 ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-700"
+                }`}
+              >
+                {s === "all" ? "Semua" : STATUS_LABELS[s]}
+              </button>
+            );
+          })}
+        </div>
         <input
           placeholder="Cari customer / nomor order…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className={`${inputCls} max-w-xs`}
+          className={`${inputCls} sm:max-w-xs`}
         />
       </div>
       <ErrorNote message={error} />

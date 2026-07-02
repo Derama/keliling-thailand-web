@@ -9,6 +9,10 @@ import { uploadPlaceImage } from "@/lib/admin/storage";
 import { loadOrderDoc, saveOrderDoc, clearOrderDoc } from "@/lib/admin/orderDocs";
 import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
 import {
+  downloadSheetsAsPdf,
+  isCoarsePointer,
+} from "@/lib/admin/pdfDownload";
+import {
   createTemplate,
   listTemplates,
   loadTemplate,
@@ -310,6 +314,30 @@ export default function BrochureBuilderView({
 
   async function printBrochure() {
     if (printing) return;
+
+    // Phones/tablets: assemble a real PDF from the pre-paginated sheets — the
+    // mobile print engine re-lays the doc out and rarely matches the preview.
+    if (isCoarsePointer()) {
+      setPrinting(true);
+      try {
+        await waitForImages();
+        const sheets = Array.from(
+          docInnerRef.current?.querySelectorAll<HTMLElement>(
+            ".kt-brochure-sheets article.kt-brochure-sheet"
+          ) ?? []
+        );
+        await downloadSheetsAsPdf(
+          sheets,
+          `Brosur Keliling Thailand - ${meta.title || "Katalog"}`
+        );
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
+      } finally {
+        setPrinting(false);
+      }
+      return;
+    }
+
     setPrinting(true);
     const prev = document.title;
     document.title = `Brosur Keliling Thailand - ${meta.title || "Katalog"}`;
