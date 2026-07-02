@@ -151,14 +151,18 @@ export default function DocumentLibraryView<T>({
               Pilih
             </button>
           )}
-          <button
-            type="button"
-            onClick={createNew}
-            disabled={busy}
-            className={`${btnCls} disabled:opacity-50`}
-          >
-            {newLabel}
-          </button>
+          {/* The empty state below shows its own create button — don't render
+              two identical buttons on an empty list. */}
+          {(loading || rows.length > 0) && (
+            <button
+              type="button"
+              onClick={createNew}
+              disabled={busy}
+              className={`${btnCls} disabled:opacity-50`}
+            >
+              {newLabel}
+            </button>
+          )}
         </div>
       </div>
 
