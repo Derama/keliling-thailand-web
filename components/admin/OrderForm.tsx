@@ -479,27 +479,27 @@ function WizardStepper({
   onJump: (i: number) => void;
 }) {
   return (
-    <ol className="no-print flex flex-wrap items-center gap-2 text-sm">
+    <ol className="no-print grid grid-cols-2 gap-2 text-sm sm:flex sm:flex-wrap sm:items-center">
       {steps.map((label, i) => {
         const active = i === current;
         const done = i < current;
         const jumpable = canJump(i);
         return (
-          <li key={label} className="flex items-center gap-2">
+          <li key={label} className="flex min-w-0 items-center gap-2">
             <button
               type="button"
               disabled={!jumpable}
               onClick={() => jumpable && onJump(i)}
-              className={`flex items-center gap-2 rounded-full px-3 py-1.5 font-medium transition ${
+              className={`flex w-full min-w-0 items-center gap-2 rounded-full px-3 py-2 font-medium transition-colors sm:w-auto ${
                 active
                   ? "bg-[#1B2A4A] text-white"
                   : done
                     ? "bg-[#1B2A4A]/10 text-[#1B2A4A] hover:bg-[#1B2A4A]/20"
-                    : "text-gray-400"
+                    : "bg-gray-50 text-gray-400 hover:bg-gray-100"
               } ${jumpable ? "cursor-pointer" : "cursor-default"}`}
             >
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs transition-colors ${
                   active
                     ? "bg-[#F5C518] text-[#1B2A4A]"
                     : done
@@ -509,10 +509,10 @@ function WizardStepper({
               >
                 {done ? "✓" : i + 1}
               </span>
-              {label}
+              <span className="truncate">{label}</span>
             </button>
             {i < steps.length - 1 && (
-              <span className="text-gray-300" aria-hidden>
+              <span className="hidden text-gray-300 sm:inline" aria-hidden>
                 →
               </span>
             )}
