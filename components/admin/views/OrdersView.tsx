@@ -76,7 +76,7 @@ export default function OrdersView() {
       <div className="space-y-3">
         {/* Status filter as chips — one scrollable row on phones (a native
             select there is cramped and inconsistent with the status pills). */}
-        <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 sm:mx-0 sm:flex-wrap sm:px-0">
+        <div className="no-scrollbar -mx-4 -mt-1 flex gap-1.5 overflow-x-auto px-4 py-1 sm:mx-0 sm:flex-wrap sm:px-0">
           {(["all", ...ORDER_STATUSES] as (OrderStatus | "all")[]).map((s) => {
             const active = status === s;
             return (
