@@ -108,13 +108,6 @@ export default function CalendarView() {
 
   const dayTrips = tripsOn(orders, dayIso);
 
-  // "Hari ini" only does something when we've navigated away from now.
-  const now = new Date();
-  const atToday =
-    view === "month"
-      ? year === now.getFullYear() && mon === now.getMonth()
-      : dayIso === todayIso;
-
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -136,13 +129,6 @@ export default function CalendarView() {
               </button>
             ))}
           </div>
-          <button
-            onClick={() => setCursor(new Date())}
-            disabled={atToday}
-            className={`${btnSecondaryCls} disabled:cursor-default disabled:opacity-40`}
-          >
-            Hari ini
-          </button>
           <button
             onClick={() => step(-1)}
             className={btnSecondaryCls}
