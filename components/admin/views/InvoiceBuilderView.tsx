@@ -144,9 +144,13 @@ export default function InvoiceBuilderView({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const editorPaneRef = useRef<HTMLDivElement>(null);
-  // Shrink the A4 preview to fit narrow (phone) screens. Print resets it to 1.
+  // Shrink the A4 preview to fit narrow (phone) screens via a screen-only CSS
+  // transform (never `zoom`, which mobile print engines mangle into the PDF).
+  // The clip host reserves the scaled height so the layout doesn't collapse.
   const [previewScale, setPreviewScale] = useState(1);
+  const [docNaturalH, setDocNaturalH] = useState(0);
   const previewHostRef = useRef<HTMLDivElement>(null);
+  const docInnerRef = useRef<HTMLDivElement>(null);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
   const [pickerLoading, setPickerLoading] = useState(false);
 
@@ -278,6 +282,18 @@ export default function InvoiceBuilderView({
     update();
     const observer = new ResizeObserver(update);
     observer.observe(host);
+    return () => observer.disconnect();
+  }, [lines.length]);
+
+  // Track the doc's natural (unscaled) height so the clip host can reserve the
+  // scaled height. offsetHeight ignores the CSS transform, so it's the true size.
+  useEffect(() => {
+    const inner = docInnerRef.current;
+    if (!inner) return;
+    const update = () => setDocNaturalH(inner.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(inner);
     return () => observer.disconnect();
   }, [lines.length]);
 
@@ -1120,13 +1136,18 @@ export default function InvoiceBuilderView({
               Preview invoice muncul di sini.
             </div>
           ) : (
-            <div
-              ref={previewHostRef}
-              className="w-full overflow-hidden print:overflow-visible"
-            >
+            <div ref={previewHostRef} className="w-full">
               <div
-                className="kt-invoice-fit mx-auto w-[842px] print:w-auto"
-                style={{ zoom: previewScale }}
+                className="kt-invoice-fit-host mx-auto overflow-hidden print:!h-auto print:!w-auto print:overflow-visible"
+                style={{
+                  width: 842 * previewScale,
+                  height: docNaturalH ? docNaturalH * previewScale : undefined,
+                }}
+              >
+              <div
+                ref={docInnerRef}
+                className="kt-invoice-fit w-[842px] origin-top-left print:!transform-none"
+                style={{ transform: `scale(${previewScale})` }}
               >
               <BuiltInvoiceDoc
                 mode={mode}
@@ -1143,6 +1164,7 @@ export default function InvoiceBuilderView({
                 custEmail={custEmail}
                 custAddress={custAddress}
               />
+              </div>
               </div>
             </div>
           )}
