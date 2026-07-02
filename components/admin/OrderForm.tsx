@@ -9,6 +9,7 @@ import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/component
 import DateField from "@/components/admin/DateField";
 import PlaceAutocomplete from "@/components/admin/PlaceAutocomplete";
 import ItineraryBuilderView from "@/components/admin/views/ItineraryBuilderView";
+import CustomerSelect from "@/components/admin/CustomerSelect";
 import InvoiceBuilderView from "@/components/admin/views/InvoiceBuilderView";
 import JobOrderBuilderView from "@/components/admin/views/JobOrderBuilderView";
 
@@ -233,27 +234,20 @@ export default function OrderForm({
     <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
       <h2 className="font-semibold text-[#1B2A4A]">Customer</h2>
       {!newCustomer ? (
-        <div className="flex items-end gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
           <div className="flex-1">
             <Field label="Customer">
-              <select
+              <CustomerSelect
                 value={draft.customer_id}
-                onChange={(e) => set("customer_id", e.target.value)}
-                className={inputCls}
-              >
-                <option value="">— pilih —</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} {c.origin_city ? `(${c.origin_city})` : ""}
-                  </option>
-                ))}
-              </select>
+                customers={customers}
+                onChange={(v) => set("customer_id", v)}
+              />
             </Field>
           </div>
           <button
             type="button"
             onClick={() => setNewCustomer(true)}
-            className="pb-2 text-sm text-blue-600 hover:underline"
+            className="self-start text-sm font-medium text-blue-600 hover:underline sm:self-auto sm:pb-2"
           >
             + Customer baru
           </button>
