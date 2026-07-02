@@ -259,6 +259,7 @@ export default function BrochureBuilderView({
   }, [orderId, templateId, templateTitle, orderNumber, libraryId, meta, cities, fleet, hotels, attractions, notes]);
 
   const [printing, setPrinting] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState("");
   const [coverPickerOpen, setCoverPickerOpen] = useState(false);
   // Screen-only transform scaling (never `zoom`, which mobile print engines bake
   // into the PDF). The clip host reserves the scaled height.
@@ -328,12 +329,14 @@ export default function BrochureBuilderView({
         );
         await downloadSheetsAsPdf(
           sheets,
-          `Brosur Keliling Thailand - ${meta.title || "Katalog"}`
+          `Brosur Keliling Thailand - ${meta.title || "Katalog"}`,
+          (page, total) => setPdfProgress(`${page}/${total}`)
         );
       } catch (err) {
         alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
       } finally {
         setPrinting(false);
+        setPdfProgress("");
       }
       return;
     }
@@ -536,7 +539,9 @@ export default function BrochureBuilderView({
             disabled={printing}
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-60"
           >
-            {printing ? "Menyiapkan…" : "Print / Simpan PDF"}
+            {printing
+              ? `Menyiapkan${pdfProgress ? ` hal. ${pdfProgress}` : ""}…`
+              : "Print / Simpan PDF"}
           </button>
         </div>
       </div>

@@ -154,6 +154,7 @@ export default function InvoiceBuilderView({
   const [previewScale, setPreviewScale] = useState(1);
   const [docNaturalH, setDocNaturalH] = useState(0);
   const [downloading, setDownloading] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState("");
   const previewHostRef = useRef<HTMLDivElement>(null);
   const docInnerRef = useRef<HTMLDivElement>(null);
   const [pickerRows, setPickerRows] = useState<PickerRowData[]>([]);
@@ -403,11 +404,14 @@ export default function InvoiceBuilderView({
             ".invoice-page.kt-invoice-page"
           ) ?? []
         );
-        await downloadSheetsAsPdf(sheets, `${invoiceNumber} - ${date}`);
+        await downloadSheetsAsPdf(sheets, `${invoiceNumber} - ${date}`, (page, total) =>
+          setPdfProgress(`${page}/${total}`)
+        );
       } catch (err) {
         alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
       } finally {
         setDownloading(false);
+        setPdfProgress("");
       }
       return;
     }
@@ -757,7 +761,9 @@ export default function InvoiceBuilderView({
             disabled={lines.length === 0 || downloading}
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50"
           >
-            {downloading ? "Menyiapkan…" : "Print / Simpan PDF"}
+            {downloading
+              ? `Menyiapkan${pdfProgress ? ` hal. ${pdfProgress}` : ""}…`
+              : "Print / Simpan PDF"}
           </button>
         </div>
       </div>

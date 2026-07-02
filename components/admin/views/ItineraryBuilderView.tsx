@@ -171,6 +171,7 @@ export default function ItineraryBuilderView({
   // True once the admin sets/uploads a cover manually — stops AI from overwriting it.
   const [coverManual, setCoverManual] = useState(false);
   const [printing, setPrinting] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState("");
   // Screen-only transform scaling (never `zoom`, which mobile print engines bake
   // into the PDF). The clip host reserves the scaled height.
   const [previewScale, setPreviewScale] = useState(1);
@@ -624,12 +625,14 @@ export default function ItineraryBuilderView({
         );
         await downloadSheetsAsPdf(
           sheets,
-          [tripTitle || "Itinerary", customer].filter(Boolean).join(" - ")
+          [tripTitle || "Itinerary", customer].filter(Boolean).join(" - "),
+          (page, total) => setPdfProgress(`${page}/${total}`)
         );
       } catch (err) {
         alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
       } finally {
         setPrinting(false);
+        setPdfProgress("");
       }
       return;
     }
@@ -924,7 +927,9 @@ export default function ItineraryBuilderView({
             disabled={days.length === 0 || printing}
             className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50 sm:w-auto"
           >
-            {printing ? "Menyiapkan…" : "Download PDF"}
+            {printing
+              ? `Menyiapkan${pdfProgress ? ` hal. ${pdfProgress}` : ""}…`
+              : "Download PDF"}
           </button>
         </div>
       </div>

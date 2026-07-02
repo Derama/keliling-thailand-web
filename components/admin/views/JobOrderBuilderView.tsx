@@ -90,6 +90,7 @@ export default function JobOrderBuilderView({
   // the PDF). The clip host reserves the scaled height.
   const [previewScale, setPreviewScale] = useState(1);
   const [downloading, setDownloading] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState("");
   const [docNaturalH, setDocNaturalH] = useState(0);
   const previewHostRef = useRef<HTMLDivElement>(null);
   const docInnerRef = useRef<HTMLDivElement>(null);
@@ -233,12 +234,14 @@ export default function JobOrderBuilderView({
         );
         await downloadSheetsAsPdf(
           sheets,
-          `${jobOrderNo || "Job Order"} - ${date}`
+          `${jobOrderNo || "Job Order"} - ${date}`,
+          (page, total) => setPdfProgress(`${page}/${total}`)
         );
       } catch (err) {
         alert(err instanceof Error ? err.message : "Gagal membuat PDF.");
       } finally {
         setDownloading(false);
+        setPdfProgress("");
       }
       return;
     }
@@ -430,7 +433,9 @@ export default function JobOrderBuilderView({
             disabled={downloading}
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-60"
           >
-            {downloading ? "Menyiapkan…" : "Download PDF"}
+            {downloading
+              ? `Menyiapkan${pdfProgress ? ` hal. ${pdfProgress}` : ""}…`
+              : "Download PDF"}
           </button>
         </div>
       </div>

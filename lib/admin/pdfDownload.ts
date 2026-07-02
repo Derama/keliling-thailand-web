@@ -30,13 +30,18 @@ export function isCoarsePointer(): boolean {
  */
 export async function downloadSheetsAsPdf(
   sheets: HTMLElement[],
-  filename: string
+  filename: string,
+  /** Called before each sheet renders: (pageBeingRendered, totalPages). */
+  onProgress?: (page: number, total: number) => void
 ): Promise<void> {
   if (sheets.length === 0) {
     throw new Error("Dokumen kosong — tidak ada halaman untuk diunduh.");
   }
   const pdf = await PDFDocument.create();
-  for (const el of sheets) {
+  for (const [i, el] of sheets.entries()) {
+    onProgress?.(i + 1, sheets.length);
+    // Let React paint the progress label before the capture blocks the thread.
+    await new Promise((r) => setTimeout(r, 0));
     const w = el.offsetWidth;
     // One physical page per sheet: never capture past the A4 aspect ratio.
     const h = Math.min(el.offsetHeight, Math.round((w * A4_H) / A4_W));
