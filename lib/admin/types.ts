@@ -101,6 +101,7 @@ export const INVOICE_TYPE_LABELS: Record<InvoiceType, string> = {
 
 export interface SocialPost {
   id: string;
+  kind: "review" | "attraction" | "journey";
   image_url: string;
   photo_url: string | null;
   review_text: string | null;
@@ -111,5 +112,7 @@ export interface SocialPost {
   caption: string | null;
   template: string | null;
   format: string | null;
+  /** Kind-specific extras: attraction title/location/date/hook, journey slide URLs. */
+  payload: Record<string, unknown> | null;
   created_at: string;
 }
