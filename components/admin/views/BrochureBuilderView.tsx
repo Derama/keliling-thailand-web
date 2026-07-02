@@ -256,9 +256,12 @@ export default function BrochureBuilderView({
 
   const [printing, setPrinting] = useState(false);
   const [coverPickerOpen, setCoverPickerOpen] = useState(false);
-  // Shrink the A4 preview to fit narrow (phone) screens. Print resets it to 1.
+  // Screen-only transform scaling (never `zoom`, which mobile print engines bake
+  // into the PDF). The clip host reserves the scaled height.
   const [previewScale, setPreviewScale] = useState(1);
+  const [docNaturalH, setDocNaturalH] = useState(0);
   const previewHostRef = useRef<HTMLDivElement>(null);
+  const docInnerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = previewHostRef.current;
@@ -267,6 +270,18 @@ export default function BrochureBuilderView({
     update();
     const observer = new ResizeObserver(update);
     observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
+
+  // Track the doc's natural (unscaled) height so the clip host reserves the
+  // scaled height. offsetHeight ignores the CSS transform, so it's the true size.
+  useEffect(() => {
+    const inner = docInnerRef.current;
+    if (!inner) return;
+    const update = () => setDocNaturalH(inner.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(inner);
     return () => observer.disconnect();
   }, []);
 
@@ -633,22 +648,28 @@ export default function BrochureBuilderView({
 
         {/* Preview column */}
         <div>
-          <div
-            ref={previewHostRef}
-            className="w-full overflow-hidden print:overflow-visible"
-          >
+          <div ref={previewHostRef} className="w-full">
             <div
-              className="kt-brochure-fit mx-auto w-[794px] print:w-auto print:min-w-0"
-              style={{ zoom: previewScale }}
+              className="mx-auto overflow-hidden print:!h-auto print:!w-auto print:min-w-0 print:overflow-visible"
+              style={{
+                width: 794 * previewScale,
+                height: docNaturalH ? docNaturalH * previewScale : undefined,
+              }}
             >
-              <BrochureDoc
-                meta={meta}
-                cities={docCities}
-                fleet={fleet}
-                hotels={hotels}
-                attractions={attractions}
-                notes={notes}
-              />
+              <div
+                ref={docInnerRef}
+                className="kt-brochure-fit w-[794px] origin-top-left print:!transform-none"
+                style={{ transform: `scale(${previewScale})` }}
+              >
+                <BrochureDoc
+                  meta={meta}
+                  cities={docCities}
+                  fleet={fleet}
+                  hotels={hotels}
+                  attractions={attractions}
+                  notes={notes}
+                />
+              </div>
             </div>
           </div>
         </div>

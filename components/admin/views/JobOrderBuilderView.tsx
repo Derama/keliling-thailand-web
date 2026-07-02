@@ -81,10 +81,13 @@ export default function JobOrderBuilderView({
 
   const hydrated = useRef(false);
 
-  // Shrink the 794px-wide A4 job-order preview to fit narrow (phone) screens,
-  // mirroring the itinerary/invoice/brochure builders. Print resets zoom to 1.
+  // Shrink the 794px-wide A4 job-order preview to fit narrow (phone) screens via
+  // a screen-only transform (never `zoom`, which mobile print engines bake into
+  // the PDF). The clip host reserves the scaled height.
   const [previewScale, setPreviewScale] = useState(1);
+  const [docNaturalH, setDocNaturalH] = useState(0);
   const previewHostRef = useRef<HTMLDivElement>(null);
+  const docInnerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const host = previewHostRef.current;
     if (!host) return;
@@ -92,6 +95,15 @@ export default function JobOrderBuilderView({
     update();
     const observer = new ResizeObserver(update);
     observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const inner = docInnerRef.current;
+    if (!inner) return;
+    const update = () => setDocNaturalH(inner.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(inner);
     return () => observer.disconnect();
   }, []);
 
@@ -687,15 +699,21 @@ export default function JobOrderBuilderView({
 
         {/* ── Live preview ── */}
         <div>
-          <div
-            ref={previewHostRef}
-            className="w-full overflow-hidden print:overflow-visible"
-          >
+          <div ref={previewHostRef} className="w-full">
             <div
-              className="kt-joborder-fit mx-auto w-[794px] print:w-auto"
-              style={{ zoom: previewScale }}
+              className="mx-auto overflow-hidden print:!h-auto print:!w-auto print:overflow-visible"
+              style={{
+                width: 794 * previewScale,
+                height: docNaturalH ? docNaturalH * previewScale : undefined,
+              }}
             >
-              <JobOrderDoc {...data} />
+              <div
+                ref={docInnerRef}
+                className="kt-joborder-fit w-[794px] origin-top-left print:!transform-none"
+                style={{ transform: `scale(${previewScale})` }}
+              >
+                <JobOrderDoc {...data} />
+              </div>
             </div>
           </div>
         </div>

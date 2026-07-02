@@ -167,7 +167,11 @@ export default function ItineraryBuilderView({
   // True once the admin sets/uploads a cover manually — stops AI from overwriting it.
   const [coverManual, setCoverManual] = useState(false);
   const [printing, setPrinting] = useState(false);
+  // Screen-only transform scaling (never `zoom`, which mobile print engines bake
+  // into the PDF). The clip host reserves the scaled height.
   const [previewScale, setPreviewScale] = useState(1);
+  const [docNaturalH, setDocNaturalH] = useState(0);
+  const docInnerRef = useRef<HTMLDivElement>(null);
 
   // Library mirror (orderId mode): one itineraries row per order, autosaved in
   // sync. Distinct from the `libraryId` prop, which is the library-edit mode.
@@ -192,6 +196,18 @@ export default function ItineraryBuilderView({
 
     const observer = new ResizeObserver(updateScale);
     observer.observe(host);
+    return () => observer.disconnect();
+  }, [days.length]);
+
+  // Track the doc's natural (unscaled) height so the clip host reserves the
+  // scaled height. offsetHeight ignores the CSS transform, so it's the true size.
+  useEffect(() => {
+    const inner = docInnerRef.current;
+    if (!inner) return;
+    const update = () => setDocNaturalH(inner.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(inner);
     return () => observer.disconnect();
   }, [days.length]);
 
@@ -1126,26 +1142,32 @@ export default function ItineraryBuilderView({
             </div>
           ) : (
             <div ref={docRef} className="print:overflow-visible">
-              <div
-                ref={previewHostRef}
-                className="w-full overflow-hidden print:overflow-visible"
-              >
+              <div ref={previewHostRef} className="w-full">
                 <div
-                  className="kt-itinerary-preview mx-auto w-[858px] print:w-auto"
-                  style={{ zoom: previewScale }}
+                  className="mx-auto overflow-hidden print:!h-auto print:!w-auto print:overflow-visible"
+                  style={{
+                    width: 858 * previewScale,
+                    height: docNaturalH ? docNaturalH * previewScale : undefined,
+                  }}
                 >
-                  <ItineraryDoc
-                    tripTitle={tripTitle}
-                    customer={customer}
-                    pax={pax}
-                    notes={notes}
-                    vehicle={vehicle}
-                    heroImage={heroImage}
-                    days={days}
-                    galleryImages={galleryImages}
-                    travelTips={travelTips}
-                    showTravelTips={showTravelTips}
-                  />
+                  <div
+                    ref={docInnerRef}
+                    className="kt-itinerary-preview w-[858px] origin-top-left print:!transform-none"
+                    style={{ transform: `scale(${previewScale})` }}
+                  >
+                    <ItineraryDoc
+                      tripTitle={tripTitle}
+                      customer={customer}
+                      pax={pax}
+                      notes={notes}
+                      vehicle={vehicle}
+                      heroImage={heroImage}
+                      days={days}
+                      galleryImages={galleryImages}
+                      travelTips={travelTips}
+                      showTravelTips={showTravelTips}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
