@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Vehicle, VehicleStatus } from "@/lib/rental/types";
 import { VEHICLE_STATUSES, VEHICLE_STATUS_LABELS } from "@/lib/rental/types";
+import Select from "@/components/admin/Select";
 import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 
 interface Draft {
@@ -86,11 +87,11 @@ export default function VehicleForm({
           <input value={draft.type} onChange={(e) => set("type", e.target.value)} className={inputCls} placeholder="Sedan / SUV" />
         </Field>
         <Field label="Status">
-          <select value={draft.status} onChange={(e) => set("status", e.target.value as VehicleStatus)} className={inputCls}>
-            {VEHICLE_STATUSES.map((s) => (
-              <option key={s} value={s}>{VEHICLE_STATUS_LABELS[s]}</option>
-            ))}
-          </select>
+          <Select
+            value={draft.status}
+            onChange={(v) => set("status", v as VehicleStatus)}
+            options={VEHICLE_STATUSES.map((s) => ({ value: s, label: VEHICLE_STATUS_LABELS[s] }))}
+          />
         </Field>
         <Field label="Tarif / hari (THB)">
           <input type="number" min="0" value={draft.daily_rate_thb} onChange={(e) => set("daily_rate_thb", e.target.value)} className={inputCls} />

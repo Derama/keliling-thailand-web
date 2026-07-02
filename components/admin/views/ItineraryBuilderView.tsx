@@ -13,6 +13,7 @@ import {
   createItinerary,
 } from "@/lib/admin/itineraryLibrary";
 import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
+import Select from "@/components/admin/Select";
 import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
 import { loadSetting, saveSetting } from "@/lib/admin/settings";
 import {
@@ -1622,18 +1623,15 @@ function PlacePalette({
             placeholder="Cari…"
             className={`${inputCls} h-8 w-32 py-1`}
           />
-          <select
+          <Select
             value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className={`${inputCls} h-8 w-auto bg-white py-1`}
-          >
-            <option value="">Semua kota</option>
-            {cities.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            onChange={setCity}
+            className="h-8 w-auto bg-white py-1"
+            options={[
+              { value: "", label: "Semua kota" },
+              ...cities.map((c) => ({ value: c, label: c })),
+            ]}
+          />
         </div>
       </div>
 
@@ -2151,34 +2149,29 @@ function DayPlaces({
         )}
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <select
+        <Select
           value={city}
-          onChange={(e) => {
-            setCity(e.target.value);
+          onChange={(v) => {
+            setCity(v);
             setPlaceId("");
           }}
-          className={`${inputCls} w-auto bg-white`}
-        >
-          {cities.length === 0 && <option value="">— belum ada tempat —</option>}
-          {cities.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
+          className="w-auto bg-white"
+          placeholder="— belum ada tempat —"
+          options={cities.map((c) => ({ value: c, label: c }))}
+        />
+        <Select
           value={placeId}
-          onChange={(e) => setPlaceId(e.target.value)}
-          className={`${inputCls} w-auto bg-white`}
-        >
-          <option value="">— pilih tempat —</option>
-          {inCity.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-              {p.image_url ? " 🖼" : ""}
-            </option>
-          ))}
-        </select>
+          onChange={setPlaceId}
+          className="w-auto bg-white"
+          placeholder="— pilih tempat —"
+          options={[
+            { value: "", label: "— pilih tempat —" },
+            ...inCity.map((p) => ({
+              value: p.id,
+              label: `${p.name}${p.image_url ? " 🖼" : ""}`,
+            })),
+          ]}
+        />
         <button
           type="button"
           onClick={addFromPlace}

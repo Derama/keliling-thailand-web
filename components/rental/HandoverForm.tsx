@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { RentalHandover, HandoverKind, FuelLevel } from "@/lib/rental/types";
 import { FUEL_LEVELS, FUEL_LEVEL_LABELS } from "@/lib/rental/types";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import Select from "@/components/admin/Select";
 import SignaturePad, { type SignaturePadHandle } from "@/components/rental/SignaturePad";
 import MediaUpload from "@/components/rental/MediaUpload";
 
@@ -94,17 +95,21 @@ export default function HandoverForm({
           <input type="number" min="0" value={odo} onChange={(e) => setOdo(e.target.value)} className={inputCls} />
         </Field>
         <Field label="Bensin">
-          <select value={fuel} onChange={(e) => setFuel(e.target.value as FuelLevel)} className={inputCls}>
-            {FUEL_LEVELS.map((f) => (
-              <option key={f} value={f}>{FUEL_LEVEL_LABELS[f]}</option>
-            ))}
-          </select>
+          <Select
+            value={fuel}
+            onChange={(v) => setFuel(v as FuelLevel)}
+            options={FUEL_LEVELS.map((f) => ({ value: f, label: FUEL_LEVEL_LABELS[f] }))}
+          />
         </Field>
         <Field label="Oli">
-          <select value={oil} onChange={(e) => setOil(e.target.value)} className={inputCls}>
-            <option value="ok">OK</option>
-            <option value="low">Kurang</option>
-          </select>
+          <Select
+            value={oil}
+            onChange={setOil}
+            options={[
+              { value: "ok", label: "OK" },
+              { value: "low", label: "Kurang" },
+            ]}
+          />
         </Field>
       </div>
 

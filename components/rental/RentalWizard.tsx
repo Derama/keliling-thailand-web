@@ -9,6 +9,7 @@ import { buildRentalNumber } from "@/lib/rental/rentalNumber";
 import { formatTHB, formatIDR } from "@/lib/admin/utils";
 import { convertThbToIdr } from "@/lib/currency";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import Select from "@/components/admin/Select";
 
 export default function RentalWizard() {
   const router = useRouter();
@@ -117,24 +118,30 @@ export default function RentalWizard() {
       <section className="space-y-3 rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="font-semibold text-[#1B2A4A]">Mobil &amp; penyewa</h2>
         <Field label="Mobil (tersedia)">
-          <select value={vehicleId} onChange={(e) => chooseVehicle(e.target.value)} className={inputCls}>
-            <option value="">— pilih —</option>
-            {vehicles.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name} · {v.plate} · {formatTHB(v.daily_rate_thb)}/hari
-              </option>
-            ))}
-          </select>
+          <Select
+            value={vehicleId}
+            onChange={chooseVehicle}
+            options={[
+              { value: "", label: "— pilih —" },
+              ...vehicles.map((v) => ({
+                value: v.id,
+                label: `${v.name} · ${v.plate} · ${formatTHB(v.daily_rate_thb)}/hari`,
+              })),
+            ]}
+          />
         </Field>
         <Field label="Penyewa">
-          <select value={renterId} onChange={(e) => setRenterId(e.target.value)} className={inputCls}>
-            <option value="">— pilih —</option>
-            {renters.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name} {r.origin_city ? `(${r.origin_city})` : ""}
-              </option>
-            ))}
-          </select>
+          <Select
+            value={renterId}
+            onChange={setRenterId}
+            options={[
+              { value: "", label: "— pilih —" },
+              ...renters.map((r) => ({
+                value: r.id,
+                label: `${r.name}${r.origin_city ? ` (${r.origin_city})` : ""}`,
+              })),
+            ]}
+          />
         </Field>
         <p className="text-xs text-gray-500">
           Penyewa baru dibuat dulu di tab Penyewa.

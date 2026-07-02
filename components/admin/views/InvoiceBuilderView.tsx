@@ -12,6 +12,7 @@ import {
   isCoarsePointer,
 } from "@/lib/admin/pdfDownload";
 import CatalogPicker from "@/components/admin/invoice/CatalogPicker";
+import Select from "@/components/admin/Select";
 import { useCatalog, type CatalogItem } from "@/components/admin/invoice/useCatalog";
 import TemplatePickerModal from "@/components/admin/TemplatePickerModal";
 import { pickerRow, type PickerRowData } from "@/lib/admin/docLibrary.labels";
@@ -869,19 +870,14 @@ export default function InvoiceBuilderView({
               />
             </Field>
             <Field label="Status">
-              <select
+              <Select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as InvoiceStatus)}
-                className={`${inputCls} h-10 pr-8`}
-              >
-                {(Object.keys(INVOICE_STATUS_LABELS) as InvoiceStatus[]).map(
-                  (s) => (
-                    <option key={s} value={s}>
-                      {INVOICE_STATUS_FORM_LABELS[s]}
-                    </option>
-                  )
+                onChange={(v) => setStatus(v as InvoiceStatus)}
+                className="h-10"
+                options={(Object.keys(INVOICE_STATUS_LABELS) as InvoiceStatus[]).map(
+                  (s) => ({ value: s, label: INVOICE_STATUS_FORM_LABELS[s] })
                 )}
-              </select>
+              />
             </Field>
             <Field label="Tanggal">
               <input

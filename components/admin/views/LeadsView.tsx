@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "@/components/admin/Modal";
 import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
+import Select from "@/components/admin/Select";
 import { formatIDR } from "@/lib/admin/utils";
 import LeadCard from "@/components/admin/LeadCard";
 import LeadDetail from "@/components/admin/LeadDetail";
@@ -144,17 +145,11 @@ export default function LeadsView() {
             <input value={nName} onChange={(e) => setNName(e.target.value)} className={inputCls} />
           </Field>
           <Field label="Channel">
-            <select
+            <Select
               value={nChannel}
-              onChange={(e) => setNChannel(e.target.value as LeadChannel)}
-              className={inputCls}
-            >
-              {CHANNELS.map((c) => (
-                <option key={c} value={c}>
-                  {CHANNEL_META[c].label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setNChannel(v as LeadChannel)}
+              options={CHANNELS.map((c) => ({ value: c, label: CHANNEL_META[c].label }))}
+            />
           </Field>
           <Field label="Handle / profil">
             <input value={nHandle} onChange={(e) => setNHandle(e.target.value)} placeholder="@username atau URL" className={inputCls} />

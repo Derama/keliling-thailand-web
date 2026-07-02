@@ -8,6 +8,7 @@ import { INVOICE_TYPES, INVOICE_TYPE_LABELS } from "@/lib/admin/types";
 import { formatIDR } from "@/lib/admin/utils";
 import { syncOrderPrice } from "@/lib/admin/orderPrice";
 import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
+import Select from "@/components/admin/Select";
 
 export default function InvoiceForm({
   order,
@@ -67,17 +68,11 @@ export default function InvoiceForm({
         Invoice baru — {order.order_number}
       </h1>
       <Field label="Jenis">
-        <select
+        <Select
           value={type}
-          onChange={(e) => setType(e.target.value as InvoiceType)}
-          className={inputCls}
-        >
-          {INVOICE_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {INVOICE_TYPE_LABELS[t]}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => setType(v as InvoiceType)}
+          options={INVOICE_TYPES.map((t) => ({ value: t, label: INVOICE_TYPE_LABELS[t] }))}
+        />
       </Field>
       <div className="space-y-2">
         <p className="text-sm font-medium text-gray-700">Rincian</p>

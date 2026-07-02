@@ -13,6 +13,7 @@ import {
 } from "@/lib/rental/types";
 import { formatTHB, formatIDR, formatDate } from "@/lib/admin/utils";
 import { convertThbToIdr } from "@/lib/currency";
+import Select from "@/components/admin/Select";
 import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 
 export default function RentalDetail({ rentalId }: { rentalId: string }) {
@@ -161,11 +162,11 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
         <h2 className="font-semibold text-[#1B2A4A]">Pembayaran</h2>
         <form onSubmit={addPayment} className="grid gap-3 sm:grid-cols-4 sm:items-end">
           <Field label="Jenis">
-            <select value={payKind} onChange={(e) => setPayKind(e.target.value as PaymentKind)} className={inputCls}>
-              {PAYMENT_KINDS.map((k) => (
-                <option key={k} value={k}>{PAYMENT_KIND_LABELS[k]}</option>
-              ))}
-            </select>
+            <Select
+              value={payKind}
+              onChange={(v) => setPayKind(v as PaymentKind)}
+              options={PAYMENT_KINDS.map((k) => ({ value: k, label: PAYMENT_KIND_LABELS[k] }))}
+            />
           </Field>
           <Field label="Jumlah (THB)">
             <input type="number" min="0" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} className={inputCls} />

@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
+import Select from "@/components/admin/Select";
 import { loadSetting } from "@/lib/admin/settings";
 import { LEAD_TEMPLATES_KEY } from "@/components/admin/LeadTemplatesModal";
 import {
@@ -131,17 +132,11 @@ export default function LeadDetail({
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
         </Field>
         <Field label="Channel">
-          <select
+          <Select
             value={channel}
-            onChange={(e) => setChannel(e.target.value as LeadChannel)}
-            className={inputCls}
-          >
-            {CHANNELS.map((c) => (
-              <option key={c} value={c}>
-                {CHANNEL_META[c].label}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setChannel(v as LeadChannel)}
+            options={CHANNELS.map((c) => ({ value: c, label: CHANNEL_META[c].label }))}
+          />
         </Field>
         <Field label="Handle / profil">
           <input
@@ -160,17 +155,11 @@ export default function LeadDetail({
           />
         </Field>
         <Field label="Tahap">
-          <select
+          <Select
             value={stage}
-            onChange={(e) => setStage(e.target.value as LeadStage)}
-            className={inputCls}
-          >
-            {LEAD_STAGES.map((s) => (
-              <option key={s} value={s}>
-                {STAGE_LABELS[s]}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setStage(v as LeadStage)}
+            options={LEAD_STAGES.map((s) => ({ value: s, label: STAGE_LABELS[s] }))}
+          />
         </Field>
         <Field label="Estimasi nilai (IDR)">
           <input
