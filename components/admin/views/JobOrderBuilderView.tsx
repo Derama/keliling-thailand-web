@@ -399,7 +399,7 @@ export default function JobOrderBuilderView({
           <button
             type="button"
             onClick={printJobOrder}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95"
           >
             Download PDF
           </button>

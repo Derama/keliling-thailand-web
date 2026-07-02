@@ -437,25 +437,29 @@ export default function OrderForm({
             </div>
           )}
 
-          <div className="no-print flex items-center justify-between gap-3 border-t border-gray-200 pt-4">
+          <div className="no-print flex flex-col gap-2 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <button
               type="button"
               onClick={() => goToStep(step - 1)}
-              className={btnSecondaryCls}
+              className={`${btnSecondaryCls} w-full sm:w-auto`}
             >
               ← {WIZARD_STEPS[step - 1]}
             </button>
-            <div className="flex items-center gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3">
               {step < WIZARD_STEPS.length - 1 && (
                 <button
                   type="button"
                   onClick={() => goToStep(step + 1)}
-                  className={btnSecondaryCls}
+                  className={`${btnSecondaryCls} w-full sm:w-auto`}
                 >
                   Lanjut → {WIZARD_STEPS[step + 1]}
                 </button>
               )}
-              <button type="button" onClick={finishWizard} className={btnCls}>
+              <button
+                type="button"
+                onClick={finishWizard}
+                className={`${btnCls} w-full sm:w-auto`}
+              >
                 Selesai
               </button>
             </div>

@@ -858,7 +858,7 @@ export default function ItineraryBuilderView({
             hari = 1 halaman).
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
           {savedAt && (
             <span className="hidden text-xs text-gray-400 sm:inline">
               Tersimpan · {savedAt}
@@ -868,7 +868,7 @@ export default function ItineraryBuilderView({
             <button
               type="button"
               onClick={resetAll}
-              className="text-sm font-medium text-red-500 hover:underline"
+              className="self-start text-sm font-medium text-red-500 hover:underline sm:self-auto"
             >
               Reset
             </button>
@@ -877,7 +877,7 @@ export default function ItineraryBuilderView({
             <button
               type="button"
               onClick={openPicker}
-              className={btnSecondaryCls}
+              className={`${btnSecondaryCls} w-full sm:w-auto`}
             >
               Pilih dari tersimpan
             </button>
@@ -886,7 +886,7 @@ export default function ItineraryBuilderView({
             type="button"
             onClick={saveNow}
             disabled={saving}
-            className={`${btnSecondaryCls} disabled:opacity-50`}
+            className={`${btnSecondaryCls} w-full disabled:opacity-50 sm:w-auto`}
           >
             {saving ? "Menyimpan…" : "Simpan"}
           </button>
@@ -894,7 +894,7 @@ export default function ItineraryBuilderView({
             type="button"
             onClick={printItinerary}
             disabled={days.length === 0 || printing}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-semibold text-[#1B2A4A] hover:brightness-95 disabled:opacity-50 sm:w-auto"
           >
             {printing ? "Menyiapkan…" : "Download PDF"}
           </button>

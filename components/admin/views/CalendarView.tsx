@@ -198,33 +198,40 @@ export default function CalendarView() {
                 type="button"
                 disabled={!day}
                 onClick={() => day && openDay(day)}
-                className={`flex min-h-14 flex-col items-center gap-1 border-b border-l border-gray-100 py-1.5 first:border-l-0 ${
+                className={`flex min-h-16 flex-col items-stretch gap-0.5 border-b border-l border-gray-100 p-1 text-left first:border-l-0 ${
                   day === todayIso ? "bg-[#F5C518]/10" : ""
                 }`}
               >
-                {day && (
-                  <>
-                    <span
-                      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                        day === todayIso
-                          ? "bg-[#F5C518] font-bold text-[#1B2A4A]"
-                          : "text-gray-600"
-                      }`}
-                    >
-                      {Number(day.slice(8))}
-                    </span>
-                    <span className="flex gap-0.5">
-                      {tripsOn(orders, day)
-                        .slice(0, 4)
-                        .map((o) => (
+                {day &&
+                  (() => {
+                    const trips = tripsOn(orders, day);
+                    return (
+                      <>
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center self-center rounded-full text-[11px] ${
+                            day === todayIso
+                              ? "bg-[#F5C518] font-bold text-[#1B2A4A]"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {Number(day.slice(8))}
+                        </span>
+                        {trips.slice(0, 2).map((o) => (
                           <span
                             key={o.id}
-                            className={`h-1.5 w-1.5 rounded-full ${BAR_COLORS[o.status]}`}
-                          />
+                            className={`truncate rounded px-1 text-[9px] leading-tight ${BAR_COLORS[o.status]}`}
+                          >
+                            {o.customers.name.split(" ")[0]}
+                          </span>
                         ))}
-                    </span>
-                  </>
-                )}
+                        {trips.length > 2 && (
+                          <span className="text-[9px] text-gray-400">
+                            +{trips.length - 2}
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
               </button>
             ))}
           </div>
