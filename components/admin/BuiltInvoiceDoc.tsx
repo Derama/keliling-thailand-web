@@ -192,7 +192,7 @@ export default function BuiltInvoiceDoc(props: Props) {
 function RunningHeader({ invoiceNumber, status }: Props) {
   const paid = status === "paid";
   return (
-    <header className="flex items-start justify-between gap-6 border-b border-gray-100 pb-4">
+    <header className="flex items-start justify-between gap-6 border-b-2 border-[#F5C518] pb-4">
       <div className="flex items-center gap-3">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#F5C518] shadow-sm">
           <Image src="/Logo.png" alt="" width={32} height={24} priority />
@@ -430,7 +430,7 @@ function Totals({
  *  every page via mt-auto. */
 function RunningFooter({ page, total }: { page: number; total: number }) {
   return (
-    <footer className="mt-auto border-t border-gray-100 pt-4 text-xs">
+    <footer className="mt-auto border-t-2 border-[#F5C518] pt-4 text-xs">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Contact icon={<WhatsAppIcon />} value={KELILING_THAILAND.whatsapp} />
         <Contact icon={<MailIcon />} value={KELILING_THAILAND.email} />
