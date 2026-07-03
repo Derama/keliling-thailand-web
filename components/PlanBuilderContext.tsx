@@ -3,18 +3,31 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import PlanBuilderModal from "@/components/PlanBuilderModal";
 
-const PlanBuilderContext = createContext<{ openPlanner: () => void }>({
+interface PlannerRequest {
+  initialCityId?: string;
+}
+
+const PlanBuilderContext = createContext<{
+  openPlanner: (initialCityId?: string) => void;
+}>({
   openPlanner: () => {},
 });
 
 export function PlanBuilderProvider({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(false);
+  const [request, setRequest] = useState<PlannerRequest | null>(null);
 
   return (
-    <PlanBuilderContext.Provider value={{ openPlanner: () => setOpen(true) }}>
+    <PlanBuilderContext.Provider
+      value={{ openPlanner: (initialCityId) => setRequest({ initialCityId }) }}
+    >
       {children}
       {/* Mount only while open so state resets on close. */}
-      {open && <PlanBuilderModal onClose={() => setOpen(false)} />}
+      {request && (
+        <PlanBuilderModal
+          initialCityId={request.initialCityId}
+          onClose={() => setRequest(null)}
+        />
+      )}
     </PlanBuilderContext.Provider>
   );
 }

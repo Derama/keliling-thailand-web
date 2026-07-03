@@ -1,4 +1,5 @@
 import { cities } from "@/lib/tours";
+import { tourPackages } from "@/lib/packages";
 import { getAllPosts } from "@/lib/blog";
 
 const productionUrl =
@@ -19,6 +20,11 @@ const routes: {
   { path: "tours", changeFrequency: "weekly", priority: 0.9 },
   ...cities.map((c) => ({
     path: `tours/${c.id}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  })),
+  ...tourPackages.map((p) => ({
+    path: `tours/packages/${p.id}`,
     changeFrequency: "monthly" as const,
     priority: 0.8,
   })),

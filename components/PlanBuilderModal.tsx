@@ -7,24 +7,11 @@ import { cities, getCity, bookableVehicles, VehicleId } from "@/lib/tours";
 import { cityNames, attractionNames } from "@/lib/translations";
 import { convertThbToIdr } from "@/lib/currency";
 import { waLink, fillTemplate } from "@/lib/site";
+import { createInitialPlan, defaultAttractionPicks } from "@/lib/planner";
 
 const MAX_DAYS = 5;
 const MAX_PAX = 20;
 const TOTAL_STEPS = 6;
-
-/** Famous attractions pre-checked in itinerary order until the day is full. */
-function defaultPicks(cityId: string): string[] {
-  const city = getCity(cityId);
-  if (!city) return [];
-  const picks: string[] = [];
-  let used = 0;
-  for (const a of city.attractions) {
-    if (used + a.hours > city.durationHours) break;
-    picks.push(a.id);
-    used += a.hours;
-  }
-  return picks;
-}
 
 function maxVehiclePax(pax: string): number {
   return Number(pax.split("-")[1] ?? pax);
@@ -40,13 +27,22 @@ function CheckBadge() {
   );
 }
 
-export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
+export default function PlanBuilderModal({
+  initialCityId,
+  onClose,
+}: {
+  initialCityId?: string;
+  onClose: () => void;
+}) {
   const { t } = useLanguage();
-  const [nav, setNav] = useState({ step: 0, dir: 1 });
+  const [initialPlan] = useState(() => createInitialPlan(initialCityId, cities));
+  const [nav, setNav] = useState({ step: initialPlan.initialStep, dir: 1 });
   const [days, setDays] = useState(1);
-  const [tripCities, setTripCities] = useState<string[]>([""]);
-  const [picks, setPicks] = useState<string[][]>([[]]);
-  const [customPlaces, setCustomPlaces] = useState<string[][]>([[]]);
+  const [tripCities, setTripCities] = useState<string[]>(initialPlan.tripCities);
+  const [picks, setPicks] = useState<string[][]>(initialPlan.picks);
+  const [customPlaces, setCustomPlaces] = useState<string[][]>(
+    initialPlan.customPlaces,
+  );
   const [pax, setPax] = useState(2);
   const [addons, setAddons] = useState({ hotel: false, tickets: false });
   const [vehicle, setVehicle] = useState<VehicleId | null>(null);
@@ -73,7 +69,11 @@ export default function PlanBuilderModal({ onClose }: { onClose: () => void }) {
 
   const chooseCity = (day: number, cityId: string) => {
     setTripCities((prev) => prev.map((c, i) => (i === day ? cityId : c)));
-    setPicks((prev) => prev.map((p, i) => (i === day ? defaultPicks(cityId) : p)));
+    setPicks((prev) =>
+      prev.map((p, i) =>
+        i === day ? defaultAttractionPicks(cityId, cities) : p,
+      ),
+    );
     setCustomPlaces((prev) => prev.map((c, i) => (i === day ? [] : c)));
     setVehicle(null);
   };

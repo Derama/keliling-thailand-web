@@ -74,7 +74,7 @@ export default function Navbar() {
             </Link>
           ))}
           <button
-            onClick={openPlanner}
+            onClick={() => openPlanner()}
             className="bg-[#F5C518] text-[#1B2A4A] text-sm font-bold px-4 py-1.5 rounded-full hover:brightness-95 transition"
           >
             {t.planner.openButton}

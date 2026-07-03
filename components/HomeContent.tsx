@@ -47,7 +47,7 @@ export default function HomeContent() {
           <p className="mt-4 text-lg text-white/85 max-w-2xl mx-auto">{t.home.heroSubtitle}</p>
           <div className="mt-8 flex justify-center">
             <button
-              onClick={openPlanner}
+              onClick={() => openPlanner()}
               className="bg-[#F5C518] text-[#1B2A4A] font-bold px-8 py-3 rounded-full hover:brightness-95 transition"
             >
               {t.planner.openButton}

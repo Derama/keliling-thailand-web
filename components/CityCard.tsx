@@ -5,13 +5,15 @@ import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
 import { City, cheapestPrice } from "@/lib/tours";
 import { cityNames } from "@/lib/translations";
+import { fillTemplate } from "@/lib/site";
 
 interface CityCardProps {
   city: City;
   onSelect?: (city: City, trigger: HTMLButtonElement) => void;
+  onPlan?: (city: City) => void;
 }
 
-export default function CityCard({ city, onSelect }: CityCardProps) {
+export default function CityCard({ city, onSelect, onPlan }: CityCardProps) {
   const { t } = useLanguage();
   const price = cheapestPrice(city.id);
   const name = cityNames[city.id] ?? city.id;
@@ -55,6 +57,29 @@ export default function CityCard({ city, onSelect }: CityCardProps) {
       >
         {content}
       </button>
+    );
+  }
+
+  if (onPlan) {
+    return (
+      <article className="overflow-hidden rounded-2xl bg-white shadow transition-shadow hover:shadow-xl">
+        <Link
+          href={`/tours/${city.id}`}
+          className="group block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-[#F5C518]/70"
+        >
+          {content}
+        </Link>
+        <div className="px-4 pb-4">
+          <button
+            type="button"
+            onClick={() => onPlan(city)}
+            aria-label={fillTemplate(t.packages.dailyPlanAria, { city: name })}
+            className="w-full rounded-full bg-[#F5C518] px-4 py-2.5 text-sm font-bold text-[#1B2A4A] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/50"
+          >
+            {t.packages.dailyPlanButton}
+          </button>
+        </div>
+      </article>
     );
   }
 

@@ -134,6 +134,96 @@ export const translations = {
       attractions: "tempat wisata",
       viewDetail: "Lihat Itinerary",
     },
+    packages: {
+      tabPackages: "Paket Multi-Hari",
+      tabDaily: "Tur Harian per Kota",
+      dailyPlanButton: "Susun Tur Harian",
+      dailyPlanAria: "Susun tur harian di {city}",
+      multiDayTitle: "Ingin mengunjungi beberapa kota?",
+      multiDayDesc:
+        "Gabungkan beberapa kota menjadi perjalanan privat multi-hari yang sesuai dengan rencana Anda.",
+      multiDayButton: "Buat Rencana Multi-Hari",
+      title: "Tur Privat & Paket Wisata",
+      subtitle:
+        "Paket multi-hari keliling Thailand atau tur harian per kota — semuanya privat: satu kendaraan khusus untuk rombongan Anda.",
+      dayLabel: "Hari {day}",
+      durationLong: "{days} Hari {nights} Malam",
+      citiesCount: "{count} kota",
+      arrivalNote: "Penjemputan di bandara / hotel Anda",
+      departureNote: "Diantar ke bandara untuk penerbangan pulang",
+      viewDetail: "Lihat Itinerary",
+      includedTitle: "Sudah Termasuk",
+      excludedTitle: "Belum Termasuk",
+      includedItems: [
+        "Kendaraan privat + sopir selama tur",
+        "BBM, tol, dan parkir",
+        "Penjemputan & pengantaran bandara",
+      ],
+      excludedItems: [
+        "Hotel (bisa kami bantu pesankan)",
+        "Tiket masuk wisata",
+        "Makan & pengeluaran pribadi",
+      ],
+      priceNote:
+        "Harga menyesuaikan jumlah rombongan, kendaraan, dan tanggal — minta penawaran via WhatsApp.",
+      waButton: "Minta Penawaran via WhatsApp",
+      waMessage:
+        "Halo Keliling Thailand! Saya tertarik paket {name}. Boleh minta penawaran harganya?",
+      customTitle: "Punya rencana berbeda?",
+      customDesc:
+        "Kombinasi kota, jumlah hari, atau tempat wisata bisa diatur sesuai keinginan rombongan Anda. Ceritakan rencananya — tim kami susun paketnya.",
+      customButton: "Buat Paket Custom",
+      customWaMessage:
+        "Halo Keliling Thailand! Saya mau buat paket tur custom. Rencananya begini:",
+      badges: {
+        bestSeller: "Terlaris",
+        grandTour: "Grand Tour",
+        allCities: "Semua Kota",
+      },
+      taglines: {
+        "bangkok-pattaya-3d2n": "Liburan singkat kota & pantai — pas untuk long weekend",
+        "bangkok-pattaya-4d3n": "Kombinasi kota metropolitan & pantai — paket favorit keluarga",
+        "bangkok-khaoyai-4d3n": "Kota & pegunungan sejuk dengan kebun anggur dan cafe estetik",
+        "bangkok-kanchanaburi-4d3n": "Sejarah Sungai Kwai & air terjun Erawan dari Bangkok",
+        "bangkok-huahin-4d3n": "Kota kerajaan & pantai tenang untuk liburan santai",
+        "bangkok-pattaya-khaoyai-5d4n": "Kota, pantai, dan alam pegunungan dalam satu perjalanan",
+        "bangkok-pattaya-kanchanaburi-5d4n": "Sejarah, alam, dan hiburan lengkap",
+        "bangkok-pattaya-huahin-5d4n": "Dua kota pantai dengan karakter berbeda plus Bangkok",
+        "bangkok-khaoyai-kanchanaburi-5d4n": "Alam pegunungan, air terjun, dan jejak sejarah",
+        "bangkok-pattaya-kanchanaburi-khaoyai-6d5n": "Grand Tour — destinasi terbaik Thailand tengah",
+        "bangkok-pattaya-khaoyai-huahin-6d5n": "Pantai, pegunungan, dan kota dalam satu rangkaian",
+        "bangkok-pattaya-huahin-kanchanaburi-7d6n": "Eksplorasi lengkap: dua pantai, sejarah, dan Bangkok",
+        "bangkok-pattaya-kanchanaburi-khaoyai-huahin-7d6n": "Semua 5 kota dalam satu perjalanan penuh",
+      },
+      descriptions: {
+        "bangkok-pattaya-3d2n":
+          "Paket singkat untuk mencicipi Thailand: dua hari di pantai Pattaya lalu ikon-ikon Bangkok sebelum pulang. Ideal untuk long weekend.",
+        "bangkok-pattaya-4d3n":
+          "Paket paling populer untuk pertama kali ke Thailand. Nikmati gemerlap Bangkok lalu bersantai di pantai Pattaya — cocok untuk keluarga, honeymoon, dan grup.",
+        "bangkok-khaoyai-4d3n":
+          "Udara sejuk pegunungan Khao Yai: taman nasional UNESCO, kebun anggur, dan farm bergaya Eropa, ditutup dengan ikon Bangkok.",
+        "bangkok-kanchanaburi-4d3n":
+          "Wisata sejarah Perang Dunia II di Kanchanaburi — Jembatan Sungai Kwai dan Death Railway — plus air terjun Erawan tujuh tingkat.",
+        "bangkok-huahin-4d3n":
+          "Alternatif lebih tenang dari Pattaya. Hua Hin cocok untuk keluarga yang mencari suasana pantai relaks, pasar malam artistik, dan taman bergaya Yunani.",
+        "bangkok-pattaya-khaoyai-5d4n":
+          "Untuk yang mau lebih dari sekadar kota: pantai Pattaya lalu udara sejuk Khao Yai dengan kebun anggur dan spot foto Instagramable.",
+        "bangkok-pattaya-kanchanaburi-5d4n":
+          "Gabungan wisata sejarah Perang Dunia II di Kanchanaburi dengan keseruan pantai Pattaya dan ikon Bangkok.",
+        "bangkok-pattaya-huahin-5d4n":
+          "Dua sisi pantai Thailand: Pattaya yang semarak dan Hua Hin yang tenang, ditutup belanja di Bangkok.",
+        "bangkok-khaoyai-kanchanaburi-5d4n":
+          "Untuk pecinta alam dan sejarah: taman nasional Khao Yai, kebun anggur, air terjun Erawan, dan Jembatan Sungai Kwai.",
+        "bangkok-pattaya-kanchanaburi-khaoyai-6d5n":
+          "Paket lengkap destinasi terbaik Thailand tengah: pantai, sejarah, pegunungan, dan kota. Ideal untuk rombongan.",
+        "bangkok-pattaya-khaoyai-huahin-6d5n":
+          "Rangkaian santai: pantai Pattaya, kebun anggur Khao Yai, lalu pantai tenang Hua Hin sebelum kembali ke Bangkok.",
+        "bangkok-pattaya-huahin-kanchanaburi-7d6n":
+          "Seminggu penuh menjelajah: dua kota pantai berbeda karakter, sejarah Sungai Kwai, dan ikon-ikon Bangkok.",
+        "bangkok-pattaya-kanchanaburi-khaoyai-huahin-7d6n":
+          "Paket terlengkap kami: kelima kota — Pattaya, Kanchanaburi, Khao Yai, Hua Hin, dan Bangkok — dalam satu perjalanan.",
+      },
+    },
     tourDetail: {
       itineraryTitle: "Itinerary",
       includedTitle: "Sudah Termasuk",
@@ -570,6 +660,96 @@ export const translations = {
       attractions: "attractions",
       viewDetail: "View Itinerary",
     },
+    packages: {
+      tabPackages: "Multi-Day Packages",
+      tabDaily: "Day Tours by City",
+      dailyPlanButton: "Plan a Day Tour",
+      dailyPlanAria: "Plan a day tour in {city}",
+      multiDayTitle: "Want to visit several cities?",
+      multiDayDesc:
+        "Combine several cities into a private multi-day trip built around your plans.",
+      multiDayButton: "Plan a Multi-Day Trip",
+      title: "Private Tours & Packages",
+      subtitle:
+        "Multi-day packages around Thailand or full-day city tours — all private: one vehicle exclusively for your group.",
+      dayLabel: "Day {day}",
+      durationLong: "{days} Days {nights} Nights",
+      citiesCount: "{count} cities",
+      arrivalNote: "Pickup at the airport / your hotel",
+      departureNote: "Drop-off at the airport for your flight home",
+      viewDetail: "View Itinerary",
+      includedTitle: "Included",
+      excludedTitle: "Not Included",
+      includedItems: [
+        "Private vehicle + driver throughout the tour",
+        "Fuel, tolls, and parking",
+        "Airport pickup & drop-off",
+      ],
+      excludedItems: [
+        "Hotels (we can help book them)",
+        "Attraction tickets",
+        "Meals & personal expenses",
+      ],
+      priceNote:
+        "Pricing depends on group size, vehicle, and dates — request a quote via WhatsApp.",
+      waButton: "Request a Quote via WhatsApp",
+      waMessage:
+        "Hello Keliling Thailand! I'm interested in the {name} package. Could you send me a quote?",
+      customTitle: "Have a different plan?",
+      customDesc:
+        "Cities, number of days, and attractions can all be arranged to fit your group. Tell us your plan — our team will build the package.",
+      customButton: "Build a Custom Package",
+      customWaMessage:
+        "Hello Keliling Thailand! I'd like to build a custom tour package. Here's my plan:",
+      badges: {
+        bestSeller: "Best Seller",
+        grandTour: "Grand Tour",
+        allCities: "All Cities",
+      },
+      taglines: {
+        "bangkok-pattaya-3d2n": "A short city & beach escape — perfect for a long weekend",
+        "bangkok-pattaya-4d3n": "Metropolis meets beach — our family favorite",
+        "bangkok-khaoyai-4d3n": "City & cool highlands with vineyards and scenic cafés",
+        "bangkok-kanchanaburi-4d3n": "River Kwai history & Erawan Falls from Bangkok",
+        "bangkok-huahin-4d3n": "Royal seaside town & calm beaches for a relaxed holiday",
+        "bangkok-pattaya-khaoyai-5d4n": "City, beach, and mountain nature in one trip",
+        "bangkok-pattaya-kanchanaburi-5d4n": "History, nature, and entertainment — the complete mix",
+        "bangkok-pattaya-huahin-5d4n": "Two beach towns with different characters, plus Bangkok",
+        "bangkok-khaoyai-kanchanaburi-5d4n": "Mountain nature, waterfalls, and wartime history",
+        "bangkok-pattaya-kanchanaburi-khaoyai-6d5n": "Grand Tour — central Thailand's best destinations",
+        "bangkok-pattaya-khaoyai-huahin-6d5n": "Beach, mountains, and city in one route",
+        "bangkok-pattaya-huahin-kanchanaburi-7d6n": "The full explorer: two beaches, history, and Bangkok",
+        "bangkok-pattaya-kanchanaburi-khaoyai-huahin-7d6n": "All 5 cities in one complete journey",
+      },
+      descriptions: {
+        "bangkok-pattaya-3d2n":
+          "A short taste of Thailand: two days on Pattaya's beaches, then Bangkok's icons before flying home. Ideal for a long weekend.",
+        "bangkok-pattaya-4d3n":
+          "Our most popular package for first-timers. Enjoy Bangkok's buzz, then unwind on Pattaya's beaches — great for families, honeymoons, and groups.",
+        "bangkok-khaoyai-4d3n":
+          "Cool mountain air in Khao Yai: a UNESCO national park, vineyards, and European-style farms, capped off with Bangkok's icons.",
+        "bangkok-kanchanaburi-4d3n":
+          "World War II history in Kanchanaburi — the Bridge over the River Kwai and the Death Railway — plus the seven-tiered Erawan Falls.",
+        "bangkok-huahin-4d3n":
+          "A calmer alternative to Pattaya. Hua Hin suits families after a relaxed beach vibe, an artistic night market, and a Greek-style theme park.",
+        "bangkok-pattaya-khaoyai-5d4n":
+          "For those who want more than the city: Pattaya's beaches, then Khao Yai's cool air, vineyards, and Instagram-worthy photo spots.",
+        "bangkok-pattaya-kanchanaburi-5d4n":
+          "World War II history in Kanchanaburi combined with Pattaya's beach fun and Bangkok's icons.",
+        "bangkok-pattaya-huahin-5d4n":
+          "Two sides of Thailand's coast: lively Pattaya and tranquil Hua Hin, finished with shopping in Bangkok.",
+        "bangkok-khaoyai-kanchanaburi-5d4n":
+          "For nature and history lovers: Khao Yai National Park, vineyards, Erawan Falls, and the Bridge over the River Kwai.",
+        "bangkok-pattaya-kanchanaburi-khaoyai-6d5n":
+          "The complete central-Thailand collection: beach, history, mountains, and city. Ideal for bigger groups.",
+        "bangkok-pattaya-khaoyai-huahin-6d5n":
+          "A relaxed circuit: Pattaya's beaches, Khao Yai's vineyards, then Hua Hin's calm coast before returning to Bangkok.",
+        "bangkok-pattaya-huahin-kanchanaburi-7d6n":
+          "A full week of exploring: two very different beach towns, River Kwai history, and Bangkok's icons.",
+        "bangkok-pattaya-kanchanaburi-khaoyai-huahin-7d6n":
+          "Our most complete package: all five cities — Pattaya, Kanchanaburi, Khao Yai, Hua Hin, and Bangkok — in one journey.",
+      },
+    },
     tourDetail: {
       itineraryTitle: "Itinerary",
       includedTitle: "Included",
@@ -1004,6 +1184,96 @@ export const translations = {
       subtitle: "ทุกทัวร์เป็นแบบส่วนตัว: รถหนึ่งคันสำหรับกรุ๊ปของคุณเท่านั้น คิดราคาต่อคัน ไม่ใช่ต่อคน",
       attractions: "ที่เที่ยว",
       viewDetail: "ดูแผนเที่ยว",
+    },
+    packages: {
+      tabPackages: "แพ็กเกจหลายวัน",
+      tabDaily: "ทัวร์รายวันรายเมือง",
+      dailyPlanButton: "จัดทัวร์รายวัน",
+      dailyPlanAria: "จัดทัวร์รายวันที่ {city}",
+      multiDayTitle: "อยากเที่ยวหลายเมือง?",
+      multiDayDesc:
+        "รวมหลายเมืองเป็นทริปส่วนตัวหลายวันที่ออกแบบตามแผนของคุณ",
+      multiDayButton: "วางแผนทริปหลายวัน",
+      title: "ทัวร์ส่วนตัวและแพ็กเกจ",
+      subtitle:
+        "แพ็กเกจหลายวันทั่วไทยหรือทัวร์เต็มวันรายเมือง — ทั้งหมดเป็นแบบส่วนตัว: รถหนึ่งคันสำหรับกรุ๊ปของคุณเท่านั้น",
+      dayLabel: "วันที่ {day}",
+      durationLong: "{days} วัน {nights} คืน",
+      citiesCount: "{count} เมือง",
+      arrivalNote: "รับที่สนามบิน / โรงแรมของคุณ",
+      departureNote: "ส่งสนามบินสำหรับเที่ยวบินขากลับ",
+      viewDetail: "ดูแผนเที่ยว",
+      includedTitle: "รวมในราคา",
+      excludedTitle: "ไม่รวม",
+      includedItems: [
+        "รถส่วนตัวพร้อมคนขับตลอดทัวร์",
+        "น้ำมัน ทางด่วน และที่จอดรถ",
+        "รับส่งสนามบิน",
+      ],
+      excludedItems: [
+        "โรงแรม (ช่วยจองให้ได้)",
+        "ค่าเข้าชมสถานที่",
+        "อาหารและค่าใช้จ่ายส่วนตัว",
+      ],
+      priceNote:
+        "ราคาขึ้นอยู่กับขนาดกรุ๊ป รถ และวันเดินทาง — ขอใบเสนอราคาทาง WhatsApp",
+      waButton: "ขอใบเสนอราคาทาง WhatsApp",
+      waMessage:
+        "สวัสดีค่ะ/ครับ Keliling Thailand! สนใจแพ็กเกจ {name} ขอใบเสนอราคาด้วยค่ะ/ครับ",
+      customTitle: "มีแผนเที่ยวแบบอื่น?",
+      customDesc:
+        "เมือง จำนวนวัน และสถานที่เที่ยวปรับได้ตามกรุ๊ปของคุณ เล่าแผนให้เราฟัง — ทีมงานจัดแพ็กเกจให้",
+      customButton: "สร้างแพ็กเกจของคุณเอง",
+      customWaMessage:
+        "สวัสดีค่ะ/ครับ Keliling Thailand! อยากจัดแพ็กเกจทัวร์เอง แผนเป็นแบบนี้ค่ะ/ครับ:",
+      badges: {
+        bestSeller: "ขายดี",
+        grandTour: "แกรนด์ทัวร์",
+        allCities: "ครบทุกเมือง",
+      },
+      taglines: {
+        "bangkok-pattaya-3d2n": "ทริปสั้นเมืองและทะเล — เหมาะกับวันหยุดยาว",
+        "bangkok-pattaya-4d3n": "มหานครและชายหาด — แพ็กเกจยอดนิยมของครอบครัว",
+        "bangkok-khaoyai-4d3n": "เมืองและภูเขาอากาศเย็น พร้อมไร่องุ่นและคาเฟ่สวย",
+        "bangkok-kanchanaburi-4d3n": "ประวัติศาสตร์แม่น้ำแควและน้ำตกเอราวัณจากกรุงเทพฯ",
+        "bangkok-huahin-4d3n": "เมืองตากอากาศและหาดเงียบสงบสำหรับวันพักผ่อน",
+        "bangkok-pattaya-khaoyai-5d4n": "เมือง ทะเล และธรรมชาติภูเขาในทริปเดียว",
+        "bangkok-pattaya-kanchanaburi-5d4n": "ประวัติศาสตร์ ธรรมชาติ และความบันเทิงครบครัน",
+        "bangkok-pattaya-huahin-5d4n": "สองเมืองทะเลต่างสไตล์ พร้อมกรุงเทพฯ",
+        "bangkok-khaoyai-kanchanaburi-5d4n": "ธรรมชาติภูเขา น้ำตก และร่องรอยประวัติศาสตร์",
+        "bangkok-pattaya-kanchanaburi-khaoyai-6d5n": "แกรนด์ทัวร์ — สุดยอดจุดหมายภาคกลาง",
+        "bangkok-pattaya-khaoyai-huahin-6d5n": "ทะเล ภูเขา และเมืองในเส้นทางเดียว",
+        "bangkok-pattaya-huahin-kanchanaburi-7d6n": "สำรวจเต็มอิ่ม: สองหาด ประวัติศาสตร์ และกรุงเทพฯ",
+        "bangkok-pattaya-kanchanaburi-khaoyai-huahin-7d6n": "ครบทั้ง 5 เมืองในทริปเดียว",
+      },
+      descriptions: {
+        "bangkok-pattaya-3d2n":
+          "ทริปสั้นชิมลางเมืองไทย: สองวันที่หาดพัทยา ปิดท้ายด้วยแลนด์มาร์กกรุงเทพฯ ก่อนบินกลับ เหมาะกับวันหยุดยาว",
+        "bangkok-pattaya-4d3n":
+          "แพ็กเกจยอดนิยมสำหรับมือใหม่: สัมผัสความคึกคักของกรุงเทพฯ แล้วพักผ่อนริมหาดพัทยา เหมาะกับครอบครัว ฮันนีมูน และหมู่คณะ",
+        "bangkok-khaoyai-4d3n":
+          "อากาศเย็นสบายที่เขาใหญ่: อุทยานมรดกโลก ไร่องุ่น และฟาร์มสไตล์ยุโรป ปิดท้ายด้วยแลนด์มาร์กกรุงเทพฯ",
+        "bangkok-kanchanaburi-4d3n":
+          "ประวัติศาสตร์สงครามโลกที่กาญจนบุรี — สะพานข้ามแม่น้ำแควและทางรถไฟสายมรณะ — พร้อมน้ำตกเอราวัณเจ็ดชั้น",
+        "bangkok-huahin-4d3n":
+          "ทางเลือกเงียบสงบกว่าพัทยา หัวหินเหมาะกับครอบครัวที่ต้องการบรรยากาศชายทะเลผ่อนคลาย ตลาดโต้รุ่งสุดอาร์ต และสวนสไตล์กรีก",
+        "bangkok-pattaya-khaoyai-5d4n":
+          "สำหรับคนที่อยากได้มากกว่าเมือง: หาดพัทยา ต่อด้วยอากาศเย็นเขาใหญ่ ไร่องุ่น และมุมถ่ายรูปสวย ๆ",
+        "bangkok-pattaya-kanchanaburi-5d4n":
+          "ประวัติศาสตร์สงครามโลกที่กาญจนบุรี ผสานความสนุกริมหาดพัทยาและแลนด์มาร์กกรุงเทพฯ",
+        "bangkok-pattaya-huahin-5d4n":
+          "สองอารมณ์ชายทะเลไทย: พัทยาสุดคึกคักและหัวหินแสนสงบ ปิดท้ายช้อปปิ้งกรุงเทพฯ",
+        "bangkok-khaoyai-kanchanaburi-5d4n":
+          "สำหรับคนรักธรรมชาติและประวัติศาสตร์: อุทยานเขาใหญ่ ไร่องุ่น น้ำตกเอราวัณ และสะพานข้ามแม่น้ำแคว",
+        "bangkok-pattaya-kanchanaburi-khaoyai-6d5n":
+          "รวมสุดยอดจุดหมายภาคกลางครบชุด: ทะเล ประวัติศาสตร์ ภูเขา และเมือง เหมาะกับกรุ๊ปใหญ่",
+        "bangkok-pattaya-khaoyai-huahin-6d5n":
+          "เส้นทางชิลล์ ๆ: หาดพัทยา ไร่องุ่นเขาใหญ่ แล้วต่อด้วยชายฝั่งเงียบสงบหัวหิน ก่อนกลับกรุงเทพฯ",
+        "bangkok-pattaya-huahin-kanchanaburi-7d6n":
+          "หนึ่งสัปดาห์เต็ม: สองเมืองทะเลต่างสไตล์ ประวัติศาสตร์แม่น้ำแคว และแลนด์มาร์กกรุงเทพฯ",
+        "bangkok-pattaya-kanchanaburi-khaoyai-huahin-7d6n":
+          "แพ็กเกจครบที่สุดของเรา: ทั้งห้าเมือง — พัทยา กาญจนบุรี เขาใหญ่ หัวหิน และกรุงเทพฯ — ในทริปเดียว",
+      },
     },
     tourDetail: {
       itineraryTitle: "แผนเที่ยว",
