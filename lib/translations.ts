@@ -104,6 +104,14 @@ export const translations = {
       heroTitle: "Tur privat keliling Thailand untuk rombongan Anda",
       heroSubtitle:
         "Kendaraan pribadi, sopir berpengalaman, dan itinerary sesuai keinginan. Sedan, SUV, van, hingga mini bus untuk 1–20 orang.",
+      packageBrowser: {
+        openButton: "Lihat Paket Tur",
+        title: "Pilih paket perjalanan Anda",
+        description:
+          "Bandingkan seluruh paket multi-hari kami, lalu buka itinerary lengkap yang paling sesuai untuk rombongan Anda.",
+        close: "Tutup daftar paket tur",
+        customAria: "Buat paket tur custom melalui WhatsApp",
+      },
       howTitle: "Cara Pesan",
       how1Title: "Buat rencana",
       how1Desc: "Tentukan jumlah hari, kota, dan tempat wisata yang ingin dikunjungi.",
@@ -630,6 +638,14 @@ export const translations = {
       heroTitle: "Private tours around Thailand for your group",
       heroSubtitle:
         "Your own vehicle, an experienced driver, and an itinerary that fits you. Sedan, SUV, van, or mini bus for 1–20 people.",
+      packageBrowser: {
+        openButton: "View Tour Packages",
+        title: "Choose your trip package",
+        description:
+          "Compare all our multi-day packages, then open the full itinerary that best fits your group.",
+        close: "Close tour package list",
+        customAria: "Build a custom tour package through WhatsApp",
+      },
       howTitle: "How It Works",
       how1Title: "Build your plan",
       how1Desc: "Choose how many days, which cities, and the attractions you want to visit.",
@@ -1156,6 +1172,14 @@ export const translations = {
       heroTitle: "ทัวร์ส่วนตัวทั่วไทยสำหรับกรุ๊ปของคุณ",
       heroSubtitle:
         "รถส่วนตัว คนขับมืออาชีพ และแผนเที่ยวที่ปรับได้ตามใจ มีรถเก๋ง SUV รถตู้ และมินิบัส รองรับ 1–20 คน",
+      packageBrowser: {
+        openButton: "ดูแพ็กเกจทัวร์",
+        title: "เลือกแพ็กเกจเที่ยวของคุณ",
+        description:
+          "เปรียบเทียบแพ็กเกจหลายวันทั้งหมด แล้วเปิดดูแผนเที่ยวเต็มรูปแบบที่เหมาะกับกรุ๊ปของคุณ",
+        close: "ปิดรายการแพ็กเกจทัวร์",
+        customAria: "สร้างแพ็กเกจทัวร์เองผ่าน WhatsApp",
+      },
       howTitle: "วิธีจอง",
       how1Title: "สร้างแผนเที่ยว",
       how1Desc: "เลือกจำนวนวัน เมือง และสถานที่ท่องเที่ยวที่อยากไป",

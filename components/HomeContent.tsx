@@ -9,6 +9,7 @@ import { cities, City, vehicles } from "@/lib/tours";
 import { waLink } from "@/lib/site";
 import CityCard from "@/components/CityCard";
 import DestinationPreviewModal from "@/components/DestinationPreviewModal";
+import HomePackageBrowserModal from "@/components/HomePackageBrowserModal";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const HERO_IMAGE =
@@ -21,12 +22,19 @@ export default function HomeContent() {
     city: City;
     trigger: HTMLButtonElement;
   } | null>(null);
+  const [packageBrowserTrigger, setPackageBrowserTrigger] =
+    useState<HTMLButtonElement | null>(null);
 
   const closeDestinationPreview = useCallback(() => {
     const trigger = destinationPreview?.trigger;
     setDestinationPreview(null);
     window.requestAnimationFrame(() => trigger?.focus());
   }, [destinationPreview]);
+
+  const closePackageBrowser = useCallback(() => {
+    setPackageBrowserTrigger(null);
+    window.requestAnimationFrame(() => packageBrowserTrigger?.focus());
+  }, [packageBrowserTrigger]);
 
   const steps = [
     { title: t.home.how1Title, desc: t.home.how1Desc },
@@ -45,12 +53,19 @@ export default function HomeContent() {
             {t.home.heroTitle}
           </h1>
           <p className="mt-4 text-lg text-white/85 max-w-2xl mx-auto">{t.home.heroSubtitle}</p>
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
             <button
               onClick={() => openPlanner()}
-              className="bg-[#F5C518] text-[#1B2A4A] font-bold px-8 py-3 rounded-full hover:brightness-95 transition"
+              className="min-h-12 rounded-full bg-[#F5C518] px-8 py-3 font-bold text-[#1B2A4A] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/70"
             >
               {t.planner.openButton}
+            </button>
+            <button
+              type="button"
+              onClick={(event) => setPackageBrowserTrigger(event.currentTarget)}
+              className="min-h-12 rounded-full border-2 border-white/80 bg-[#1B2A4A]/20 px-8 py-3 font-bold text-white transition-colors hover:border-[#F5C518] hover:bg-[#F5C518] hover:text-[#1B2A4A] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/70"
+            >
+              {t.home.packageBrowser.openButton}
             </button>
           </div>
         </div>
@@ -167,6 +182,9 @@ export default function HomeContent() {
           city={destinationPreview.city}
           onClose={closeDestinationPreview}
         />
+      )}
+      {packageBrowserTrigger && (
+        <HomePackageBrowserModal onClose={closePackageBrowser} />
       )}
     </main>
   );
