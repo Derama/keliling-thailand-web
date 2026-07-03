@@ -18,6 +18,13 @@ Give homepage visitors a clear choice between building a custom itinerary and br
 - The custom-package option reuses the existing localized WhatsApp message and link.
 - The dialog has a visible title, supporting copy, close button, Escape-to-close behavior, backdrop close, body scroll lock, and initial focus on the close button.
 
+## Motion
+
+- Reuse the planner's 250ms backdrop fade and 400ms panel rise/scale entrance so both homepage choices feel like one system.
+- Reveal package and custom cards with the planner's upward card entrance, using 35ms intervals capped after the eighth item so the 14-option catalog remains responsive.
+- Give the package-browser trigger and close control subtle press feedback.
+- Apply no meaningful delay or movement when `prefers-reduced-motion: reduce` is active.
+
 ## Content
 
 - Add localized homepage copy for the hero action, dialog title, dialog description, and close-label/accessibility text in Indonesian, English, and Thai.
