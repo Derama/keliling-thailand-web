@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Field, inputCls, btnSecondaryCls } from "@/components/admin/ui";
 import { formatTHB, formatIDR, isoLocal } from "@/lib/admin/utils";
@@ -137,6 +137,12 @@ export default function InvoiceBuilderView({
   // Payable invoice linked to the order. Stored in the draft so re-saving
   // updates the same `invoices` row instead of creating duplicates.
   const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
+  // Ref twin read by the async sync — never stale mid-flight like state.
+  const savedInvoiceIdRef = useRef<string | null>(null);
+  const setSavedInvoice = useCallback((id: string | null) => {
+    savedInvoiceIdRef.current = id;
+    setSavedInvoiceId(id);
+  }, []);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">(
     "idle"
   );
@@ -214,7 +220,7 @@ export default function InvoiceBuilderView({
     setCustEmail(d.custEmail ?? "");
     setCustAddress(d.custAddress ?? "");
     if (typeof d.idrRate === "number") setIdrRate(d.idrRate);
-    setSavedInvoiceId(d.savedInvoiceId ?? null);
+    setSavedInvoice(d.savedInvoiceId ?? null);
     setLibraryId(d.libraryId ?? null);
   }
 
@@ -276,6 +282,8 @@ export default function InvoiceBuilderView({
     return () => {
       cancelled = true;
     };
+    // applyDraft only writes state; re-running on its identity would refetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, templateId]);
 
   const isOperator = mode !== "customer";
@@ -336,7 +344,9 @@ export default function InvoiceBuilderView({
     [orderId]
   );
 
-  // Autosave to the order (debounced) once hydrated; mirror to the library too.
+  // Autosave to the order (debounced) once hydrated; mirror to the library and
+  // keep the payable accounting invoice in sync so Pembayaran/Dashboard always
+  // reflect the latest lines without an extra tap.
   useEffect(() => {
     if (!orderId || !hydrated.current) return;
     const t = setTimeout(async () => {
@@ -357,6 +367,7 @@ export default function InvoiceBuilderView({
       } catch {
         /* mirror is best-effort */
       }
+      void queuePayableSync(false);
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -405,7 +416,10 @@ export default function InvoiceBuilderView({
             ".invoice-page.kt-invoice-page"
           ) ?? []
         );
-        await downloadSheetsAsPdf(sheets, `${invoiceNumber} - ${date}`, (page, total) =>
+        // No. Invoice is only allocated on save — fall back to the doc title so
+        // an unsaved invoice never downloads as " - 2026-07-03.pdf".
+        const stem = invoiceNumber.trim() || docTitle.trim() || "Invoice";
+        await downloadSheetsAsPdf(sheets, `${stem} - ${date}`, (page, total) =>
           setPdfProgress(`${page}/${total}`)
         );
       } catch (err) {
@@ -451,46 +465,70 @@ export default function InvoiceBuilderView({
 
   // Create/update the payable accounting invoice (invoices table) for this
   // order from the customer-facing total, so payment can be requested off it.
-  async function saveToOrder() {
+  // Runs both explicitly (button) and silently after every autosave — the
+  // Pembayaran tab and the Dashboard read `orders.price_idr`, which only moves
+  // when this row exists, so an invoice that is merely drafted stays invisible
+  // to finance. All calls are serialized through `payableChain` so overlapping
+  // autosave ticks can never double-allocate an invoice number.
+  const payableChain = useRef<Promise<void>>(Promise.resolve());
+  function queuePayableSync(explicit: boolean): Promise<void> {
+    payableChain.current = payableChain.current
+      .catch(() => {})
+      .then(() => syncPayableInvoice(explicit));
+    return payableChain.current;
+  }
+
+  async function syncPayableInvoice(explicit: boolean): Promise<void> {
     if (!orderId) return;
-    const amountIdr = Math.round(totals.customerTotal * idrRate);
+    const d = draftRef.current;
+    const t = invoiceTotals(d.lines);
+    const amountIdr = Math.round(t.customerTotal * d.idrRate);
+    const existingId = savedInvoiceIdRef.current;
     if (amountIdr <= 0) {
-      setSaveErr("Total customer masih 0 — isi item dulu.");
+      if (explicit) setSaveErr("Total customer masih 0 — isi item dulu.");
       return;
     }
-    setSaveState("saving");
-    setSaveErr(null);
+    // Personal invoices are throwaway — they only hit accounting when the user
+    // explicitly asks; customer/operator invoices sync automatically.
+    if (!explicit && !existingId && d.mode === "personal") return;
+
+    if (explicit) {
+      setSaveState("saving");
+      setSaveErr(null);
+    }
+    const fail = (msg: string) => {
+      if (explicit) {
+        setSaveErr(msg);
+        setSaveState("idle");
+      }
+    };
     const supabase = createClient();
-    const lineItems = lines.map((l) => ({
+    const lineItems = d.lines.map((l) => ({
       description: l.desc || "Item",
-      amount_idr: Math.round(lineCustomerTotal(l) * idrRate),
+      amount_idr: Math.round(lineCustomerTotal(l) * d.idrRate),
     }));
 
     // Allocate a unique, sequential document number the first time a customer /
     // operator invoice is saved. Personal invoices keep their typed number and
     // never draw from the shared counter.
-    let docNumber = invoiceNumber;
-    if (!savedInvoiceId && mode !== "personal") {
+    let docNumber = d.invoiceNumber;
+    if (!existingId && d.mode !== "personal") {
       const { data, error } = await supabase.rpc("next_invoice_number");
       if (error || typeof data !== "string") {
-        setSaveErr(
-          `Gagal membuat nomor invoice: ${error?.message ?? "tak terduga"}`
-        );
-        setSaveState("idle");
+        fail(`Gagal membuat nomor invoice: ${error?.message ?? "tak terduga"}`);
         return;
       }
       docNumber = data;
     }
 
-    let invoiceRowId = savedInvoiceId;
-    if (savedInvoiceId) {
+    let invoiceRowId = existingId;
+    if (existingId) {
       const { error } = await supabase
         .from("invoices")
         .update({ amount_idr: amountIdr, line_items: lineItems })
-        .eq("id", savedInvoiceId);
+        .eq("id", existingId);
       if (error) {
-        setSaveErr(`Gagal menyimpan: ${error.message}`);
-        setSaveState("idle");
+        fail(`Gagal menyimpan: ${error.message}`);
         return;
       }
     } else {
@@ -502,22 +540,21 @@ export default function InvoiceBuilderView({
           amount_idr: amountIdr,
           line_items: lineItems,
           // Personal: omit so the BEFORE INSERT trigger assigns a fallback id.
-          ...(mode !== "personal" ? { invoice_number: docNumber } : {}),
+          ...(d.mode !== "personal" ? { invoice_number: docNumber } : {}),
         })
         .select("id")
         .single();
       if (error) {
-        setSaveErr(`Gagal menyimpan: ${error.message}`);
-        setSaveState("idle");
+        fail(`Gagal menyimpan: ${error.message}`);
         return;
       }
       invoiceRowId = data.id;
-      setSavedInvoiceId(data.id);
+      setSavedInvoice(data.id);
     }
 
     // Persist the assigned number + invoice id into the draft so the doc shows
     // it and re-saves update the same row instead of allocating a new number.
-    if (docNumber !== invoiceNumber) setInvoiceNumber(docNumber);
+    if (docNumber !== d.invoiceNumber) setInvoiceNumber(docNumber);
     await saveOrderDoc(orderId, "invoice", {
       ...draftRef.current,
       invoiceNumber: docNumber,
@@ -530,10 +567,14 @@ export default function InvoiceBuilderView({
     // the invoice rate. Company margin = customer total − operator total.
     await supabase
       .from("orders")
-      .update({ cost_thb: totals.operatorTotal, fx_rate: idrRate })
+      .update({ cost_thb: t.operatorTotal, fx_rate: d.idrRate })
       .eq("id", orderId);
     setSaveState("saved");
     onInvoiceSaved?.();
+  }
+
+  function saveToOrder() {
+    void queuePayableSync(true);
   }
 
   async function openPicker() {
@@ -959,6 +1000,19 @@ export default function InvoiceBuilderView({
                 Kurs bisa diubah manual.
               </p>
             </section>
+          )}
+
+          {/* Finance-link warning — only when the automatic payable-invoice
+              sync can't run, so the user knows Pembayaran/Dashboard won't see
+              this invoice yet and why. */}
+          {orderId && lines.length > 0 && !savedInvoiceId && (
+            <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-800">
+              {mode === "personal"
+                ? "Invoice personal tidak otomatis masuk Pembayaran & Dashboard — tekan “Simpan ke order” jika ingin dihitung."
+                : totals.customerTotal <= 0
+                  ? "Invoice belum terhitung di Pembayaran & Dashboard — total customer masih 0, isi harga jual dulu."
+                  : "Menghubungkan ke Pembayaran & Dashboard…"}
+            </div>
           )}
 
           {/* Items card */}

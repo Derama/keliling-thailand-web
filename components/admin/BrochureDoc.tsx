@@ -18,8 +18,12 @@ function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
-// eslint-disable-next-line @next/next/no-img-element
-const Img = (p: React.ImgHTMLAttributes<HTMLImageElement>) => <img alt="" {...p} />;
+// crossOrigin="anonymous" makes the browser cache photos WITH CORS headers, so
+// the mobile PDF capture (html-to-image re-fetch) can read them back reliably.
+const Img = (p: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  // eslint-disable-next-line @next/next/no-img-element
+  <img alt="" crossOrigin="anonymous" {...p} />
+);
 
 function Eyebrow({ children, light }: { children: React.ReactNode; light?: boolean }) {
   return (

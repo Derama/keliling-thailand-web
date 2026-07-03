@@ -114,9 +114,13 @@ export default function JobOrderDoc(data: JobOrderData) {
   useLayoutEffect(() => {
     const root = measureRef.current;
     if (!root) return;
+    // The measure layer lives inside the phone preview's `transform: scale()`
+    // wrapper, so rect heights come back scaled. Un-scale them or the packer
+    // overfills page 1 and the overflow is clipped by the fixed sheet height.
+    const scale = root.getBoundingClientRect().width / root.offsetWidth || 1;
     const heights = new Map<string, number>();
     root.querySelectorAll<HTMLElement>("[data-block]").forEach((el) => {
-      heights.set(el.dataset.block!, el.getBoundingClientRect().height);
+      heights.set(el.dataset.block!, el.getBoundingClientRect().height / scale);
     });
 
     // Running banner + footer eat into the usable height of every page, so the

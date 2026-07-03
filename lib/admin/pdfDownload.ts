@@ -51,6 +51,12 @@ export async function downloadSheetsAsPdf(
       backgroundColor: "#ffffff",
       width: w,
       height: h,
+      // Remote photos (Supabase storage, Unsplash…) were often first loaded by a
+      // plain <img>, so the browser cached them WITHOUT CORS headers. The capture
+      // re-fetches every image in CORS mode; served from that cache the fetch
+      // fails silently and the photo comes out blank. `no-cache` forces a
+      // revalidation with the server, which responds with proper CORS headers.
+      fetchRequestInit: { cache: "no-cache" },
       style: {
         transform: "none",
         margin: "0",
@@ -79,7 +85,9 @@ export async function downloadSheetsAsPdf(
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename.endsWith(".pdf") ? filename : `${filename}.pdf`;
+  // Strip characters that break the download name on some platforms.
+  const safe = filename.replace(/[\\/:*?"<>|]+/g, "-").trim() || "dokumen";
+  a.download = safe.endsWith(".pdf") ? safe : `${safe}.pdf`;
   document.body.appendChild(a);
   a.click();
   a.remove();

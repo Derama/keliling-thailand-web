@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import BuiltInvoiceDoc from "@/components/admin/BuiltInvoiceDoc";
 import type { InvoiceLine } from "@/lib/admin/invoice";
 
@@ -14,6 +16,19 @@ const lines: InvoiceLine[] = Array.from({ length: 16 }, (_, i) => ({
 }));
 
 export default function InvoicePrintCheckPage() {
+  return (
+    <Suspense>
+      <InvoicePrintCheck />
+    </Suspense>
+  );
+}
+
+function InvoicePrintCheck() {
+  // ?scale=0.45 mimics the builders' phone preview (transform: scale on the doc
+  // wrapper) so the pagination-under-scale regression stays checkable here.
+  const raw = Number(useSearchParams().get("scale"));
+  const scale = raw > 0 && raw <= 1 ? raw : 1;
+
   function printInvoice() {
     const style = document.createElement("style");
     style.dataset.ktInvoicePrint = "true";
@@ -43,7 +58,14 @@ export default function InvoicePrintCheckPage() {
         <div className="grid items-start gap-6 min-[1280px]:grid-cols-[minmax(380px,1fr)_minmax(0,820px)] print:block">
           <div className="no-print h-[720px] rounded-xl bg-gray-100" />
           <div className="overflow-x-auto print:overflow-visible">
+            <div
+              className="origin-top-left print:!transform-none"
+              style={scale < 1 ? { transform: `scale(${scale})` } : undefined}
+            >
+            {/* key remounts the doc so it measures under the new transform,
+                exactly like the builders mounting inside the phone preview. */}
             <BuiltInvoiceDoc
+              key={scale}
               mode="customer"
               billTo="Debug Customer"
               docTitle="Debug two-page invoice"
@@ -58,6 +80,7 @@ export default function InvoicePrintCheckPage() {
               custEmail="debug@example.com"
               custAddress="Jakarta, Indonesia"
             />
+            </div>
           </div>
         </div>
       </div>
