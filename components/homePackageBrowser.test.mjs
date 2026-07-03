@@ -8,6 +8,7 @@ const readSource = (path) =>
 const homeSource = await readSource("./HomeContent.tsx");
 const modalSource = await readSource("./HomePackageBrowserModal.tsx");
 const translationsSource = await readSource("../lib/translations.ts");
+const globalCssSource = await readSource("../app/globals.css");
 
 test("adds a secondary package-browser action to the homepage hero", () => {
   assert.match(homeSource, /t\.home\.packageBrowser\.openButton/);
@@ -47,4 +48,16 @@ test("localizes package-browser copy in all three languages", () => {
     3,
     "packageBrowser must exist in all three locales",
   );
+});
+
+test("matches planner motion with capped staggering and reduced-motion support", () => {
+  assert.match(modalSource, /planner-overlay/);
+  assert.match(modalSource, /planner-panel/);
+  assert.match(modalSource, /package-browser-stagger/);
+  assert.match(modalSource, /active:scale-\[0\.97\]/);
+  assert.match(homeSource, /active:scale-\[0\.97\]/);
+  assert.match(globalCssSource, /\.package-browser-stagger > \*/);
+  assert.match(globalCssSource, /nth-child\(n \+ 9\)/);
+  assert.match(globalCssSource, /35ms/);
+  assert.match(globalCssSource, /@media \(prefers-reduced-motion: reduce\)/);
 });

@@ -62,3 +62,31 @@ Run `npm run build`. Expect successful Next.js compilation, type checking, and s
 - [ ] **Step 4: Review the final diff**
 
 Run `git diff --check` and inspect `git diff --stat`. Confirm no package records or card markup were duplicated and no unrelated files changed.
+
+### Task 3: Planner-consistent package-browser motion
+
+**Files:**
+- Modify: `components/HomePackageBrowserModal.tsx`
+- Modify: `components/HomeContent.tsx`
+- Modify: `components/homePackageBrowser.test.mjs`
+- Modify: `app/globals.css`
+
+- [ ] **Step 1: Write the failing motion contract test**
+
+Extend the package-browser source test to require `planner-overlay` and `planner-panel` on the dialog, `package-browser-stagger` on its grid, capped eighth-item stagger CSS, active press scaling on the hero trigger and close button, and the existing reduced-motion media query.
+
+- [ ] **Step 2: Run the test and verify RED**
+
+Run `node --test components/homePackageBrowser.test.mjs`. Expect the new motion test to fail because the package-browser motion hooks do not exist.
+
+- [ ] **Step 3: Apply shared modal motion and capped card staggering**
+
+Add the planner overlay and panel classes to the package browser. Add `package-browser-stagger` to the package grid and CSS that reuses `planner-card-in` for direct children, assigns 35ms increments to children two through eight, and caps child nine onward at the eighth delay.
+
+- [ ] **Step 4: Add press feedback**
+
+Add `active:scale-[0.97]` with transform-specific transitions to the homepage package-browser trigger and modal close button.
+
+- [ ] **Step 5: Run focused and full verification**
+
+Run `node --test components/homePackageBrowser.test.mjs`, `node --test`, `npm run lint`, and `npm run build`. Expect zero test failures and successful lint/build output.

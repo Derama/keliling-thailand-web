@@ -197,6 +197,21 @@ a, button {
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
+/* Package browser uses the planner's card entrance with a tighter, capped
+   stagger so a 14-option catalog never feels slow. */
+.package-browser-stagger > * {
+  animation: planner-card-in 0.4s var(--ease-out-quart) both;
+  animation-delay: calc(var(--i, 0) * 35ms);
+}
+.package-browser-stagger > :nth-child(2) { --i: 1; }
+.package-browser-stagger > :nth-child(3) { --i: 2; }
+.package-browser-stagger > :nth-child(4) { --i: 3; }
+.package-browser-stagger > :nth-child(5) { --i: 4; }
+.package-browser-stagger > :nth-child(6) { --i: 5; }
+.package-browser-stagger > :nth-child(7) { --i: 6; }
+.package-browser-stagger > :nth-child(8) { --i: 7; }
+.package-browser-stagger > :nth-child(n + 9) { --i: 7; }
+
 @keyframes price-category-panel-in {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: none; }

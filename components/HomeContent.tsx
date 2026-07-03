@@ -63,7 +63,7 @@ export default function HomeContent() {
             <button
               type="button"
               onClick={(event) => setPackageBrowserTrigger(event.currentTarget)}
-              className="min-h-12 rounded-full border-2 border-white/80 bg-[#1B2A4A]/20 px-8 py-3 font-bold text-white transition-colors hover:border-[#F5C518] hover:bg-[#F5C518] hover:text-[#1B2A4A] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/70"
+              className="min-h-12 rounded-full border-2 border-white/80 bg-[#1B2A4A]/20 px-8 py-3 font-bold text-white transition-[transform,background-color,border-color,color] duration-150 hover:border-[#F5C518] hover:bg-[#F5C518] hover:text-[#1B2A4A] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/70"
             >
               {t.home.packageBrowser.openButton}
             </button>

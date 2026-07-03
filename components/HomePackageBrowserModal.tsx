@@ -32,7 +32,7 @@ export default function HomePackageBrowserModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center bg-[#1B2A4A]/80 backdrop-blur-sm sm:items-center sm:p-4"
+      className="planner-overlay fixed inset-0 z-[70] flex items-end justify-center bg-[#1B2A4A]/80 backdrop-blur-sm sm:items-center sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -41,7 +41,7 @@ export default function HomePackageBrowserModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="flex max-h-[94dvh] w-full flex-col overflow-hidden rounded-t-3xl bg-[#FEF9EC] shadow-2xl sm:max-h-[90dvh] sm:max-w-6xl sm:rounded-3xl"
+        className="planner-panel flex max-h-[94dvh] w-full flex-col overflow-hidden rounded-t-3xl bg-[#FEF9EC] shadow-2xl sm:max-h-[90dvh] sm:max-w-6xl sm:rounded-3xl"
       >
         <header className="flex shrink-0 items-start justify-between gap-4 border-b border-[#1B2A4A]/10 bg-[#FEF9EC] px-5 py-5 sm:px-8 sm:py-6">
           <div className="min-w-0 text-left">
@@ -63,7 +63,7 @@ export default function HomePackageBrowserModal({
             type="button"
             onClick={onClose}
             aria-label={t.home.packageBrowser.close}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#1B2A4A]/10 bg-white text-[#1B2A4A] transition-colors hover:border-[#F5C518] hover:bg-[#F5C518]/15 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/70"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#1B2A4A]/10 bg-white text-[#1B2A4A] transition-[transform,background-color,border-color] duration-150 hover:border-[#F5C518] hover:bg-[#F5C518]/15 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F5C518]/70"
           >
             <svg
               className="h-5 w-5"
@@ -78,7 +78,7 @@ export default function HomePackageBrowserModal({
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="package-browser-stagger grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {tourPackages.map((pkg) => (
               <PackageCard key={pkg.id} pkg={pkg} />
             ))}
