@@ -22,6 +22,7 @@ export default function CustomerSelect({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const selected = customers.find((c) => c.id === value);
   const label = (c: Customer) =>
@@ -39,16 +40,22 @@ export default function CustomerSelect({
 
   useEffect(() => {
     if (!open) return;
-    function onDown(e: MouseEvent) {
+    // Focus the search only on fine-pointer devices. On phones autofocus pops
+    // the keyboard over the list, and the layout shift when it closes makes
+    // taps on options land elsewhere — the panel feels stuck.
+    if (!window.matchMedia("(pointer: coarse)").matches)
+      searchRef.current?.focus();
+    // `pointerdown` (not `mousedown`) so touch taps dismiss immediately.
+    function onDown(e: PointerEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
-    document.addEventListener("mousedown", onDown);
+    document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("pointerdown", onDown);
       document.removeEventListener("keydown", onKey);
     };
   }, [open]);
@@ -76,7 +83,7 @@ export default function CustomerSelect({
         <div className="absolute left-0 right-0 z-30 mt-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
           <div className="border-b border-gray-100 p-2">
             <input
-              autoFocus
+              ref={searchRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari customer…"

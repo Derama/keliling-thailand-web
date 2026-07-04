@@ -71,6 +71,7 @@ function AssetImg({
     <img
       src={src}
       alt={alt}
+      crossOrigin="anonymous"
       className={className}
       onError={() => setFailed(true)}
     />

@@ -1,4 +1,4 @@
-import { toJpeg } from "html-to-image";
+import { toJpeg, toPng } from "html-to-image";
 import { PDFDocument } from "pdf-lib";
 
 // A4 in PDF points.
@@ -17,6 +17,73 @@ export function isCoarsePointer(): boolean {
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches
   );
+}
+
+/**
+ * WebKit (all iOS browsers + desktop Safari) has a long-standing bug where
+ * images inside the SVG `<foreignObject>` html-to-image rasterizes through are
+ * not yet decoded on the first draw — logos and photos come out blank in the
+ * captured JPEG/PNG even though the on-screen preview is fine.
+ */
+function isWebKit(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  const iOS =
+    /iP(hone|od|ad)/.test(ua) ||
+    (ua.includes("Mac") && navigator.maxTouchPoints > 1);
+  const safari = /Safari/i.test(ua) && !/Chrom|Edg|OPR|SamsungBrowser/i.test(ua);
+  return iOS || safari;
+}
+
+/** Wait until every <img> under `el` is loaded AND decoded. */
+async function waitForImages(el: HTMLElement): Promise<void> {
+  const imgs = Array.from(el.querySelectorAll("img"));
+  await Promise.all(
+    imgs.map((img) =>
+      img
+        .decode()
+        .catch(() => new Promise<void>((r) => {
+          if (img.complete) return r();
+          img.onload = () => r();
+          img.onerror = () => r();
+        }))
+    )
+  );
+}
+
+type CaptureOptions = Parameters<typeof toJpeg>[1];
+
+/**
+ * Capture `el` with html-to-image, working around the WebKit foreignObject
+ * decode race: warm-up passes let Safari decode the embedded images so the
+ * final pass paints them. Chrome/Firefox skip the warm-ups.
+ */
+async function captureWithWarmup(
+  fn: typeof toJpeg | typeof toPng,
+  el: HTMLElement,
+  options: CaptureOptions
+): Promise<string> {
+  await waitForImages(el);
+  if (isWebKit()) {
+    // Two throwaway renders — the known workaround for WebKit blank images.
+    await fn(el, options);
+    await fn(el, options);
+  }
+  return fn(el, options);
+}
+
+/**
+ * Capture a node as a PNG data URL (Instagram studio exports). Same WebKit
+ * warm-up + CORS-safe fetch behavior as the PDF sheet capture.
+ */
+export async function captureNodePng(
+  el: HTMLElement,
+  options: CaptureOptions = {}
+): Promise<string> {
+  return captureWithWarmup(toPng, el, {
+    fetchRequestInit: { cache: "no-cache" },
+    ...options,
+  });
 }
 
 /**
@@ -45,7 +112,7 @@ export async function downloadSheetsAsPdf(
     const w = el.offsetWidth;
     // One physical page per sheet: never capture past the A4 aspect ratio.
     const h = Math.min(el.offsetHeight, Math.round((w * A4_H) / A4_W));
-    const dataUrl = await toJpeg(el, {
+    const dataUrl = await captureWithWarmup(toJpeg, el, {
       pixelRatio: 2,
       quality: 0.93,
       backgroundColor: "#ffffff",

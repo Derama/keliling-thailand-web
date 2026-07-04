@@ -1,7 +1,6 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { formatTHB, formatIDR } from "@/lib/admin/utils";
 import PrintedStamp from "@/components/admin/PrintedStamp";
 import {
@@ -199,7 +198,16 @@ function RunningHeader({ invoiceNumber, status }: Props) {
     <header className="flex items-start justify-between gap-6 border-b-2 border-[#F5C518] pb-4">
       <div className="flex items-center gap-3">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#F5C518] shadow-sm">
-          <Image src="/Logo.png" alt="" width={32} height={24} priority />
+          {/* Plain <img> + crossOrigin so the mobile PDF capture (html-to-image
+              CORS re-fetch) can embed the logo reliably. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/Logo.png"
+            alt=""
+            crossOrigin="anonymous"
+            width={32}
+            height={24}
+          />
         </span>
         <div className="leading-tight">
           <p className="text-base font-extrabold tracking-tight">

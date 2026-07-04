@@ -1822,11 +1822,12 @@ function DayCard({
           placeholder={`Judul hari ${dayNo} (mis. Tiba & City Tour)`}
           className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white placeholder-white/50 focus:outline-none"
         />
-        <input
-          type="date"
+        <DateField
           value={day.date}
-          onChange={(e) => onPatch({ date: e.target.value })}
-          className="shrink-0 rounded bg-white/10 px-2 py-1 text-xs text-white focus:outline-none [color-scheme:dark]"
+          onChange={(v) => onPatch({ date: v })}
+          variant="chip"
+          align="right"
+          placeholder="Tanggal"
         />
         <div className="flex shrink-0 items-center gap-1 pl-1">
           <button

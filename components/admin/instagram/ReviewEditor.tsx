@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { toPng } from "html-to-image";
+import { captureNodePng } from "@/lib/admin/pdfDownload";
 import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import type { Customer } from "@/lib/admin/types";
 import {
@@ -124,7 +124,7 @@ export default function ReviewEditor({
     setError(null);
     try {
       const { w, h } = FORMAT_SIZES[format];
-      const dataUrl = await toPng(nodeRef.current, { width: w, height: h, pixelRatio: 1, cacheBust: true });
+      const dataUrl = await captureNodePng(nodeRef.current, { width: w, height: h, pixelRatio: 1, cacheBust: true });
       const blob = await (await fetch(dataUrl)).blob();
       const imageUrl = await uploadPostImage(blob, "post", "png");
       await saveSocialPost({

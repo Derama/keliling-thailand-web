@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { toPng } from "html-to-image";
+import { captureNodePng } from "@/lib/admin/pdfDownload";
 import { Field, inputCls, btnCls, btnSecondaryCls, ErrorNote } from "@/components/admin/ui";
 import type { Customer } from "@/lib/admin/types";
 import {
@@ -131,7 +131,7 @@ export default function JourneyEditor({
       for (let i = 0; i < data.slides.length + 1; i++) {
         const node = exportRefs.current[i];
         if (!node) throw new Error("Slide belum siap — coba lagi.");
-        const dataUrl = await toPng(node, { width: w, height: h, pixelRatio: 1, cacheBust: true });
+        const dataUrl = await captureNodePng(node, { width: w, height: h, pixelRatio: 1, cacheBust: true });
         const blob = await (await fetch(dataUrl)).blob();
         slideUrls.push(await uploadPostImage(blob, "post", "png"));
         const a = document.createElement("a");

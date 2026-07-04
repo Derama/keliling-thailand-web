@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { formatDate } from "@/lib/admin/utils";
 import { KELILING_THAILAND } from "@/lib/admin/company";
 import type { ItineraryDay, ItineraryPlace, TravelTip } from "@/lib/admin/itinerary";
@@ -237,7 +236,7 @@ function CoverPage({
       <div className="relative flex items-center justify-between p-10 sm:p-12">
         <div className="flex items-center gap-3">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F5C518] shadow">
-            <Image src="/Logo.png" alt="" width={38} height={29} priority />
+            <Img src="/Logo.png" width={38} height={29} />
           </span>
           <span className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">
             KELILING THAILAND
@@ -334,7 +333,7 @@ function DayPage({
       >
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5C518]">
-            <Image src="/Logo.png" alt="" width={18} height={14} priority />
+            <Img src="/Logo.png" width={18} height={14} />
           </span>
           <span
             className="text-[11px] font-extrabold tracking-tight"
@@ -499,7 +498,7 @@ function ClosingPage({
     <div className="flex flex-1 flex-col p-10 sm:p-12">
       <div className="flex items-center gap-2.5">
         <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F5C518] shadow-sm">
-          <Image src="/Logo.png" alt="" width={30} height={23} priority />
+          <Img src="/Logo.png" width={30} height={23} />
         </span>
         <div className="leading-tight">
           <p className="text-base font-extrabold tracking-tight">KELILING THAILAND</p>

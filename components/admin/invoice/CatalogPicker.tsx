@@ -91,7 +91,10 @@ export default function CatalogPicker({
   }, [anchorRef]);
 
   useEffect(() => {
-    inputRef.current?.focus();
+    // Autofocus only with a real keyboard — on phones it pops the on-screen
+    // keyboard over the catalog list when the admin only wants to tap items.
+    if (!window.matchMedia?.("(pointer: coarse)").matches)
+      inputRef.current?.focus();
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
