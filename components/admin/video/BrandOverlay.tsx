@@ -68,20 +68,20 @@ function ContactChip({
 }) {
   const chip = CHIP_STYLES[icon] ?? { background: brandColors.yellow, glyph: brandColors.navy };
   return (
-    <span style={{ display: "flex", alignItems: "center", gap: 8 * s, whiteSpace: "nowrap" }}>
+    <span style={{ display: "flex", alignItems: "center", gap: 7 * s, whiteSpace: "nowrap" }}>
       <span
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 36 * s,
-          height: 36 * s,
+          width: 32 * s,
+          height: 32 * s,
           borderRadius: "50%",
           background: chip.background,
           flexShrink: 0,
         }}
       >
-        <svg viewBox="0 0 24 24" width={21 * s} height={21 * s} fill={chip.glyph} aria-hidden>
+        <svg viewBox="0 0 24 24" width={19 * s} height={19 * s} fill={chip.glyph} aria-hidden>
           <path d={ICON_PATHS[icon]} />
         </svg>
       </span>
@@ -132,6 +132,12 @@ export default function BrandOverlay({
   const s = width / 1080;
   const words = captionWords(caption);
   const steps = Math.min(words.length, MAX_CAPTION_STEPS);
+  // Keep all four contacts on one uncropped line: budget the 1080 design
+  // width (padding + band gaps + icon chips) and shrink the font for long
+  // text. 0.66em/char over-estimates so wider system fonts (iOS SF Pro)
+  // still fit.
+  const contactChars = [fields.website, fields.instagram, fields.facebook, fields.phone].join("").length;
+  const contactFont = Math.min(20, (1080 - 2 * 16 - 3 * 12 - 4 * (32 + 7)) / Math.max(1, contactChars * 0.66));
   const captionTop =
     captionPosition === "top"
       ? height * 0.14
@@ -241,14 +247,14 @@ export default function BrandOverlay({
           left: 0,
           right: 0,
           bottom: 0,
-          padding: `${100 * s}px ${20 * s}px ${30 * s}px`,
+          padding: `${100 * s}px ${16 * s}px ${30 * s}px`,
           background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${brandColors.navy}E6 70%)`,
           display: "flex",
           flexWrap: "nowrap",
           alignItems: "center",
           justifyContent: "center",
-          gap: 16 * s,
-          fontSize: 20 * s,
+          gap: 12 * s,
+          fontSize: contactFont * s,
           fontWeight: 600,
           whiteSpace: "nowrap",
         }}

@@ -120,10 +120,12 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
     } else if (musicName) {
       // normalize=0 keeps the original audio at full volume with the music
       // gained by the slider value, instead of amix's default attenuation.
-      filter += `;[0:a][${musicIdx}:a]amix=inputs=2:duration=first:normalize=0:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
+      filter += `;[0:a:0][${musicIdx}:a]amix=inputs=2:duration=first:normalize=0:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
       maps.push("-map", "[a]");
     } else {
-      maps.push("-map", "0:a?");
+      // First audio track only — iPhone MOVs carry extra spatial-audio/data
+      // streams the wasm core has no decoder for, and 0:a? maps them all.
+      maps.push("-map", "0:a:0?");
     }
 
     args.push(
