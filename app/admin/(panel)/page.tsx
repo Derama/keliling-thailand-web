@@ -16,6 +16,7 @@ import {
   BlogView,
 } from "@/components/admin/views/marketing/MarketingViews";
 import InstagramStudioView from "@/components/admin/views/marketing/InstagramStudioView";
+import VideoStudioView from "@/components/admin/views/marketing/VideoStudioView";
 import LeadsView from "@/components/admin/views/LeadsView";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
 
@@ -47,6 +48,7 @@ const TABS: readonly Tab[] = [
   { id: "leads", label: "Leads", View: LeadsView },
   { id: "blog", label: "Blog & SEO", View: BlogView },
   { id: "instagram", label: "Instagram Studio", View: InstagramStudioView },
+  { id: "video", label: "Video Studio", View: VideoStudioView },
 ];
 
 export default function AdminPage() {
