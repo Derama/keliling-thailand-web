@@ -51,7 +51,6 @@ export default function VideoStudioView() {
     loadBrandColors().then(setBrandColors);
     try {
       const saved = localStorage.getItem(FIELDS_KEY);
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount localStorage sync
       if (saved) setFields({ ...DEFAULT_BRAND_FIELDS, ...JSON.parse(saved) });
     } catch {
       /* corrupt storage — keep defaults */
