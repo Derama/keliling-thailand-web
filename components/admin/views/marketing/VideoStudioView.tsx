@@ -17,7 +17,7 @@ import Modal from "@/components/admin/Modal";
 import { exportBrandedVideo, type MusicMode } from "@/lib/admin/video/ffmpeg";
 
 const FIELDS_KEY = "video-brand-fields";
-const PREVIEW_WIDTH = 360;
+const PREVIEW_WIDTH = 400;
 const MAX_SECONDS = 61;
 const MAX_BYTES = 100 * 1024 * 1024;
 
@@ -81,6 +81,15 @@ export default function VideoStudioView() {
     setDuration(0);
     setTrim({ start: 0, end: 0 });
     setTab("edit");
+  }
+
+  // Keep the looping preview inside the trim window so cuts are visible live.
+  function onTimeUpdate(e: React.SyntheticEvent<HTMLVideoElement>) {
+    if (trim.end <= 0) return;
+    const v = e.currentTarget;
+    if (v.currentTime < trim.start - 0.05 || v.currentTime > trim.end + 0.05) {
+      v.currentTime = trim.start;
+    }
   }
 
   function onMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
@@ -177,16 +186,30 @@ export default function VideoStudioView() {
       )}
 
       {videoUrl && tab === "edit" && (
-        <div className="flex flex-col gap-6 md:flex-row">
-          {/* Preview: video + live overlay */}
-          <div className="shrink-0">
+        // DOM order = preview, controls; row-reverse puts controls left and the
+        // big preview pane right on desktop (Instagram Studio layout), while
+        // mobile keeps the preview on top.
+        <div className="flex flex-col gap-6 md:flex-row-reverse">
+          {/* Preview pane: video + live overlay, sticky beside the controls */}
+          <div className="flex min-w-0 flex-1 items-start justify-center rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-6 md:sticky md:top-20 md:self-start">
             {dims ? (
               <div
-                style={{ width: PREVIEW_WIDTH, height: dims.h * scale }}
-                className="relative overflow-hidden rounded-lg border border-gray-200 bg-black"
+                style={{ width: PREVIEW_WIDTH, height: dims.h * scale, maxWidth: "100%" }}
+                className="relative overflow-hidden rounded-lg bg-black shadow-lg"
               >
                 {/* autoPlay: WebKit leaves non-playing videos blank, so loop a muted preview. */}
-                <video src={videoUrl} controls muted playsInline autoPlay loop preload="auto" className="absolute inset-0 h-full w-full" onLoadedMetadata={onMetadata} />
+                <video
+                  src={videoUrl}
+                  controls
+                  muted
+                  playsInline
+                  autoPlay
+                  loop
+                  preload="auto"
+                  className="absolute inset-0 h-full w-full"
+                  onLoadedMetadata={onMetadata}
+                  onTimeUpdate={onTimeUpdate}
+                />
                 <div className="pointer-events-none absolute inset-0" style={{ transform: `scale(${scale})`, transformOrigin: "top left" }}>
                   <BrandOverlay
                     width={dims.w}
@@ -204,7 +227,7 @@ export default function VideoStudioView() {
           </div>
 
           {/* Controls */}
-          <div className="min-w-0 flex-1 space-y-4">
+          <div className="min-w-0 space-y-4 md:w-[360px] md:shrink-0">
             <fieldset className="space-y-2">
               <legend className="text-sm font-semibold text-[#1B2A4A]">Kontak di video</legend>
               <input className={inputCls} value={fields.website} onChange={(e) => updateField("website", e.target.value)} placeholder="Website" />
