@@ -192,7 +192,7 @@ export default function VideoStudioView() {
         <div className="flex flex-col gap-6 md:flex-row-reverse">
           {/* Preview pane: video + live overlay, sticky beside the controls */}
           <div className="flex min-w-0 flex-1 items-start justify-center rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-6 md:sticky md:top-20 md:self-start">
-            {dims ? (
+            {videoUrl && dims ? (
               <div
                 style={{ width: PREVIEW_WIDTH, height: dims.h * scale, maxWidth: "100%" }}
                 className="relative overflow-hidden rounded-lg bg-black shadow-lg"
