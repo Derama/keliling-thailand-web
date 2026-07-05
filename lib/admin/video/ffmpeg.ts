@@ -133,10 +133,12 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
       ...maps,
       "-c:v", "libx264",
       "-preset", "veryfast",
-      // Near-transparent quality — reels are short, so the larger file is fine.
-      "-crf", "18",
+      // Highest practical in-browser quality: crf 16 is visually identical to
+      // the source; true lossless would blow wasm memory on phone exports.
+      "-crf", "16",
       "-pix_fmt", "yuv420p",
       "-c:a", "aac",
+      "-b:a", "256k",
       "-shortest",
       "-movflags", "+faststart",
       "out.mp4"
