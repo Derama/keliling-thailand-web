@@ -32,8 +32,13 @@ export interface VideoExportInput {
   video: File;
   /** Transparent PNG data URL at the video's exact pixel dimensions. */
   overlayPng: string;
-  /** Caption-only transparent PNG, burned with a fade+slide entrance. */
-  captionPng: string | null;
+  /**
+   * Caption-only transparent PNGs, one per type-in step (cumulative words).
+   * Burned in sequence so the caption types in word by word. Empty = no caption.
+   */
+  captionPngs: string[];
+  /** Seconds each type-in step stays before the next reveals. */
+  captionStepSeconds: number;
   /** Trim window in seconds. */
   trimStart: number;
   trimEnd: number;
@@ -67,8 +72,8 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
   try {
     await ff.writeFile("input.mp4", await fetchFile(input.video));
     await ff.writeFile("overlay.png", await fetchFile(input.overlayPng));
-    if (input.captionPng) {
-      await ff.writeFile("caption.png", await fetchFile(input.captionPng));
+    for (let k = 0; k < input.captionPngs.length; k++) {
+      await ff.writeFile(`caption${k}.png`, await fetchFile(input.captionPngs[k]));
     }
     if (input.music && musicName) {
       await ff.writeFile(musicName, await fetchFile(input.music));
@@ -89,21 +94,25 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
       "-i", "input.mp4",
       "-i", "overlay.png",
     ];
-    // Caption must be a looped stream (not a still) so fade can vary over time.
-    if (input.captionPng) args.push("-loop", "1", "-i", "caption.png");
+    for (let k = 0; k < input.captionPngs.length; k++) {
+      args.push("-i", `caption${k}.png`);
+    }
     if (musicName) args.push("-i", musicName);
 
-    const musicIdx = input.captionPng ? 3 : 2;
-    let filter: string;
-    if (input.captionPng) {
-      // Fade the caption in over 0.8s while sliding it up 4% of the height.
-      filter =
-        "[0:v][1:v]overlay=0:0[vb];" +
-        "[2:v]format=rgba,fade=t=in:st=0:d=0.8:alpha=1[cap];" +
-        "[vb][cap]overlay=x=0:y='(main_h*0.04)*(1-min(t/0.8,1))'[v]";
-    } else {
-      filter = "[0:v][1:v]overlay=0:0[v]";
-    }
+    const musicIdx = 2 + input.captionPngs.length;
+    // Type-in: each cumulative caption frame is enabled for its own time
+    // window; overlay's default eof_action=repeat keeps the still visible.
+    let filter = "[0:v][1:v]overlay=0:0[v0]";
+    const step = input.captionStepSeconds;
+    input.captionPngs.forEach((_, k) => {
+      const last = k === input.captionPngs.length - 1;
+      const enable = last
+        ? `gte(t,${(k * step).toFixed(2)})`
+        : `between(t,${(k * step).toFixed(2)},${((k + 1) * step).toFixed(2)})`;
+      filter += `;[v${k}][${2 + k}:v]overlay=0:0:enable='${enable}'[v${k + 1}]`;
+    });
+    const outLabel = `v${input.captionPngs.length}`;
+    filter = filter.replace(new RegExp(`\\[${outLabel}\\]$`), "[v]");
 
     const maps = ["-map", "[v]"];
     if (musicName && musicMode === "replace") {
@@ -139,7 +148,8 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
   } finally {
     ff.off("log", onLog);
     ff.off("progress", onProgress);
-    for (const f of ["input.mp4", "overlay.png", input.captionPng ? "caption.png" : null, musicName, "out.mp4"]) {
+    const captionFiles = input.captionPngs.map((_, k) => `caption${k}.png`);
+    for (const f of ["input.mp4", "overlay.png", ...captionFiles, musicName, "out.mp4"]) {
       if (f) await ff.deleteFile(f).catch(() => {});
     }
   }

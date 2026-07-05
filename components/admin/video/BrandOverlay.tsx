@@ -5,14 +5,31 @@ import type { BrandColors } from "@/lib/admin/settings";
 export interface BrandFields {
   website: string;
   instagram: string;
+  facebook: string;
   phone: string;
 }
 
 export const DEFAULT_BRAND_FIELDS: BrandFields = {
   website: "kelilingthailand.com",
   instagram: "@kelilingthailand",
+  facebook: "Keliling Thailand",
   phone: "+62 857-5092-3934",
 };
+
+/** Word-by-word caption type-in timing, shared by CSS preview and ffmpeg burn. */
+export const CAPTION_STEP_SECONDS = 0.28;
+export const MAX_CAPTION_STEPS = 8;
+
+export function captionWords(caption: string): string[] {
+  return caption.split(/\s+/).filter(Boolean);
+}
+
+/** Cumulative visible-word counts per animation step (≤ MAX_CAPTION_STEPS). */
+export function captionStepCounts(caption: string): number[] {
+  const n = captionWords(caption).length;
+  const steps = Math.min(n, MAX_CAPTION_STEPS);
+  return Array.from({ length: steps }, (_, k) => Math.ceil(((k + 1) * n) / steps));
+}
 
 export type CaptionPosition = "top" | "middle" | "bottom";
 
@@ -27,7 +44,17 @@ const ICON_PATHS = {
     "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z",
 } as const;
 
-/** Contact line: brand-yellow round icon chip + white text. */
+/** Official brand chip colors; other icons use the brand-yellow chip. */
+const CHIP_STYLES: Partial<Record<keyof typeof ICON_PATHS, { background: string; glyph: string }>> = {
+  instagram: {
+    background:
+      "radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)",
+    glyph: "#fff",
+  },
+  facebook: { background: "#1877F2", glyph: "#fff" },
+};
+
+/** Contact line: round icon chip + white text. */
 function ContactChip({
   icon,
   text,
@@ -39,21 +66,22 @@ function ContactChip({
   s: number;
   brandColors: BrandColors;
 }) {
+  const chip = CHIP_STYLES[icon] ?? { background: brandColors.yellow, glyph: brandColors.navy };
   return (
-    <span style={{ display: "flex", alignItems: "center", gap: 10 * s }}>
+    <span style={{ display: "flex", alignItems: "center", gap: 8 * s, whiteSpace: "nowrap" }}>
       <span
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 42 * s,
-          height: 42 * s,
+          width: 36 * s,
+          height: 36 * s,
           borderRadius: "50%",
-          background: brandColors.yellow,
+          background: chip.background,
           flexShrink: 0,
         }}
       >
-        <svg viewBox="0 0 24 24" width={24 * s} height={24 * s} fill={brandColors.navy} aria-hidden>
+        <svg viewBox="0 0 24 24" width={21 * s} height={21 * s} fill={chip.glyph} aria-hidden>
           <path d={ICON_PATHS[icon]} />
         </svg>
       </span>
@@ -88,6 +116,7 @@ export default function BrandOverlay({
   brandColors,
   layer = "full",
   animateCaption = false,
+  visibleWords,
 }: {
   width: number;
   height: number;
@@ -97,8 +126,12 @@ export default function BrandOverlay({
   brandColors: BrandColors;
   layer?: OverlayLayer;
   animateCaption?: boolean;
+  /** Export stepping: words at index ≥ this are rendered invisible (layout kept). */
+  visibleWords?: number;
 }) {
   const s = width / 1080;
+  const words = captionWords(caption);
+  const steps = Math.min(words.length, MAX_CAPTION_STEPS);
   const captionTop =
     captionPosition === "top"
       ? height * 0.14
@@ -177,10 +210,27 @@ export default function BrandOverlay({
             fontWeight: 800,
             lineHeight: 1.25,
             textShadow: "0 3px 14px rgba(0,0,0,.75)",
-            animation: animateCaption ? "video-caption-in .8s ease-out both" : undefined,
           }}
         >
-          {caption}
+          {/* Each word types in on its own step, like Instagram captions. */}
+          {words.map((word, i) => {
+            const step = Math.floor((i * steps) / words.length);
+            return (
+              <span
+                key={`${word}-${i}`}
+                style={{
+                  display: "inline-block",
+                  marginRight: i < words.length - 1 ? "0.28em" : 0,
+                  opacity: visibleWords !== undefined && i >= visibleWords ? 0 : undefined,
+                  animation: animateCaption
+                    ? `video-caption-word-in .35s ease-out ${(step * CAPTION_STEP_SECONDS).toFixed(2)}s both`
+                    : undefined,
+                }}
+              >
+                {word}
+              </span>
+            );
+          })}
         </div>
       )}
 
@@ -191,19 +241,21 @@ export default function BrandOverlay({
           left: 0,
           right: 0,
           bottom: 0,
-          padding: `${100 * s}px ${36 * s}px ${30 * s}px`,
+          padding: `${100 * s}px ${20 * s}px ${30 * s}px`,
           background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${brandColors.navy}E6 70%)`,
           display: "flex",
-          flexWrap: "wrap",
+          flexWrap: "nowrap",
           alignItems: "center",
           justifyContent: "center",
-          gap: `${12 * s}px ${28 * s}px`,
-          fontSize: 26 * s,
+          gap: 16 * s,
+          fontSize: 20 * s,
           fontWeight: 600,
+          whiteSpace: "nowrap",
         }}
       >
         <ContactChip icon="globe" text={fields.website} s={s} brandColors={brandColors} />
         <ContactChip icon="instagram" text={fields.instagram} s={s} brandColors={brandColors} />
+        <ContactChip icon="facebook" text={fields.facebook} s={s} brandColors={brandColors} />
         <ContactChip icon="phone" text={fields.phone} s={s} brandColors={brandColors} />
       </div>
       )}

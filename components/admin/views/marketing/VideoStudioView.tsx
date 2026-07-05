@@ -9,6 +9,8 @@ import BrandOverlay, {
   DEFAULT_BRAND_FIELDS,
   CAPTION_POSITIONS,
   CAPTION_POSITION_LABELS,
+  CAPTION_STEP_SECONDS,
+  captionStepCounts,
   type BrandFields,
   type CaptionPosition,
 } from "@/components/admin/video/BrandOverlay";
@@ -39,7 +41,7 @@ export default function VideoStudioView() {
   const [result, setResult] = useState<{ url: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const exportNodeRef = useRef<HTMLDivElement>(null);
-  const captionNodeRef = useRef<HTMLDivElement>(null);
+  const captionStepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Revoke object URLs when replaced or on unmount.
   useEffect(() => {
@@ -114,14 +116,17 @@ export default function VideoStudioView() {
         cacheBust: true,
       };
       const overlayPng = await captureNodePng(exportNodeRef.current, captureOpts);
-      const captionPng =
-        caption && captionNodeRef.current
-          ? await captureNodePng(captionNodeRef.current, captureOpts)
-          : null;
+      // One PNG per type-in step (cumulative words) so ffmpeg can burn the
+      // caption appearing word by word.
+      const captionPngs: string[] = [];
+      for (const node of captionStepRefs.current) {
+        if (node) captionPngs.push(await captureNodePng(node, captureOpts));
+      }
       const blob = await exportBrandedVideo({
         video,
         overlayPng,
-        captionPng,
+        captionPngs,
+        captionStepSeconds: CAPTION_STEP_SECONDS,
         trimStart: trim.start,
         trimEnd: trim.end,
         music,
@@ -262,6 +267,7 @@ export default function VideoStudioView() {
               <legend className="text-sm font-semibold text-[#1B2A4A]">Kontak di video</legend>
               <input className={inputCls} value={fields.website} onChange={(e) => updateField("website", e.target.value)} placeholder="Website" />
               <input className={inputCls} value={fields.instagram} onChange={(e) => updateField("instagram", e.target.value)} placeholder="Instagram" />
+              <input className={inputCls} value={fields.facebook} onChange={(e) => updateField("facebook", e.target.value)} placeholder="Facebook" />
               <input className={inputCls} value={fields.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="Nomor telepon" />
             </fieldset>
 
@@ -383,19 +389,26 @@ export default function VideoStudioView() {
               layer="brand"
             />
           </div>
-          {caption && (
-            <div ref={captionNodeRef}>
-              <BrandOverlay
-                width={dims.w}
-                height={dims.h}
-                fields={fields}
-                caption={caption}
-                captionPosition={captionPos}
-                brandColors={brandColors}
-                layer="caption"
-              />
-            </div>
-          )}
+          {caption &&
+            captionStepCounts(caption).map((count, k) => (
+              <div
+                key={k}
+                ref={(el) => {
+                  captionStepRefs.current[k] = el;
+                }}
+              >
+                <BrandOverlay
+                  width={dims.w}
+                  height={dims.h}
+                  fields={fields}
+                  caption={caption}
+                  captionPosition={captionPos}
+                  brandColors={brandColors}
+                  layer="caption"
+                  visibleWords={count}
+                />
+              </div>
+            ))}
         </div>
       )}
     </div>
