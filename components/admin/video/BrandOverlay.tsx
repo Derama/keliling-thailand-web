@@ -16,6 +16,50 @@ export const DEFAULT_BRAND_FIELDS: BrandFields = {
 
 export type CaptionPosition = "top" | "middle" | "bottom";
 
+const ICON_PATHS = {
+  globe:
+    "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z",
+  facebook:
+    "M17 2v4h-2c-.69 0-1 .81-1 1.5V10h3l-.5 3H14v9h-3v-9H8v-3h3V6a4 4 0 0 1 4-4h2z",
+  phone:
+    "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z",
+} as const;
+
+/** Contact line: brand-yellow round icon chip + white text. */
+function ContactChip({
+  icon,
+  text,
+  s,
+  brandColors,
+}: {
+  icon: keyof typeof ICON_PATHS;
+  text: string;
+  s: number;
+  brandColors: BrandColors;
+}) {
+  return (
+    <span style={{ display: "flex", alignItems: "center", gap: 10 * s }}>
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 42 * s,
+          height: 42 * s,
+          borderRadius: "50%",
+          background: brandColors.yellow,
+          flexShrink: 0,
+        }}
+      >
+        <svg viewBox="0 0 24 24" width={24 * s} height={24 * s} fill={brandColors.navy} aria-hidden>
+          <path d={ICON_PATHS[icon]} />
+        </svg>
+      </span>
+      <span>{text}</span>
+    </span>
+  );
+}
+
 export const CAPTION_POSITIONS: readonly CaptionPosition[] = ["top", "middle", "bottom"];
 
 export const CAPTION_POSITION_LABELS: Record<CaptionPosition, string> = {
@@ -117,20 +161,20 @@ export default function BrandOverlay({
           left: 0,
           right: 0,
           bottom: 0,
-          padding: `${90 * s}px ${36 * s}px ${30 * s}px`,
-          background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.65) 70%)",
+          padding: `${100 * s}px ${36 * s}px ${30 * s}px`,
+          background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${brandColors.navy}E6 70%)`,
           display: "flex",
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "center",
-          gap: `${8 * s}px ${28 * s}px`,
+          gap: `${12 * s}px ${28 * s}px`,
           fontSize: 26 * s,
           fontWeight: 600,
         }}
       >
-        <span>🌐 {fields.website}</span>
-        <span>📘 {fields.facebook}</span>
-        <span style={{ color: brandColors.yellow }}>📞 {fields.phone}</span>
+        <ContactChip icon="globe" text={fields.website} s={s} brandColors={brandColors} />
+        <ContactChip icon="facebook" text={fields.facebook} s={s} brandColors={brandColors} />
+        <ContactChip icon="phone" text={fields.phone} s={s} brandColors={brandColors} />
       </div>
     </div>
   );
