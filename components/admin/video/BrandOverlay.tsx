@@ -70,6 +70,10 @@ export const CAPTION_POSITION_LABELS: Record<CaptionPosition, string> = {
   bottom: "Bawah",
 };
 
+/** Which parts to render — export burns brand and caption as separate
+ * ffmpeg inputs so the caption can animate in. */
+export type OverlayLayer = "full" | "brand" | "caption";
+
 /**
  * Brand watermark template rendered over the video: logo chip top-left,
  * optional caption, contact band along the bottom. Background is transparent
@@ -82,6 +86,8 @@ export default function BrandOverlay({
   caption,
   captionPosition,
   brandColors,
+  layer = "full",
+  animateCaption = false,
 }: {
   width: number;
   height: number;
@@ -89,6 +95,8 @@ export default function BrandOverlay({
   caption: string;
   captionPosition: CaptionPosition;
   brandColors: BrandColors;
+  layer?: OverlayLayer;
+  animateCaption?: boolean;
 }) {
   const s = width / 1080;
   const captionTop =
@@ -110,6 +118,7 @@ export default function BrandOverlay({
         fontFamily: "'Segoe UI', system-ui, sans-serif",
       }}
     >
+      {layer !== "caption" && (
       <div
         style={{
           position: "absolute",
@@ -153,9 +162,11 @@ export default function BrandOverlay({
           Keliling Thailand
         </span>
       </div>
+      )}
 
-      {caption && (
+      {layer !== "brand" && caption && (
         <div
+          key={`${caption}-${captionPosition}`}
           style={{
             position: "absolute",
             top: captionTop,
@@ -166,12 +177,14 @@ export default function BrandOverlay({
             fontWeight: 800,
             lineHeight: 1.25,
             textShadow: "0 3px 14px rgba(0,0,0,.75)",
+            animation: animateCaption ? "video-caption-in .8s ease-out both" : undefined,
           }}
         >
           {caption}
         </div>
       )}
 
+      {layer !== "caption" && (
       <div
         style={{
           position: "absolute",
@@ -193,6 +206,7 @@ export default function BrandOverlay({
         <ContactChip icon="instagram" text={fields.instagram} s={s} brandColors={brandColors} />
         <ContactChip icon="phone" text={fields.phone} s={s} brandColors={brandColors} />
       </div>
+      )}
     </div>
   );
 }

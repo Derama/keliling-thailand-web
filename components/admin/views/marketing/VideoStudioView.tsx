@@ -39,6 +39,7 @@ export default function VideoStudioView() {
   const [result, setResult] = useState<{ url: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const exportNodeRef = useRef<HTMLDivElement>(null);
+  const captionNodeRef = useRef<HTMLDivElement>(null);
 
   // Revoke object URLs when replaced or on unmount.
   useEffect(() => {
@@ -106,15 +107,21 @@ export default function VideoStudioView() {
     setError(null);
     setProgress(0);
     try {
-      const overlayPng = await captureNodePng(exportNodeRef.current, {
+      const captureOpts = {
         width: dims.w,
         height: dims.h,
         pixelRatio: 1,
         cacheBust: true,
-      });
+      };
+      const overlayPng = await captureNodePng(exportNodeRef.current, captureOpts);
+      const captionPng =
+        caption && captionNodeRef.current
+          ? await captureNodePng(captionNodeRef.current, captureOpts)
+          : null;
       const blob = await exportBrandedVideo({
         video,
         overlayPng,
+        captionPng,
         trimStart: trim.start,
         trimEnd: trim.end,
         music,
@@ -218,6 +225,7 @@ export default function VideoStudioView() {
                     caption={caption}
                     captionPosition={captionPos}
                     brandColors={brandColors}
+                    animateCaption
                   />
                 </div>
               </div>
@@ -238,6 +246,7 @@ export default function VideoStudioView() {
                     caption={caption}
                     captionPosition={captionPos}
                     brandColors={brandColors}
+                    animateCaption
                   />
                 </div>
                 <p className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-sm text-white/60">
@@ -359,7 +368,8 @@ export default function VideoStudioView() {
         )}
       </Modal>
 
-      {/* Offscreen full-size overlay node captured at export time. */}
+      {/* Offscreen full-size nodes captured at export time: brand layer and
+          caption layer separately, so ffmpeg can animate the caption in. */}
       {dims && (
         <div style={{ position: "fixed", left: -100000, top: 0 }} aria-hidden>
           <div ref={exportNodeRef}>
@@ -367,11 +377,25 @@ export default function VideoStudioView() {
               width={dims.w}
               height={dims.h}
               fields={fields}
-              caption={caption}
+              caption=""
               captionPosition={captionPos}
               brandColors={brandColors}
+              layer="brand"
             />
           </div>
+          {caption && (
+            <div ref={captionNodeRef}>
+              <BrandOverlay
+                width={dims.w}
+                height={dims.h}
+                fields={fields}
+                caption={caption}
+                captionPosition={captionPos}
+                brandColors={brandColors}
+                layer="caption"
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -63,6 +63,12 @@ a, button {
   to { opacity: 1; }
 }
 
+/* Video studio caption entrance — mirrors the ffmpeg fade+slide burn. */
+@keyframes video-caption-in {
+  from { opacity: 0; transform: translateY(4%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes destination-preview-panel-in {
   from { opacity: 0; transform: translateY(24px) scale(0.98); }
   to { opacity: 1; transform: none; }

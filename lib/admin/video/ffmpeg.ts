@@ -32,6 +32,8 @@ export interface VideoExportInput {
   video: File;
   /** Transparent PNG data URL at the video's exact pixel dimensions. */
   overlayPng: string;
+  /** Caption-only transparent PNG, burned with a fade+slide entrance. */
+  captionPng: string | null;
   /** Trim window in seconds. */
   trimStart: number;
   trimEnd: number;
@@ -65,6 +67,9 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
   try {
     await ff.writeFile("input.mp4", await fetchFile(input.video));
     await ff.writeFile("overlay.png", await fetchFile(input.overlayPng));
+    if (input.captionPng) {
+      await ff.writeFile("caption.png", await fetchFile(input.captionPng));
+    }
     if (input.music && musicName) {
       await ff.writeFile(musicName, await fetchFile(input.music));
     }
@@ -78,22 +83,35 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
     }
 
     const duration = Math.max(0.1, input.trimEnd - input.trimStart);
-    let filter = "[0:v][1:v]overlay=0:0[v]";
     const args = [
       "-ss", String(input.trimStart),
       "-t", String(duration),
       "-i", "input.mp4",
       "-i", "overlay.png",
     ];
+    // Caption must be a looped stream (not a still) so fade can vary over time.
+    if (input.captionPng) args.push("-loop", "1", "-i", "caption.png");
     if (musicName) args.push("-i", musicName);
+
+    const musicIdx = input.captionPng ? 3 : 2;
+    let filter: string;
+    if (input.captionPng) {
+      // Fade the caption in over 0.8s while sliding it up 4% of the height.
+      filter =
+        "[0:v][1:v]overlay=0:0[vb];" +
+        "[2:v]format=rgba,fade=t=in:st=0:d=0.8:alpha=1[cap];" +
+        "[vb][cap]overlay=x=0:y='(main_h*0.04)*(1-min(t/0.8,1))'[v]";
+    } else {
+      filter = "[0:v][1:v]overlay=0:0[v]";
+    }
 
     const maps = ["-map", "[v]"];
     if (musicName && musicMode === "replace") {
-      maps.push("-map", "2:a");
+      maps.push("-map", `${musicIdx}:a`);
     } else if (musicName) {
       // normalize=0 keeps the original audio at full volume with the music
       // gained by the slider value, instead of amix's default attenuation.
-      filter += `;[0:a][2:a]amix=inputs=2:duration=first:normalize=0:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
+      filter += `;[0:a][${musicIdx}:a]amix=inputs=2:duration=first:normalize=0:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
       maps.push("-map", "[a]");
     } else {
       maps.push("-map", "0:a?");
@@ -121,7 +139,7 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
   } finally {
     ff.off("log", onLog);
     ff.off("progress", onProgress);
-    for (const f of ["input.mp4", "overlay.png", musicName, "out.mp4"]) {
+    for (const f of ["input.mp4", "overlay.png", input.captionPng ? "caption.png" : null, musicName, "out.mp4"]) {
       if (f) await ff.deleteFile(f).catch(() => {});
     }
   }
