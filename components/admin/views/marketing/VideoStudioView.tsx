@@ -185,7 +185,7 @@ export default function VideoStudioView() {
         />
       )}
 
-      {videoUrl && tab === "edit" && (
+      {tab === "edit" && (
         // DOM order = preview, controls; row-reverse puts controls left and the
         // big preview pane right on desktop (Instagram Studio layout), while
         // mobile keeps the preview on top.
@@ -221,8 +221,29 @@ export default function VideoStudioView() {
                   />
                 </div>
               </div>
-            ) : (
+            ) : videoUrl ? (
               <video src={videoUrl} muted playsInline autoPlay loop preload="auto" className="w-[300px] rounded-lg" onLoadedMetadata={onMetadata} />
+            ) : (
+              // No video yet: show the brand template on a 9:16 placeholder so
+              // the pane is alive before upload, like Instagram Studio.
+              <div
+                style={{ width: PREVIEW_WIDTH, height: (PREVIEW_WIDTH * 16) / 9, maxWidth: "100%" }}
+                className="relative overflow-hidden rounded-lg bg-[#1B2A4A] shadow-lg"
+              >
+                <div className="pointer-events-none absolute inset-0" style={{ transform: `scale(${PREVIEW_WIDTH / 1080})`, transformOrigin: "top left" }}>
+                  <BrandOverlay
+                    width={1080}
+                    height={1920}
+                    fields={fields}
+                    caption={caption}
+                    captionPosition={captionPos}
+                    brandColors={brandColors}
+                  />
+                </div>
+                <p className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-sm text-white/60">
+                  Upload video untuk melihat pratinjau
+                </p>
+              </div>
             )}
           </div>
 
