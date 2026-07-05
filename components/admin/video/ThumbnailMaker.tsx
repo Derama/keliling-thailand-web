@@ -102,8 +102,19 @@ export default function ThumbnailMaker({
 
   return (
     <div className="space-y-3">
-      {/* Hidden decode video used only for frame grabs. */}
-      <video ref={videoRef} src={videoUrl} muted playsInline preload="auto" style={{ display: "none" }} />
+      {/* Hidden decode video used only for frame grabs; grab frame 0 on load
+          so the preview appears without touching the slider. */}
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        muted
+        playsInline
+        preload="auto"
+        style={{ display: "none" }}
+        onLoadedData={() => {
+          if (!frameUrl) pickFrame(0);
+        }}
+      />
 
       <ErrorNote message={error} />
 

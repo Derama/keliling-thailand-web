@@ -185,7 +185,8 @@ export default function VideoStudioView() {
                 style={{ width: PREVIEW_WIDTH, height: dims.h * scale }}
                 className="relative overflow-hidden rounded-lg border border-gray-200 bg-black"
               >
-                <video src={videoUrl} controls muted playsInline className="absolute inset-0 h-full w-full" onLoadedMetadata={onMetadata} />
+                {/* autoPlay: WebKit leaves non-playing videos blank, so loop a muted preview. */}
+                <video src={videoUrl} controls muted playsInline autoPlay loop preload="auto" className="absolute inset-0 h-full w-full" onLoadedMetadata={onMetadata} />
                 <div className="pointer-events-none absolute inset-0" style={{ transform: `scale(${scale})`, transformOrigin: "top left" }}>
                   <BrandOverlay
                     width={dims.w}
@@ -198,7 +199,7 @@ export default function VideoStudioView() {
                 </div>
               </div>
             ) : (
-              <video src={videoUrl} muted playsInline className="w-[300px] rounded-lg" onLoadedMetadata={onMetadata} />
+              <video src={videoUrl} muted playsInline autoPlay loop preload="auto" className="w-[300px] rounded-lg" onLoadedMetadata={onMetadata} />
             )}
           </div>
 
