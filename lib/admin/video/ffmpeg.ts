@@ -133,7 +133,8 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
       ...maps,
       "-c:v", "libx264",
       "-preset", "veryfast",
-      "-crf", "23",
+      // Near-transparent quality — reels are short, so the larger file is fine.
+      "-crf", "18",
       "-pix_fmt", "yuv420p",
       "-c:a", "aac",
       "-shortest",

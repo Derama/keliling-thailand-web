@@ -134,10 +134,10 @@ export default function BrandOverlay({
   const steps = Math.min(words.length, MAX_CAPTION_STEPS);
   // Keep all four contacts on one uncropped line: budget the 1080 design
   // width (padding + band gaps + icon chips) and shrink the font for long
-  // text. 0.66em/char over-estimates so wider system fonts (iOS SF Pro)
+  // text. 0.58em/char over-estimates so wider system fonts (iOS SF Pro)
   // still fit.
   const contactChars = [fields.website, fields.instagram, fields.facebook, fields.phone].join("").length;
-  const contactFont = Math.min(20, (1080 - 2 * 16 - 3 * 12 - 4 * (32 + 7)) / Math.max(1, contactChars * 0.66));
+  const contactFont = Math.min(24, (1080 - 2 * 16 - 3 * 12 - 4 * (32 + 7)) / Math.max(1, contactChars * 0.58));
   const captionTop =
     captionPosition === "top"
       ? height * 0.14
