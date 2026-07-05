@@ -1,7 +1,7 @@
 export type PostFormat = "4x5" | "1x1" | "9x16";
-export type TemplateId = "A" | "B" | "C" | "D" | "E" | "F";
+export type TemplateId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
 
-export const TEMPLATE_IDS: TemplateId[] = ["A", "B", "C", "D", "E", "F"];
+export const TEMPLATE_IDS: TemplateId[] = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
 export type PostKind = "review" | "attraction" | "journey";
 
@@ -13,11 +13,11 @@ export const KIND_LABELS: Record<PostKind, string> = {
   journey: "Journey Trip",
 };
 
-export type AttractionTemplateId = "P1" | "P2" | "P3";
-export const ATTRACTION_TEMPLATE_IDS: AttractionTemplateId[] = ["P1", "P2", "P3"];
+export type AttractionTemplateId = "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
+export const ATTRACTION_TEMPLATE_IDS: AttractionTemplateId[] = ["P1", "P2", "P3", "P4", "P5", "P6"];
 
-export type JourneyStyleId = "J1" | "J2";
-export const JOURNEY_STYLE_IDS: JourneyStyleId[] = ["J1", "J2"];
+export type JourneyStyleId = "J1" | "J2" | "J3" | "J4";
+export const JOURNEY_STYLE_IDS: JourneyStyleId[] = ["J1", "J2", "J3", "J4"];
 
 export const FORMAT_SIZES: Record<PostFormat, { w: number; h: number }> = {
   "4x5": { w: 1080, h: 1350 },

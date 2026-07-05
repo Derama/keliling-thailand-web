@@ -200,6 +200,181 @@ function AttractionP3({ data, format }: Props) {
   );
 }
 
+/** P4 — ticket style: white ticket card with dashed tear line and big date stub. */
+function AttractionP4({ data, format }: Props) {
+  const { w, h } = FORMAT_SIZES[format];
+  const { navy, yellow } = data.brandColors;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: w,
+        height: h,
+        overflow: "hidden",
+        fontFamily: "system-ui, sans-serif",
+        background: navy,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 48,
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ position: "absolute", top: 40, left: 40 }}>
+        <Logo data={logoData(data)} />
+      </div>
+      <div
+        style={{
+          background: "#fff",
+          color: navy,
+          borderRadius: 28,
+          overflow: "hidden",
+          width: "100%",
+          boxShadow: "0 24px 60px rgba(0,0,0,.4)",
+        }}
+      >
+        <div style={{ position: "relative", height: h * 0.38 }}>
+          <Photo url={data.photoUrl} />
+        </div>
+        <div style={{ padding: "40px 48px 32px" }}>
+          <p style={{ fontSize: 54, lineHeight: 1.12, fontWeight: 800, margin: 0 }}>
+            {data.title}
+          </p>
+          {data.hook && (
+            <p style={{ fontSize: 28, lineHeight: 1.35, opacity: 0.75, margin: "14px 0 0" }}>
+              {data.hook}
+            </p>
+          )}
+        </div>
+        <div style={{ borderTop: `4px dashed ${navy}33`, margin: "0 32px" }} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 24,
+            padding: "28px 48px 36px",
+          }}
+        >
+          <p style={{ fontSize: 28, fontWeight: 600, margin: 0, opacity: 0.8 }}>
+            {data.location ? `📍 ${data.location}` : ""}
+          </p>
+          {data.date && (
+            <span
+              style={{
+                background: yellow,
+                color: navy,
+                fontWeight: 800,
+                fontSize: 30,
+                padding: "12px 30px",
+                borderRadius: 14,
+              }}
+            >
+              {data.date}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** P5 — photo top, navy panel below with yellow underline under the title. */
+function AttractionP5({ data, format }: Props) {
+  const { w, h } = FORMAT_SIZES[format];
+  const { navy, yellow } = data.brandColors;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: w,
+        height: h,
+        overflow: "hidden",
+        fontFamily: "system-ui, sans-serif",
+        background: navy,
+        color: "#fff",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ position: "relative", height: "52%" }}>
+        <Photo url={data.photoUrl} />
+        <div style={{ position: "absolute", top: 40, left: 40 }}>
+          <Logo data={logoData(data)} />
+        </div>
+      </div>
+      <div style={{ flex: 1, padding: 56, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <p style={{ fontSize: 64, lineHeight: 1.12, fontWeight: 800, margin: 0 }}>
+          {data.title}
+        </p>
+        <div style={{ height: 12, width: 160, background: yellow, borderRadius: 6, margin: "24px 0" }} />
+        {data.hook && (
+          <p style={{ fontSize: 32, lineHeight: 1.4, margin: 0, opacity: 0.9 }}>{data.hook}</p>
+        )}
+        <p style={{ fontSize: 28, fontWeight: 600, color: yellow, margin: "26px 0 0" }}>
+          {[data.location && `📍 ${data.location}`, data.date].filter(Boolean).join(" · ")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** P6 — yellow poster: navy headline on yellow, rounded photo, footer row. */
+function AttractionP6({ data, format }: Props) {
+  const { w, h } = FORMAT_SIZES[format];
+  const { navy, yellow } = data.brandColors;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: w,
+        height: h,
+        overflow: "hidden",
+        fontFamily: "system-ui, sans-serif",
+        background: yellow,
+        color: navy,
+        display: "flex",
+        flexDirection: "column",
+        padding: 48,
+        boxSizing: "border-box",
+        gap: 32,
+      }}
+    >
+      <div>
+        {data.date && (
+          <span
+            style={{
+              display: "inline-block",
+              background: navy,
+              color: yellow,
+              fontWeight: 800,
+              fontSize: 26,
+              padding: "8px 22px",
+              borderRadius: 999,
+              marginBottom: 16,
+            }}
+          >
+            {data.date}
+          </span>
+        )}
+        <p style={{ fontSize: 66, lineHeight: 1.08, fontWeight: 800, margin: 0 }}>
+          {data.title}
+        </p>
+      </div>
+      <div style={{ position: "relative", flex: 1, overflow: "hidden", borderRadius: 28 }}>
+        <Photo url={data.photoUrl} />
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+        <p style={{ fontSize: 28, lineHeight: 1.35, fontWeight: 600, margin: 0, flex: 1 }}>
+          {[data.location && `📍 ${data.location}`, data.hook].filter(Boolean).join(" — ")}
+        </p>
+        <Logo data={logoData(data)} />
+      </div>
+    </div>
+  );
+}
+
 export const ATTRACTION_TEMPLATES: Record<
   AttractionTemplateId,
   { label: string; Component: (props: Props) => React.ReactElement }
@@ -207,4 +382,7 @@ export const ATTRACTION_TEMPLATES: Record<
   P1: { label: "Poster gradient", Component: AttractionP1 },
   P2: { label: "Banner kuning", Component: AttractionP2 },
   P3: { label: "Kartu event", Component: AttractionP3 },
+  P4: { label: "Tiket", Component: AttractionP4 },
+  P5: { label: "Split navy", Component: AttractionP5 },
+  P6: { label: "Poster kuning", Component: AttractionP6 },
 };
