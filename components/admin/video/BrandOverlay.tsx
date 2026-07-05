@@ -85,7 +85,8 @@ function ContactChip({
           <path d={ICON_PATHS[icon]} />
         </svg>
       </span>
-      <span>{text}</span>
+      {/* lineHeight 1 so the text box centers exactly against the chip. */}
+      <span style={{ lineHeight: 1 }}>{text}</span>
     </span>
   );
 }

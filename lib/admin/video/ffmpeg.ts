@@ -30,7 +30,14 @@ export type MusicMode = "replace" | "mix";
 
 export interface VideoExportInput {
   video: File;
-  /** Transparent PNG data URL at the video's exact pixel dimensions. */
+  /**
+   * Output frame size (even numbers). The source video is upscaled to this
+   * with lanczos so overlay graphics render at full sharpness even when the
+   * source is low-res.
+   */
+  outWidth: number;
+  outHeight: number;
+  /** Transparent PNG data URL at outWidth x outHeight. */
   overlayPng: string;
   /**
    * Caption-only transparent PNGs, one per type-in step (cumulative words).
@@ -100,9 +107,13 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
     if (musicName) args.push("-i", musicName);
 
     const musicIdx = 2 + input.captionPngs.length;
+    // Upscale the source to the output size first so the overlay (rendered at
+    // that size) stays pixel-sharp, then burn the layers.
     // Type-in: each cumulative caption frame is enabled for its own time
     // window; overlay's default eof_action=repeat keeps the still visible.
-    let filter = "[0:v][1:v]overlay=0:0[v0]";
+    let filter =
+      `[0:v]scale=${input.outWidth}:${input.outHeight}:flags=lanczos[vs];` +
+      "[vs][1:v]overlay=0:0[v0]";
     const step = input.captionStepSeconds;
     input.captionPngs.forEach((_, k) => {
       const last = k === input.captionPngs.length - 1;

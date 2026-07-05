@@ -105,13 +105,13 @@ export default function VideoStudioView() {
   }
 
   async function exportVideo() {
-    if (!video || !dims || !exportNodeRef.current) return;
+    if (!video || !dims || !out || !exportNodeRef.current) return;
     setError(null);
     setProgress(0);
     try {
       const captureOpts = {
-        width: dims.w,
-        height: dims.h,
+        width: out.w,
+        height: out.h,
         pixelRatio: 1,
         cacheBust: true,
       };
@@ -124,6 +124,8 @@ export default function VideoStudioView() {
       }
       const blob = await exportBrandedVideo({
         video,
+        outWidth: out.w,
+        outHeight: out.h,
         overlayPng,
         captionPngs,
         captionStepSeconds: CAPTION_STEP_SECONDS,
@@ -148,6 +150,17 @@ export default function VideoStudioView() {
   const tooLong = duration > MAX_SECONDS;
   const tooBig = (video?.size ?? 0) > MAX_BYTES;
   const scale = dims ? PREVIEW_WIDTH / dims.w : 1;
+  // Export at 1080-wide minimum (even numbers for yuv420p) so overlay
+  // graphics stay sharp even when the source video is low-res.
+  const out = dims
+    ? (() => {
+        const w = Math.max(dims.w, 1080);
+        return {
+          w: Math.round(w / 2) * 2,
+          h: Math.round((w * dims.h) / dims.w / 2) * 2,
+        };
+      })()
+    : null;
 
   return (
     <div className="space-y-4">
@@ -376,12 +389,12 @@ export default function VideoStudioView() {
 
       {/* Offscreen full-size nodes captured at export time: brand layer and
           caption layer separately, so ffmpeg can animate the caption in. */}
-      {dims && (
+      {out && (
         <div style={{ position: "fixed", left: -100000, top: 0 }} aria-hidden>
           <div ref={exportNodeRef}>
             <BrandOverlay
-              width={dims.w}
-              height={dims.h}
+              width={out.w}
+              height={out.h}
               fields={fields}
               caption=""
               captionPosition={captionPos}
@@ -398,8 +411,8 @@ export default function VideoStudioView() {
                 }}
               >
                 <BrandOverlay
-                  width={dims.w}
-                  height={dims.h}
+                  width={out.w}
+                  height={out.h}
                   fields={fields}
                   caption={caption}
                   captionPosition={captionPos}
