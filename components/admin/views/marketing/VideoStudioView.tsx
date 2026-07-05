@@ -252,7 +252,6 @@ export default function VideoStudioView() {
             <fieldset className="space-y-2">
               <legend className="text-sm font-semibold text-[#1B2A4A]">Kontak di video</legend>
               <input className={inputCls} value={fields.website} onChange={(e) => updateField("website", e.target.value)} placeholder="Website" />
-              <input className={inputCls} value={fields.facebook} onChange={(e) => updateField("facebook", e.target.value)} placeholder="Facebook" />
               <input className={inputCls} value={fields.instagram} onChange={(e) => updateField("instagram", e.target.value)} placeholder="Instagram" />
               <input className={inputCls} value={fields.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="Nomor telepon" />
             </fieldset>

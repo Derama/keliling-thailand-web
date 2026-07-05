@@ -4,14 +4,12 @@ import type { BrandColors } from "@/lib/admin/settings";
 
 export interface BrandFields {
   website: string;
-  facebook: string;
   instagram: string;
   phone: string;
 }
 
 export const DEFAULT_BRAND_FIELDS: BrandFields = {
   website: "kelilingthailand.com",
-  facebook: "Keliling Thailand",
   instagram: "@kelilingthailand",
   phone: "+62 857-5092-3934",
 };
@@ -192,7 +190,6 @@ export default function BrandOverlay({
         }}
       >
         <ContactChip icon="globe" text={fields.website} s={s} brandColors={brandColors} />
-        <ContactChip icon="facebook" text={fields.facebook} s={s} brandColors={brandColors} />
         <ContactChip icon="instagram" text={fields.instagram} s={s} brandColors={brandColors} />
         <ContactChip icon="phone" text={fields.phone} s={s} brandColors={brandColors} />
       </div>
