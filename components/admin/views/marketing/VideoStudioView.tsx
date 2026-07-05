@@ -13,20 +13,13 @@ import BrandOverlay, {
   type CaptionPosition,
 } from "@/components/admin/video/BrandOverlay";
 import ThumbnailMaker from "@/components/admin/video/ThumbnailMaker";
+import Modal from "@/components/admin/Modal";
 import { exportBrandedVideo, type MusicMode } from "@/lib/admin/video/ffmpeg";
 
 const FIELDS_KEY = "video-brand-fields";
-const PREVIEW_WIDTH = 300;
+const PREVIEW_WIDTH = 360;
 const MAX_SECONDS = 61;
 const MAX_BYTES = 100 * 1024 * 1024;
-
-function downloadBlob(blob: Blob, name: string) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
-}
 
 export default function VideoStudioView() {
   const [brandColors, setBrandColors] = useState<BrandColors>(DEFAULT_BRAND_COLORS);
@@ -43,8 +36,21 @@ export default function VideoStudioView() {
   const [musicVolume, setMusicVolume] = useState(0.5);
   const [tab, setTab] = useState<"edit" | "thumbnail">("edit");
   const [progress, setProgress] = useState<number | null>(null);
+  const [result, setResult] = useState<{ url: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const exportNodeRef = useRef<HTMLDivElement>(null);
+
+  // Revoke object URLs when replaced or on unmount.
+  useEffect(() => {
+    return () => {
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
+    };
+  }, [videoUrl]);
+  useEffect(() => {
+    return () => {
+      if (result) URL.revokeObjectURL(result.url);
+    };
+  }, [result]);
 
   // Brand colors from settings; contact fields from localStorage.
   useEffect(() => {
@@ -58,16 +64,17 @@ export default function VideoStudioView() {
   }, []);
 
   function updateField(key: keyof BrandFields, value: string) {
-    setFields((f) => {
-      const next = { ...f, [key]: value };
+    const next = { ...fields, [key]: value };
+    setFields(next);
+    try {
       localStorage.setItem(FIELDS_KEY, JSON.stringify(next));
-      return next;
-    });
+    } catch {
+      /* quota/private mode — keep in-memory value only */
+    }
   }
 
   function onVideoFile(file: File) {
     setError(null);
-    if (videoUrl) URL.revokeObjectURL(videoUrl);
     setVideo(file);
     setVideoUrl(URL.createObjectURL(file));
     setDims(null);
@@ -78,9 +85,11 @@ export default function VideoStudioView() {
 
   function onMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
     const v = e.currentTarget;
+    // Some sources report Infinity until fully buffered — treat as unknown.
+    const d = Number.isFinite(v.duration) ? v.duration : 0;
     setDims({ w: v.videoWidth, h: v.videoHeight });
-    setDuration(v.duration);
-    setTrim({ start: 0, end: v.duration });
+    setDuration(d);
+    setTrim({ start: 0, end: d });
   }
 
   async function exportVideo() {
@@ -104,7 +113,10 @@ export default function VideoStudioView() {
         musicVolume,
         onProgress: setProgress,
       });
-      downloadBlob(blob, video.name.replace(/\.[^.]+$/, "") + "-branded.mp4");
+      setResult({
+        url: URL.createObjectURL(blob),
+        name: video.name.replace(/\.[^.]+$/, "") + "-branded.mp4",
+      });
     } catch (e) {
       setError(errMsg(e));
     } finally {
@@ -285,6 +297,22 @@ export default function VideoStudioView() {
           </div>
         </div>
       )}
+
+      <Modal open={!!result} onClose={() => setResult(null)} title="Pratinjau video">
+        {result && (
+          <div className="space-y-4">
+            <video
+              src={result.url}
+              controls
+              playsInline
+              className="mx-auto max-h-[60vh] w-auto rounded-lg bg-black"
+            />
+            <a href={result.url} download={result.name} className={btnCls}>
+              Download MP4
+            </a>
+          </div>
+        )}
+      </Modal>
 
       {/* Offscreen full-size overlay node captured at export time. */}
       {dims && (

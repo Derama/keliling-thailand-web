@@ -69,6 +69,14 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
       await ff.writeFile(musicName, await fetchFile(input.music));
     }
 
+    // amix requires a source audio stream; probe and fall back to replace
+    // when the uploaded video is silent (spec: mix must not hard-fail).
+    let musicMode = input.musicMode;
+    if (musicName && musicMode === "mix") {
+      await ff.exec(["-hide_banner", "-i", "input.mp4"]);
+      if (!logs.some((l) => l.includes("Audio:"))) musicMode = "replace";
+    }
+
     const duration = Math.max(0.1, input.trimEnd - input.trimStart);
     let filter = "[0:v][1:v]overlay=0:0[v]";
     const args = [
@@ -80,10 +88,12 @@ export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob>
     if (musicName) args.push("-i", musicName);
 
     const maps = ["-map", "[v]"];
-    if (musicName && input.musicMode === "replace") {
+    if (musicName && musicMode === "replace") {
       maps.push("-map", "2:a");
     } else if (musicName) {
-      filter += `;[0:a][2:a]amix=inputs=2:duration=first:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
+      // normalize=0 keeps the original audio at full volume with the music
+      // gained by the slider value, instead of amix's default attenuation.
+      filter += `;[0:a][2:a]amix=inputs=2:duration=first:normalize=0:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
       maps.push("-map", "[a]");
     } else {
       maps.push("-map", "0:a?");

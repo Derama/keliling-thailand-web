@@ -38,18 +38,34 @@ export default function ThumbnailMaker({
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Monotonic token so rapid scrubbing only draws the latest requested frame.
+  const seekToken = useRef(0);
 
   async function pickFrame(t: number) {
     setTime(t);
     const v = videoRef.current;
     if (!v) return;
     setError(null);
+    const token = ++seekToken.current;
     try {
       v.currentTime = t;
       await new Promise<void>((res, rej) => {
-        v.addEventListener("seeked", () => res(), { once: true });
-        v.addEventListener("error", () => rej(new Error("Gagal memuat frame video")), { once: true });
+        const onSeeked = () => {
+          cleanup();
+          res();
+        };
+        const onError = () => {
+          cleanup();
+          rej(new Error("Gagal memuat frame video"));
+        };
+        const cleanup = () => {
+          v.removeEventListener("seeked", onSeeked);
+          v.removeEventListener("error", onError);
+        };
+        v.addEventListener("seeked", onSeeked);
+        v.addEventListener("error", onError);
       });
+      if (token !== seekToken.current) return; // stale seek — newer scrub in flight
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
