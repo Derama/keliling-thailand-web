@@ -1,0 +1,118 @@
+// In-browser video export via ffmpeg.wasm. Uses the single-threaded core from
+// a CDN (no COOP/COEP headers required); ~31MB fetched once then cached.
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
+
+const CORE_BASE = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd";
+
+let instance: FFmpeg | null = null;
+let loading: Promise<FFmpeg> | null = null;
+
+/** Lazy-load and cache the ffmpeg core. Reset on failure so retry works. */
+export function getFFmpeg(): Promise<FFmpeg> {
+  if (instance) return Promise.resolve(instance);
+  loading ??= (async () => {
+    const ff = new FFmpeg();
+    await ff.load({
+      coreURL: await toBlobURL(`${CORE_BASE}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${CORE_BASE}/ffmpeg-core.wasm`, "application/wasm"),
+    });
+    instance = ff;
+    return ff;
+  })().catch((e) => {
+    loading = null;
+    throw e;
+  });
+  return loading;
+}
+
+export type MusicMode = "replace" | "mix";
+
+export interface VideoExportInput {
+  video: File;
+  /** Transparent PNG data URL at the video's exact pixel dimensions. */
+  overlayPng: string;
+  /** Trim window in seconds. */
+  trimStart: number;
+  trimEnd: number;
+  music: File | null;
+  musicMode: MusicMode;
+  /** Music loudness relative to original audio, 0..1 (mix mode only). */
+  musicVolume: number;
+  onProgress?: (ratio: number) => void;
+}
+
+/**
+ * Burn the overlay and apply trim/audio, returning the MP4 blob. On ffmpeg
+ * failure the thrown Error message includes the log tail for diagnosis.
+ */
+export async function exportBrandedVideo(input: VideoExportInput): Promise<Blob> {
+  const ff = await getFFmpeg();
+  const logs: string[] = [];
+  const onLog = ({ message }: { message: string }) => {
+    logs.push(message);
+    if (logs.length > 40) logs.shift();
+  };
+  const onProgress = ({ progress }: { progress: number }) => {
+    input.onProgress?.(Math.max(0, Math.min(1, progress)));
+  };
+  ff.on("log", onLog);
+  ff.on("progress", onProgress);
+
+  const musicExt = input.music?.name.split(".").pop() || "mp3";
+  const musicName = input.music ? `music.${musicExt}` : null;
+
+  try {
+    await ff.writeFile("input.mp4", await fetchFile(input.video));
+    await ff.writeFile("overlay.png", await fetchFile(input.overlayPng));
+    if (input.music && musicName) {
+      await ff.writeFile(musicName, await fetchFile(input.music));
+    }
+
+    const duration = Math.max(0.1, input.trimEnd - input.trimStart);
+    let filter = "[0:v][1:v]overlay=0:0[v]";
+    const args = [
+      "-ss", String(input.trimStart),
+      "-t", String(duration),
+      "-i", "input.mp4",
+      "-i", "overlay.png",
+    ];
+    if (musicName) args.push("-i", musicName);
+
+    const maps = ["-map", "[v]"];
+    if (musicName && input.musicMode === "replace") {
+      maps.push("-map", "2:a");
+    } else if (musicName) {
+      filter += `;[0:a][2:a]amix=inputs=2:duration=first:weights=1 ${input.musicVolume.toFixed(2)}[a]`;
+      maps.push("-map", "[a]");
+    } else {
+      maps.push("-map", "0:a?");
+    }
+
+    args.push(
+      "-filter_complex", filter,
+      ...maps,
+      "-c:v", "libx264",
+      "-preset", "veryfast",
+      "-crf", "23",
+      "-pix_fmt", "yuv420p",
+      "-c:a", "aac",
+      "-shortest",
+      "-movflags", "+faststart",
+      "out.mp4"
+    );
+
+    const code = await ff.exec(args);
+    if (code !== 0) {
+      throw new Error(`ffmpeg gagal (kode ${code}):\n${logs.slice(-12).join("\n")}`);
+    }
+    const data = await ff.readFile("out.mp4");
+    return new Blob([new Uint8Array(data as Uint8Array)], { type: "video/mp4" });
+  } finally {
+    ff.off("log", onLog);
+    ff.off("progress", onProgress);
+    for (const f of ["input.mp4", "overlay.png", musicName, "out.mp4"]) {
+      if (f) await ff.deleteFile(f).catch(() => {});
+    }
+  }
+}
