@@ -19,6 +19,16 @@ function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
 
+/** Split "Nama Tempat: deskripsi" schedule rows so the place name renders bold
+ * next to the time. Long or missing prefixes stay a plain description line. */
+function splitStopText(text: string): { name: string; desc: string } | null {
+  const idx = (text ?? "").indexOf(":");
+  if (idx <= 0 || idx > 48) return null;
+  const name = text.slice(0, idx).trim();
+  const desc = text.slice(idx + 1).trim();
+  return name && desc ? { name, desc } : null;
+}
+
 /** Split a title into [head, tail] for the two-tone serif look. */
 function splitTitle(t: string): [string, string] {
   const m = t.match(/^(.*?)(?:\s*[-–—:]\s*)(.+)$/);
@@ -390,28 +400,46 @@ function DayPage({
 
       {/* Body — full-width numbered schedule */}
       <ol className="mt-5 flex-1">
-        {day.activities.map((a, i) => (
-          <li
-            key={a.id}
-            className="flex gap-3 py-2"
-            style={{ borderTop: i ? `1px solid ${NAVY}12` : undefined }}
-          >
-            <span
-              className="w-8 shrink-0 font-serif text-2xl leading-none"
-              style={{ color: `${RUST}B3` }}
+        {day.activities.map((a, i) => {
+          const stop = splitStopText(a.text);
+          return (
+            <li
+              key={a.id}
+              className="flex items-baseline gap-3 py-2.5"
+              style={{ borderTop: i ? `1px solid ${NAVY}12` : undefined }}
             >
-              {pad2(i + 1)}
-            </span>
-            <div className="min-w-0">
-              <p className="text-[12.5px] font-bold leading-snug" style={{ color: NAVY }}>
+              <span
+                className="w-8 shrink-0 font-serif text-2xl leading-none"
+                style={{ color: `${RUST}B3` }}
+              >
+                {pad2(i + 1)}
+              </span>
+              {/* Fixed-width hour column keeps every time aligned down the page. */}
+              <span
+                className="w-11 shrink-0 text-[12.5px] font-bold tabular-nums leading-snug"
+                style={{ color: NAVY }}
+              >
                 {a.time || "—"}
-              </p>
-              {a.text && (
-                <p className="text-[11.5px] leading-snug text-gray-600">{a.text}</p>
-              )}
-            </div>
-          </li>
-        ))}
+              </span>
+              <div className="min-w-0 flex-1">
+                {stop ? (
+                  <>
+                    <p className="text-[12.5px] font-bold leading-snug" style={{ color: NAVY }}>
+                      {stop.name}
+                    </p>
+                    <p className="mt-1 text-[11.5px] leading-snug text-gray-600">
+                      {stop.desc}
+                    </p>
+                  </>
+                ) : (
+                  a.text && (
+                    <p className="text-[11.5px] leading-snug text-gray-600">{a.text}</p>
+                  )
+                )}
+              </div>
+            </li>
+          );
+        })}
         {day.activities.length === 0 && (
           <li className="py-2 text-xs text-gray-400">Belum ada kegiatan.</li>
         )}

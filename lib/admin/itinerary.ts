@@ -94,6 +94,13 @@ export function insertByTime(
  *   - manual rows (meals, custom stops) are left untouched;
  *   - newly added attractions are appended at the end.
  */
+/** Timetable label for a place: "Nama Tempat: deskripsi" (AI "activity" lines
+ * already carry the name prefix; catalog descriptions don't). */
+function placeStopText(p: ItineraryPlace): string {
+  if (p.activity) return p.activity;
+  return p.desc ? `${p.name}: ${p.desc}` : p.name;
+}
+
 export function scheduleFromPlaces(
   places: ItineraryPlace[],
   prev: ItineraryActivity[] = []
@@ -110,7 +117,7 @@ export function scheduleFromPlaces(
       out.push({
         id: a.id,
         time: a.time || defaultTime.get(a.id) || "",
-        text: a.text || p.activity || p.desc || p.name,
+        text: a.text || placeStopText(p),
       });
       seen.add(a.id);
     } else {
@@ -122,7 +129,7 @@ export function scheduleFromPlaces(
       out.push({
         id: p.id,
         time: defaultTime.get(p.id) || "",
-        text: p.activity || p.desc || p.name,
+        text: placeStopText(p),
       });
     }
   }

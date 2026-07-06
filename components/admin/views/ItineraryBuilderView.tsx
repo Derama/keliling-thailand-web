@@ -53,6 +53,15 @@ function newId() {
   return crypto.randomUUID();
 }
 
+// Schedule rows store "Judul: deskripsi" in one text field (the print doc bolds
+// the part before the colon). The builder edits the two halves separately.
+function splitRowText(text: string): { title: string; desc: string } {
+  const ci = text.indexOf(":");
+  if (ci <= 0) return { title: "", desc: text };
+  // Keep the title un-trimmed so typing a space mid-name isn't eaten on re-parse.
+  return { title: text.slice(0, ci), desc: text.slice(ci + 1).replace(/^ /, "") };
+}
+
 /**
  * Wait for every <img> in the printed document to load AND decode before opening
  * the print dialog. Remote photos (cover hero, attractions) can take longer than
@@ -1734,6 +1743,10 @@ function DayCard({
 }) {
   const [dragOver, setDragOver] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [aiPasteOpen, setAiPasteOpen] = useState(false);
+  const [aiPasteText, setAiPasteText] = useState("");
+  const [aiPasteBusy, setAiPasteBusy] = useState(false);
+  const [aiPasteError, setAiPasteError] = useState<string | null>(null);
   const touch = useTouchDrag();
   const highlight = dragOver || touch.overDayId === day.id;
   const detailCount = [
@@ -1789,6 +1802,53 @@ function DayCard({
     }
     if (acts === day.activities) return;
     onPatch({ activities: acts });
+  }
+
+  // Paste a raw place list ("Bangkok: Jodd Fair, Platinum, …") and let the AI
+  // order the stops + assign realistic hours. Replaces this day's schedule.
+  async function arrangeDayWithAI() {
+    const text = aiPasteText.trim();
+    if (!text || aiPasteBusy) return;
+    setAiPasteBusy(true);
+    setAiPasteError(null);
+    try {
+      const res = await fetch("/api/itinerary/day", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "Gagal menyusun.");
+
+      const newPlaces: ItineraryPlace[] = (data.places ?? [])
+        .slice(0, MAX_DAY_PHOTOS)
+        .map((p: { name?: string; image?: string; desc?: string; activity?: string }) => ({
+          id: newId(),
+          name: p.name ?? "",
+          image: p.image ?? "",
+          desc: p.desc ?? "",
+          activity: p.activity ?? "",
+        }));
+      const patch: Partial<ItineraryDay> = {
+        places: newPlaces,
+        activities: mergeAiSchedule(newPlaces, data.activities ?? []),
+      };
+      // Fill brochure fields only when currently empty — keep admin edits.
+      if (!day.title.trim() && data.title) patch.title = String(data.title);
+      if (!(day.theme ?? "").trim() && data.theme) patch.theme = String(data.theme);
+      if (!(day.city ?? "").trim() && data.city) patch.city = String(data.city);
+      if (!(day.route ?? "").trim() && data.route) patch.route = String(data.route);
+      if (!(day.intro ?? "").trim() && data.intro) patch.intro = String(data.intro);
+      if (!(day.cityHighlight ?? "").trim() && data.cityHighlight)
+        patch.cityHighlight = String(data.cityHighlight);
+      onPatch(patch);
+      setAiPasteText("");
+      setAiPasteOpen(false);
+    } catch (err) {
+      setAiPasteError(err instanceof Error ? err.message : "Gagal menyusun.");
+    } finally {
+      setAiPasteBusy(false);
+    }
   }
 
   return (
@@ -1920,7 +1980,12 @@ function DayCard({
           </p>
           {day.activities.map((a, i) => {
             const isPlace = placeIds.has(a.id);
+            const row = splitRowText(a.text);
+            const patchText = (title: string, desc: string) =>
+              patchActivity(a.id, { text: title ? `${title}: ${desc}` : desc });
             return (
+              // items-center keeps the hour + row buttons vertically centered
+              // against the stacked title/description pair.
               <div key={a.id} className="flex items-center gap-2">
                 <input
                   value={a.time}
@@ -1928,12 +1993,24 @@ function DayCard({
                   placeholder="08:00"
                   className="w-16 shrink-0 rounded-lg border border-gray-300 px-2 py-2 text-center text-sm tabular-nums focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
                 />
-                <input
-                  value={a.text}
-                  onChange={(e) => patchActivity(a.id, { text: e.target.value })}
-                  placeholder={isPlace ? "Nama atraksi…" : "Kegiatan…"}
-                  className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
-                />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <input
+                    value={row.title}
+                    onChange={(e) => patchText(e.target.value, row.desc)}
+                    placeholder={
+                      isPlace
+                        ? "Nama atraksi (tampil tebal)…"
+                        : "Judul / nama tempat (tampil tebal)…"
+                    }
+                    className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-semibold focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
+                  />
+                  <input
+                    value={row.desc}
+                    onChange={(e) => patchText(row.title, e.target.value)}
+                    placeholder="Deskripsi kegiatan…"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-[#1B2A4A] focus:outline-none focus:ring-1 focus:ring-[#1B2A4A]"
+                  />
+                </div>
                 <div className="flex shrink-0 items-center text-gray-400">
                   <button
                     type="button"
@@ -1987,7 +2064,44 @@ function DayCard({
             >
               + Tambah jam
             </button>
+            <button
+              type="button"
+              onClick={() => setAiPasteOpen((v) => !v)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                aiPasteOpen
+                  ? "border-[#1B2A4A] bg-[#1B2A4A] text-white"
+                  : "border-[#F5C518] bg-[#F5C518]/15 text-[#1B2A4A] hover:bg-[#F5C518]/30"
+              }`}
+            >
+              ✨ Susun AI
+            </button>
           </div>
+          {aiPasteOpen && (
+            <div className="space-y-2 rounded-lg border border-[#F5C518]/60 bg-[#F5C518]/10 p-3">
+              <p className="text-xs text-gray-600">
+                Tempel daftar tempat hari ini — AI mengurutkan rute dan mengisi
+                jamnya. Jadwal &amp; foto atraksi hari ini akan diganti.
+              </p>
+              <textarea
+                value={aiPasteText}
+                onChange={(e) => setAiPasteText(e.target.value)}
+                rows={2}
+                placeholder="Bangkok: Jodd Fair, Erawadee Shop, Platinum, Pratunam"
+                className={inputCls}
+              />
+              {aiPasteError && (
+                <p className="text-xs text-red-600">{aiPasteError}</p>
+              )}
+              <button
+                type="button"
+                onClick={arrangeDayWithAI}
+                disabled={aiPasteBusy || !aiPasteText.trim()}
+                className="rounded-lg bg-[#1B2A4A] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#24365e] disabled:opacity-50"
+              >
+                {aiPasteBusy ? "Menyusun…" : "Susun jadwal"}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Places */}

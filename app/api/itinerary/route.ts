@@ -72,7 +72,7 @@ Write a realistic day-by-day itinerary based on the customer's request. Rules:
 - Every explicitly named destination or attraction is mandatory: never omit it, replace it, or substitute a different place.
 - Preserve the requested number and division of days. Do not merge, remove, or add days unless the customer asks for it.
 - Arrange visits in a realistic geographic order, accounting for Bangkok traffic, attraction opening times, ferry schedules, and travel time between stops.
-- Every attraction activity must begin with the attraction's exact name, followed by a warm 1-2 sentence Indonesian description of the experience, such as family time, photos, culture, or shopping.
+- Every attraction activity must use the format "Nama Atraksi: deskripsi" — the attraction's exact name, a colon, then ONE warm Indonesian sentence of 6-10 words (fits a single printed line) about the experience, such as family time, photos, culture, or shopping (e.g. "Elephant Village: Melihat dan belajar tentang gajah dari jarak dekat.").
 - Include pickup, transfers, meals, hotel check-in, and return trips when relevant to the requested day.
 - For each day provide:
   - "title": a short evocative day title (e.g. "Pattaya — Pantai & Buddha Agung").
@@ -157,7 +157,7 @@ export async function POST(request: Request) {
 - Setiap atraksi atau destinasi yang disebut eksplisit oleh customer WAJIB muncul di "activities" dan "places", meskipun namanya tidak ada di katalog. Jangan hilangkan atau ganti tempat tersebut. Tempat di luar katalog akan tetap ditampilkan tanpa foto.
 - Atraksi tambahan pilihan AI yang tidak diminta customer WAJIB berasal dari katalog dan gunakan nama PERSIS seperti di katalog.
 - Urutkan semua atraksi sesuai alur kunjungan yang realistis dari pagi ke sore. Masukkan semua tempat wajib lebih dulu; tambahkan atraksi katalog hanya jika tidak menggeser tempat wajib dari maksimal empat entri visual.
-- Untuk setiap "places[].activity", awali dengan nama atraksi yang PERSIS sama dengan "places[].name", lalu tulis deskripsi hangat 1-2 kalimat dalam Bahasa Indonesia tentang pengalaman di sana, termasuk momen keluarga, foto, budaya, atau belanja yang relevan.
+- Untuk setiap "places[].activity", gunakan format "Nama Atraksi: deskripsi" — nama yang PERSIS sama dengan "places[].name", titik dua, lalu SATU kalimat hangat 6-10 kata dalam Bahasa Indonesia tentang pengalaman di sana, termasuk momen keluarga, foto, budaya, atau belanja yang relevan.
 - Jika kota tidak ada di katalog, tetap masukkan semua atraksi yang diminta customer ke "places"; jangan menambahkan atraksi pilihan AI.`;
 
     const completion = await client.chat.completions.create({
