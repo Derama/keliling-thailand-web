@@ -15,5 +15,9 @@ create table if not exists handover_damages (
 );
 
 alter table handover_damages enable row level security;
-create policy handover_damages_authenticated_all on handover_damages
-  for all to authenticated using (true) with check (true);
+do $$
+begin
+  create policy handover_damages_authenticated_all on handover_damages
+    for all to authenticated using (true) with check (true);
+exception when duplicate_object then null;
+end $$;
