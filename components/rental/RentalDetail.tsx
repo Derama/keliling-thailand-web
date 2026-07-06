@@ -134,9 +134,17 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
             {rental.vehicles?.name} · {rental.renters?.name}
           </p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-sm font-medium ${RENTAL_STATUS_COLORS[rental.status]}`}>
-          {RENTAL_STATUS_LABELS[rental.status]}
-        </span>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/rental/rentals/${rental.id}/agreement`}
+            className="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+          >
+            Perjanjian
+          </Link>
+          <span className={`rounded-full px-3 py-1 text-sm font-medium ${RENTAL_STATUS_COLORS[rental.status]}`}>
+            {RENTAL_STATUS_LABELS[rental.status]}
+          </span>
+        </div>
       </div>
 
       <section className="grid gap-3 rounded-xl border border-gray-200 bg-white p-5 sm:grid-cols-2">
