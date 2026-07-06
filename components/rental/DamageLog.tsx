@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { HandoverDamage, DamageSeverity } from "@/lib/rental/types";
 import {
@@ -63,7 +63,7 @@ function DamageList({
             <button
               type="button"
               onClick={() => onDelete(damage)}
-              className="text-xs text-red-600 hover:underline"
+              className="px-2 py-2 text-xs text-red-600 hover:underline"
             >
               Hapus
             </button>
@@ -90,12 +90,22 @@ export default function DamageLog({
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(() => {
-    loadDamages(handoverId).then(setItems);
-    if (compareHandoverId) loadDamages(compareHandoverId).then(setCompareItems);
+    loadDamages(handoverId)
+      .then(setItems)
+      .catch((e: Error) => setError(`Gagal memuat: ${e.message}`));
+    if (compareHandoverId) {
+      setCompareItems([]);
+      loadDamages(compareHandoverId)
+        .then(setCompareItems)
+        .catch((e: Error) => setError(`Gagal memuat: ${e.message}`));
+    }
   }, [handoverId, compareHandoverId]);
 
+  // Intentional: `load` clears the stale compare list synchronously when ids change.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(load, [load]);
 
   async function add() {
@@ -121,25 +131,31 @@ export default function DamageLog({
       photo_path: photoPath,
     });
     if (insErr) {
+      if (photoPath) await supabase.storage.from(BUCKET).remove([photoPath]);
       setError(`Gagal simpan: ${insErr.message}`);
       setBusy(false);
       return;
     }
     setNote("");
     setFile(null);
+    if (fileRef.current) fileRef.current.value = "";
     setBusy(false);
     load();
   }
 
   async function remove(d: HandoverDamage) {
+    if (busy) return;
+    setBusy(true);
     const supabase = createClient();
     if (d.photo_path) await supabase.storage.from(BUCKET).remove([d.photo_path]);
     const { error } = await supabase.from("handover_damages").delete().eq("id", d.id);
     if (error) {
       setError(`Gagal hapus: ${error.message}`);
+      setBusy(false);
       return;
     }
     load();
+    setBusy(false);
   }
 
   return (
@@ -154,7 +170,7 @@ export default function DamageLog({
       )}
 
       <span className="block text-sm font-medium text-gray-700">Catatan kerusakan</span>
-      <DamageList items={items} onDelete={remove} />
+      <DamageList items={items} onDelete={busy ? undefined : remove} />
 
       <div className="grid gap-2 sm:grid-cols-4 sm:items-end">
         <Select
@@ -177,6 +193,7 @@ export default function DamageLog({
           <label className={`${btnSecondaryCls} cursor-pointer text-xs`}>
             {file ? "1 foto" : "Foto"}
             <input
+              ref={fileRef}
               type="file"
               accept="image/*"
               capture="environment"
