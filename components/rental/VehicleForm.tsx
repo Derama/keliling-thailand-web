@@ -81,8 +81,8 @@ export default function VehicleForm({
         <Field label="Nama / model">
           <input required value={draft.name} onChange={(e) => set("name", e.target.value)} className={inputCls} placeholder="Toyota Vios 2022" />
         </Field>
-        <Field label="Tipe">
-          <input value={draft.type} onChange={(e) => set("type", e.target.value)} className={inputCls} placeholder="Sedan / SUV" />
+        <Field label="Tarif / hari (THB)">
+          <input type="number" min="0" value={draft.daily_rate_thb} onChange={(e) => set("daily_rate_thb", e.target.value)} className={inputCls} />
         </Field>
         <Field label="Status">
           <Select
@@ -91,8 +91,8 @@ export default function VehicleForm({
             options={VEHICLE_STATUSES.map((s) => ({ value: s, label: VEHICLE_STATUS_LABELS[s] }))}
           />
         </Field>
-        <Field label="Tarif / hari (THB)">
-          <input type="number" min="0" value={draft.daily_rate_thb} onChange={(e) => set("daily_rate_thb", e.target.value)} className={inputCls} />
+        <Field label="Tipe">
+          <input value={draft.type} onChange={(e) => set("type", e.target.value)} className={inputCls} placeholder="Sedan / SUV" />
         </Field>
       </div>
       <Field label="Catatan">
