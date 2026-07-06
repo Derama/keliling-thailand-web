@@ -19,7 +19,6 @@ export default function RentalWizard() {
   const [renterId, setRenterId] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [deposit, setDeposit] = useState("");
   const [rate, setRate] = useState("");
   const [fx, setFx] = useState("");
   const [notes, setNotes] = useState("");
@@ -41,13 +40,12 @@ export default function RentalWizard() {
       .then(({ data }) => setRenters(data ?? []));
   }, []);
 
-  // When a vehicle is chosen, snapshot its rate + deposit into the editable fields.
+  // When a vehicle is chosen, snapshot its rate into the editable field.
   function chooseVehicle(id: string) {
     setVehicleId(id);
     const v = vehicles.find((x) => x.id === id);
     if (v) {
       setRate(String(v.daily_rate_thb));
-      setDeposit(String(v.deposit_thb));
     }
   }
 
@@ -86,7 +84,7 @@ export default function RentalWizard() {
         end_date: end,
         days,
         daily_rate_thb: Number(rate) || 0,
-        deposit_thb: Number(deposit) || 0,
+        deposit_thb: 0,
         total_thb: total,
         fx_rate: fxNum,
         status: "booked",
@@ -159,9 +157,6 @@ export default function RentalWizard() {
           </Field>
           <Field label="Tarif / hari (THB)">
             <input type="number" min="0" value={rate} onChange={(e) => setRate(e.target.value)} className={inputCls} />
-          </Field>
-          <Field label="Deposit (THB)">
-            <input type="number" min="0" value={deposit} onChange={(e) => setDeposit(e.target.value)} className={inputCls} />
           </Field>
           <Field label="Kurs (IDR per 1 THB)">
             <input type="number" min="0" step="0.01" value={fx} onChange={(e) => setFx(e.target.value)} className={inputCls} />

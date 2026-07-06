@@ -21,7 +21,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
   const [payments, setPayments] = useState<RentalPayment[]>([]);
   const [pickup, setPickup] = useState<RentalHandover | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [payKind, setPayKind] = useState<PaymentKind>("deposit");
+  const [payKind, setPayKind] = useState<PaymentKind>("rental");
   const [payAmount, setPayAmount] = useState("");
   const [payMethod, setPayMethod] = useState("");
 
@@ -99,7 +99,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
     );
   }
 
-  // Ledger: deposit + rental are inflows; refund is an outflow.
+  // Ledger: rental (and legacy deposit) inflow; refund outflow.
   const balance = payments.reduce(
     (sum, p) => sum + (p.kind === "refund" ? -p.amount_thb : p.amount_thb),
     0
@@ -135,10 +135,6 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
             {formatTHB(rental.total_thb)}
             {totalIdr != null && <span className="text-gray-500"> ≈ {formatIDR(totalIdr)}</span>}
           </p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Deposit</p>
-          <p>{formatTHB(rental.deposit_thb)}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Tarif/hari</p>
