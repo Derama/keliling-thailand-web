@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { isRentalUser } from "@/lib/rental/role";
+import { canAccessRental } from "@/lib/rental/role";
 import RentalShell from "@/components/rental/RentalShell";
 
 export default async function RentalPanelLayout({
@@ -11,7 +11,7 @@ export default async function RentalPanelLayout({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/rental/login");
-  if (!isRentalUser(user)) redirect("/rental/login");
+  if (!canAccessRental(user)) redirect("/rental/login");
 
   return <RentalShell>{children}</RentalShell>;
 }
