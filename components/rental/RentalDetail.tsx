@@ -55,6 +55,21 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
 
   async function setStatus(status: RentalWithRefs["status"]) {
     const supabase = createClient();
+    if (status === "out") {
+      const { data: out } = await supabase
+        .from("rental_handovers")
+        .select("terms_agreed")
+        .eq("rental_id", rentalId)
+        .eq("kind", "out")
+        .maybeSingle();
+      if (!out?.terms_agreed) {
+        setError(
+          "Belum bisa tandai keluar: simpan serah terima (keluar) dengan centang persetujuan S&K dulu."
+        );
+        return;
+      }
+      setError(null);
+    }
     const { error } = await supabase
       .from("rentals")
       .update({ status, updated_at: new Date().toISOString() })

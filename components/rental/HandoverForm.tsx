@@ -52,6 +52,8 @@ export default function HandoverForm({
           setOil(h.oil_level ?? "ok");
           setNotes(h.notes ?? "");
           setAgreed(h.terms_agreed ?? false);
+        } else {
+          setAgreed(false);
         }
       });
   }, [rentalId, kind]);
@@ -59,10 +61,6 @@ export default function HandoverForm({
   useEffect(load, [load]);
 
   async function save() {
-    if (kind === "out" && !agreed) {
-      setError("Penyewa harus menyetujui syarat & ketentuan dulu.");
-      return;
-    }
     setBusy(true);
     setError(null);
     const signature = sigRef.current?.toDataURL() ?? handover?.signature ?? null;
@@ -130,7 +128,7 @@ export default function HandoverForm({
 
       {kind === "out" && (
         <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <details>
+          <details open>
             <summary className="cursor-pointer text-sm font-medium text-[#1B2A4A]">
               Syarat &amp; ketentuan sewa
             </summary>
@@ -149,6 +147,9 @@ export default function HandoverForm({
             />
             <span>Penyewa menyetujui syarat &amp; ketentuan di atas</span>
           </label>
+          <p className="text-xs text-gray-400">
+            Wajib dicentang sebelum mobil bisa ditandai keluar.
+          </p>
         </div>
       )}
 
