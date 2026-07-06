@@ -62,6 +62,8 @@ export interface RentalHandover {
   odometer_km: number | null;
   fuel_level: FuelLevel | null;
   oil_level: string | null;
+  terms_agreed: boolean;
+  terms_version: string | null;
   signature: string | null;
   inspected_at: string;
   notes: string | null;
@@ -72,6 +74,18 @@ export interface HandoverMedia {
   handover_id: string;
   type: "photo" | "video";
   storage_path: string;
+  created_at: string;
+}
+
+export type DamageSeverity = "lecet" | "penyok" | "pecah";
+
+export interface HandoverDamage {
+  id: string;
+  handover_id: string;
+  panel: string;
+  severity: DamageSeverity;
+  note: string | null;
+  photo_path: string | null;
   created_at: string;
 }
 
@@ -134,7 +148,37 @@ export const FUEL_LEVEL_LABELS: Record<FuelLevel, string> = {
   empty: "Kosong",
 };
 
-export const PAYMENT_KINDS: PaymentKind[] = ["deposit", "rental", "refund"];
+export const DAMAGE_PANELS: string[] = [
+  "Bumper depan",
+  "Bumper belakang",
+  "Kap mesin",
+  "Atap",
+  "Bagasi",
+  "Pintu depan kiri",
+  "Pintu depan kanan",
+  "Pintu belakang kiri",
+  "Pintu belakang kanan",
+  "Spion kiri",
+  "Spion kanan",
+  "Lampu depan",
+  "Lampu belakang",
+  "Velg depan kiri",
+  "Velg depan kanan",
+  "Velg belakang kiri",
+  "Velg belakang kanan",
+  "Kaca depan",
+  "Kaca belakang",
+];
+
+export const DAMAGE_SEVERITIES: DamageSeverity[] = ["lecet", "penyok", "pecah"];
+
+export const DAMAGE_SEVERITY_LABELS: Record<DamageSeverity, string> = {
+  lecet: "Lecet",
+  penyok: "Penyok",
+  pecah: "Pecah",
+};
+
+export const PAYMENT_KINDS: PaymentKind[] = ["rental", "refund"];
 
 export const PAYMENT_KIND_LABELS: Record<PaymentKind, string> = {
   deposit: "Deposit",
