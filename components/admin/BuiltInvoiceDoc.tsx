@@ -271,8 +271,12 @@ function Parties({
       <div className="mt-2 h-[2px] bg-gradient-to-r from-[#F5C518] via-[#F5C518]/60 to-transparent" />
 
       {/* Parties */}
-      <div className="grid gap-x-8 gap-y-6 pt-7 text-xs leading-relaxed sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-x-12 gap-y-6 pt-7 text-xs leading-relaxed">
         <div>
+          <Label>From</Label>
+          <KelilingBlock />
+        </div>
+        <div className="text-right">
           <Label>Billed to</Label>
           {isOperator ? (
             <LoveBangkokBlock name={billTo} />
@@ -285,10 +289,6 @@ function Parties({
               address={custAddress}
             />
           )}
-        </div>
-        <div>
-          <Label>From</Label>
-          <KelilingBlock />
         </div>
       </div>
 
