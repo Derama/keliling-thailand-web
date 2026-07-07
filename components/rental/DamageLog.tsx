@@ -147,13 +147,13 @@ export default function DamageLog({
     if (busy) return;
     setBusy(true);
     const supabase = createClient();
-    if (d.photo_path) await supabase.storage.from(BUCKET).remove([d.photo_path]);
     const { error } = await supabase.from("handover_damages").delete().eq("id", d.id);
     if (error) {
       setError(`Gagal hapus: ${error.message}`);
       setBusy(false);
       return;
     }
+    if (d.photo_path) await supabase.storage.from(BUCKET).remove([d.photo_path]);
     load();
     setBusy(false);
   }

@@ -54,6 +54,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
   useEffect(load, [load]);
 
   async function setStatus(status: RentalWithRefs["status"]) {
+    setError(null);
     const supabase = createClient();
     if (status === "out") {
       const { data: out } = await supabase
@@ -68,7 +69,6 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
         );
         return;
       }
-      setError(null);
     }
     const { error } = await supabase
       .from("rentals")
@@ -217,7 +217,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
 
       <ErrorNote message={error} />
 
-      <HandoverForm rentalId={rental.id} kind="out" />
+      <HandoverForm rentalId={rental.id} kind="out" onSaved={load} />
       <HandoverForm rentalId={rental.id} kind="in" compareTo={pickup} />
     </div>
   );

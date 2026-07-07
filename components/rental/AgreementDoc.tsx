@@ -85,7 +85,7 @@ export default function AgreementDoc({ rentalId }: { rentalId: string }) {
             <p>
               Odometer: {pickup.odometer_km ?? "—"} km · BBM:{" "}
               {pickup.fuel_level ? FUEL_LEVEL_LABELS[pickup.fuel_level] : "—"} · Oli:{" "}
-              {pickup.oil_level === "low" ? "Kurang" : "OK"}
+              {pickup.oil_level === "low" ? "Kurang" : pickup.oil_level ? "OK" : "—"}
             </p>
             {damages.length > 0 ? (
               <ul className="mt-1 list-disc pl-5">

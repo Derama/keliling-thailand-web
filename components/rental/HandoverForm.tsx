@@ -20,11 +20,14 @@ export default function HandoverForm({
   rentalId,
   kind,
   compareTo,
+  onSaved,
 }: {
   rentalId: string;
   kind: HandoverKind;
   /** Pickup readings to show alongside, when this is the return panel. */
   compareTo?: RentalHandover | null;
+  /** Notifies the parent so it can refresh state derived from this handover. */
+  onSaved?: () => void;
 }) {
   const [handover, setHandover] = useState<RentalHandover | null>(null);
   const [odo, setOdo] = useState("");
@@ -43,7 +46,11 @@ export default function HandoverForm({
       .eq("rental_id", rentalId)
       .eq("kind", kind)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error: loadErr }) => {
+        if (loadErr) {
+          setError(`Gagal memuat: ${loadErr.message}`);
+          return;
+        }
         const h = data as RentalHandover | null;
         setHandover(h);
         if (h) {
@@ -86,6 +93,7 @@ export default function HandoverForm({
     }
     setBusy(false);
     load();
+    onSaved?.();
   }
 
   return (
