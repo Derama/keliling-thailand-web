@@ -64,7 +64,7 @@ export default function VehiclesView() {
               </span>
             </div>
             <div className="mt-1 text-sm text-gray-500">
-              {v.plate} · {formatTHB(v.daily_rate_thb)}/hari · deposit {formatTHB(v.deposit_thb)}
+              {v.plate} · {formatTHB(v.daily_rate_thb)}/hari
             </div>
           </button>
         ))}

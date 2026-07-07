@@ -216,10 +216,11 @@ export default function BrandOverlay({
             fontSize: 52 * s,
             fontWeight: 800,
             lineHeight: 1.25,
+            color: brandColors.yellow,
             textShadow: "0 3px 14px rgba(0,0,0,.75)",
           }}
         >
-          {/* Each word types in on its own step, like Instagram captions. */}
+          {/* Each word pops in on its own step, Instagram Reels caption style. */}
           {words.map((word, i) => {
             const step = Math.floor((i * steps) / words.length);
             return (
@@ -230,7 +231,7 @@ export default function BrandOverlay({
                   marginRight: i < words.length - 1 ? "0.28em" : 0,
                   opacity: visibleWords !== undefined && i >= visibleWords ? 0 : undefined,
                   animation: animateCaption
-                    ? `video-caption-word-in .35s ease-out ${(step * CAPTION_STEP_SECONDS).toFixed(2)}s both`
+                    ? `video-caption-word-in .4s cubic-bezier(.34,1.56,.64,1) ${(step * CAPTION_STEP_SECONDS).toFixed(2)}s both`
                     : undefined,
                 }}
               >

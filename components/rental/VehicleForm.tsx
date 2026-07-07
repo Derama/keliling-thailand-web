@@ -12,7 +12,6 @@ interface Draft {
   name: string;
   type: string;
   daily_rate_thb: string;
-  deposit_thb: string;
   status: VehicleStatus;
   notes: string;
 }
@@ -23,7 +22,6 @@ function toDraft(v: Vehicle | null): Draft {
     name: v?.name ?? "",
     type: v?.type ?? "",
     daily_rate_thb: v ? String(v.daily_rate_thb) : "",
-    deposit_thb: v ? String(v.deposit_thb) : "",
     status: v?.status ?? "available",
     notes: v?.notes ?? "",
   };
@@ -55,7 +53,7 @@ export default function VehicleForm({
       name: draft.name.trim(),
       type: draft.type.trim() || null,
       daily_rate_thb: Number(draft.daily_rate_thb) || 0,
-      deposit_thb: Number(draft.deposit_thb) || 0,
+      deposit_thb: 0,
       status: draft.status,
       notes: draft.notes.trim() || null,
     };
@@ -83,8 +81,8 @@ export default function VehicleForm({
         <Field label="Nama / model">
           <input required value={draft.name} onChange={(e) => set("name", e.target.value)} className={inputCls} placeholder="Toyota Vios 2022" />
         </Field>
-        <Field label="Tipe">
-          <input value={draft.type} onChange={(e) => set("type", e.target.value)} className={inputCls} placeholder="Sedan / SUV" />
+        <Field label="Tarif / hari (THB)">
+          <input type="number" min="0" value={draft.daily_rate_thb} onChange={(e) => set("daily_rate_thb", e.target.value)} className={inputCls} />
         </Field>
         <Field label="Status">
           <Select
@@ -93,11 +91,8 @@ export default function VehicleForm({
             options={VEHICLE_STATUSES.map((s) => ({ value: s, label: VEHICLE_STATUS_LABELS[s] }))}
           />
         </Field>
-        <Field label="Tarif / hari (THB)">
-          <input type="number" min="0" value={draft.daily_rate_thb} onChange={(e) => set("daily_rate_thb", e.target.value)} className={inputCls} />
-        </Field>
-        <Field label="Deposit (THB)">
-          <input type="number" min="0" value={draft.deposit_thb} onChange={(e) => set("deposit_thb", e.target.value)} className={inputCls} />
+        <Field label="Tipe">
+          <input value={draft.type} onChange={(e) => set("type", e.target.value)} className={inputCls} placeholder="Sedan / SUV" />
         </Field>
       </div>
       <Field label="Catatan">

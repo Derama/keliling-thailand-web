@@ -8,6 +8,8 @@ import { Field, inputCls, btnCls, ErrorNote } from "@/components/admin/ui";
 import Select from "@/components/admin/Select";
 import SignaturePad, { type SignaturePadHandle } from "@/components/rental/SignaturePad";
 import MediaUpload from "@/components/rental/MediaUpload";
+import DamageLog from "@/components/rental/DamageLog";
+import { RENTAL_TERMS, TERMS_VERSION } from "@/lib/rental/terms";
 
 const TITLES: Record<HandoverKind, string> = {
   out: "Serah terima (keluar)",
@@ -18,17 +20,21 @@ export default function HandoverForm({
   rentalId,
   kind,
   compareTo,
+  onSaved,
 }: {
   rentalId: string;
   kind: HandoverKind;
   /** Pickup readings to show alongside, when this is the return panel. */
   compareTo?: RentalHandover | null;
+  /** Notifies the parent so it can refresh state derived from this handover. */
+  onSaved?: () => void;
 }) {
   const [handover, setHandover] = useState<RentalHandover | null>(null);
   const [odo, setOdo] = useState("");
   const [fuel, setFuel] = useState<FuelLevel>("full");
   const [oil, setOil] = useState("ok");
   const [notes, setNotes] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const sigRef = useRef<SignaturePadHandle>(null);
@@ -40,7 +46,11 @@ export default function HandoverForm({
       .eq("rental_id", rentalId)
       .eq("kind", kind)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error: loadErr }) => {
+        if (loadErr) {
+          setError(`Gagal memuat: ${loadErr.message}`);
+          return;
+        }
         const h = data as RentalHandover | null;
         setHandover(h);
         if (h) {
@@ -48,6 +58,9 @@ export default function HandoverForm({
           setFuel((h.fuel_level as FuelLevel) ?? "full");
           setOil(h.oil_level ?? "ok");
           setNotes(h.notes ?? "");
+          setAgreed(h.terms_agreed ?? false);
+        } else {
+          setAgreed(false);
         }
       });
   }, [rentalId, kind]);
@@ -66,6 +79,9 @@ export default function HandoverForm({
       oil_level: oil || null,
       signature,
       notes: notes.trim() || null,
+      ...(kind === "out"
+        ? { terms_agreed: agreed, terms_version: TERMS_VERSION }
+        : {}),
     };
     const { error } = await createClient()
       .from("rental_handovers")
@@ -77,6 +93,7 @@ export default function HandoverForm({
     }
     setBusy(false);
     load();
+    onSaved?.();
   }
 
   return (
@@ -113,9 +130,36 @@ export default function HandoverForm({
         </Field>
       </div>
 
-      <Field label="Catatan kondisi / lecet">
-        <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className={inputCls} placeholder="Lecet pintu kanan, dst." />
+      <Field label="Catatan umum">
+        <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className={inputCls} placeholder="Catatan tambahan…" />
       </Field>
+
+      {kind === "out" && (
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <details open>
+            <summary className="cursor-pointer text-sm font-medium text-[#1B2A4A]">
+              Syarat &amp; ketentuan sewa
+            </summary>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs text-gray-600">
+              {RENTAL_TERMS.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
+            </ol>
+          </details>
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span>Penyewa menyetujui syarat &amp; ketentuan di atas</span>
+          </label>
+          <p className="text-xs text-gray-400">
+            Wajib dicentang sebelum mobil bisa ditandai keluar.
+          </p>
+        </div>
+      )}
 
       <div>
         <span className="mb-1 block text-sm font-medium text-gray-700">Tanda tangan penyewa</span>
@@ -133,6 +177,10 @@ export default function HandoverForm({
 
       {handover && (
         <div className="space-y-3 border-t border-gray-100 pt-3">
+          <DamageLog
+            handoverId={handover.id}
+            compareHandoverId={kind === "in" ? compareTo?.id : undefined}
+          />
           <MediaUpload handoverId={handover.id} type="photo" label="Foto" />
           <MediaUpload handoverId={handover.id} type="video" label="Video" />
         </div>

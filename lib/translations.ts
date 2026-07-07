@@ -606,6 +606,7 @@ export const translations = {
       licenseShort: "Lisensi Pariwisata No. 11/13151",
       rights: "Hak cipta dilindungi.",
       admin: "Admin",
+      rental: "Rental",
     },
   },
   en: {
@@ -1140,6 +1141,7 @@ export const translations = {
       licenseShort: "Tourism License No. 11/13151",
       rights: "All rights reserved.",
       admin: "Admin",
+      rental: "Rental",
     },
   },
   th: {
@@ -1670,6 +1672,7 @@ export const translations = {
       licenseShort: "ใบอนุญาตธุรกิจนำเที่ยวเลขที่ 11/13151",
       rights: "สงวนลิขสิทธิ์",
       admin: "แอดมิน",
+      rental: "เช่ารถ",
     },
   },
 } as const;

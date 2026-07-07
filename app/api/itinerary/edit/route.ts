@@ -76,7 +76,7 @@ You receive the CURRENT itinerary as JSON and an instruction from the admin. App
 - Preserve every "id" you are given. Reuse the same id for any day / activity / place you keep or modify. Only invent a new id (any short unique string) for an item you genuinely add.
 - All text stays in Bahasa Indonesia.
 - Times stay realistic for Thailand traffic.
-- For any attraction you ADD, set "places[].activity" to begin with the attraction's exact name, then a warm 1-2 sentence Indonesian description.
+- For any attraction you ADD, set "places[].activity" to the format "Nama Atraksi: deskripsi" — the attraction's exact name, a colon, then ONE warm Indonesian sentence of 6-10 words.
 - Never invent prices. Never mention competitors.
 - Do not change the number of days unless the instruction asks. Return the FULL updated itinerary (all days), not just the changed part.`;
 

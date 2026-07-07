@@ -21,7 +21,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
   const [payments, setPayments] = useState<RentalPayment[]>([]);
   const [pickup, setPickup] = useState<RentalHandover | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [payKind, setPayKind] = useState<PaymentKind>("deposit");
+  const [payKind, setPayKind] = useState<PaymentKind>("rental");
   const [payAmount, setPayAmount] = useState("");
   const [payMethod, setPayMethod] = useState("");
 
@@ -54,7 +54,22 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
   useEffect(load, [load]);
 
   async function setStatus(status: RentalWithRefs["status"]) {
+    setError(null);
     const supabase = createClient();
+    if (status === "out") {
+      const { data: out } = await supabase
+        .from("rental_handovers")
+        .select("terms_agreed")
+        .eq("rental_id", rentalId)
+        .eq("kind", "out")
+        .maybeSingle();
+      if (!out?.terms_agreed) {
+        setError(
+          "Belum bisa tandai keluar: simpan serah terima (keluar) dengan centang persetujuan S&K dulu."
+        );
+        return;
+      }
+    }
     const { error } = await supabase
       .from("rentals")
       .update({ status, updated_at: new Date().toISOString() })
@@ -99,7 +114,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
     );
   }
 
-  // Ledger: deposit + rental are inflows; refund is an outflow.
+  // Ledger: rental (and legacy deposit) inflow; refund outflow.
   const balance = payments.reduce(
     (sum, p) => sum + (p.kind === "refund" ? -p.amount_thb : p.amount_thb),
     0
@@ -119,9 +134,17 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
             {rental.vehicles?.name} · {rental.renters?.name}
           </p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-sm font-medium ${RENTAL_STATUS_COLORS[rental.status]}`}>
-          {RENTAL_STATUS_LABELS[rental.status]}
-        </span>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/rental/rentals/${rental.id}/agreement`}
+            className="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+          >
+            Perjanjian
+          </Link>
+          <span className={`rounded-full px-3 py-1 text-sm font-medium ${RENTAL_STATUS_COLORS[rental.status]}`}>
+            {RENTAL_STATUS_LABELS[rental.status]}
+          </span>
+        </div>
       </div>
 
       <section className="grid gap-3 rounded-xl border border-gray-200 bg-white p-5 sm:grid-cols-2">
@@ -135,10 +158,6 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
             {formatTHB(rental.total_thb)}
             {totalIdr != null && <span className="text-gray-500"> ≈ {formatIDR(totalIdr)}</span>}
           </p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-500">Deposit</p>
-          <p>{formatTHB(rental.deposit_thb)}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Tarif/hari</p>
@@ -198,7 +217,7 @@ export default function RentalDetail({ rentalId }: { rentalId: string }) {
 
       <ErrorNote message={error} />
 
-      <HandoverForm rentalId={rental.id} kind="out" />
+      <HandoverForm rentalId={rental.id} kind="out" onSaved={load} />
       <HandoverForm rentalId={rental.id} kind="in" compareTo={pickup} />
     </div>
   );
