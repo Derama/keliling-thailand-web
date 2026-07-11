@@ -96,10 +96,6 @@ export default function Footer() {
         <Link href="/admin" className="hover:text-[#F5C518]">
           {t.footer.admin}
         </Link>
-        <span className="mx-1">·</span>
-        <Link href="/rental" className="hover:text-[#F5C518]">
-          {t.footer.rental}
-        </Link>
       </div>
     </footer>
   );
