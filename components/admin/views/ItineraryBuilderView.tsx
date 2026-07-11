@@ -2263,48 +2263,58 @@ function DayPlaces({
           </span>
         )}
       </p>
-      <div className="flex flex-wrap items-center gap-2">
-        <Select
-          value={city}
-          onChange={(v) => {
-            setCity(v);
-            setPlaceId("");
-          }}
-          className="w-auto bg-white"
-          placeholder="— belum ada tempat —"
-          options={cities.map((c) => ({ value: c, label: c }))}
-        />
-        <Select
-          value={placeId}
-          onChange={setPlaceId}
-          className="w-auto bg-white"
-          placeholder="— pilih tempat —"
-          options={[
-            { value: "", label: "— pilih tempat —" },
-            ...inCity.map((p) => ({
-              value: p.id,
-              label: `${p.name}${p.image_url ? " 🖼" : ""}`,
-            })),
-          ]}
-        />
-        <button
-          type="button"
-          onClick={addFromPlace}
-          disabled={!placeId || full}
-          className={`${btnCls} disabled:opacity-50`}
-        >
-          + Tambah
-        </button>
-        <button
-          type="button"
-          onClick={() => setCustomOpen((v) => !v)}
-          className="text-sm text-blue-600 hover:underline"
-        >
-          {customOpen ? "tutup" : "+ tempat baru / unggah foto"}
-        </button>
-      </div>
+      {full ? (
+        // Day is at capacity — the add controls can't do anything, so show a
+        // clear reason instead of a silently-disabled button + dead form.
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          Hari ini sudah penuh ({MAX_DAY_PHOTOS}/{MAX_DAY_PHOTOS} foto). Hapus
+          salah satu foto di bawah dulu, atau tambah hari baru untuk menambahkan
+          tempat lain.
+        </p>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          <Select
+            value={city}
+            onChange={(v) => {
+              setCity(v);
+              setPlaceId("");
+            }}
+            className="w-auto bg-white"
+            placeholder="— belum ada tempat —"
+            options={cities.map((c) => ({ value: c, label: c }))}
+          />
+          <Select
+            value={placeId}
+            onChange={setPlaceId}
+            className="w-auto bg-white"
+            placeholder="— pilih tempat —"
+            options={[
+              { value: "", label: "— pilih tempat —" },
+              ...inCity.map((p) => ({
+                value: p.id,
+                label: `${p.name}${p.image_url ? " 🖼" : ""}`,
+              })),
+            ]}
+          />
+          <button
+            type="button"
+            onClick={addFromPlace}
+            disabled={!placeId}
+            className={`${btnCls} disabled:opacity-50`}
+          >
+            + Tambah
+          </button>
+          <button
+            type="button"
+            onClick={() => setCustomOpen((v) => !v)}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            {customOpen ? "tutup" : "+ tempat baru / unggah foto"}
+          </button>
+        </div>
+      )}
 
-      {customOpen && (
+      {customOpen && !full && (
         <div className="mt-2 space-y-2 rounded-lg border border-gray-200 bg-white p-3">
           {/* Photo: upload file or paste URL, with preview */}
           <div className="flex items-start gap-3">
