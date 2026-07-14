@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type NavTab = { id: string; label: string };
 
@@ -146,6 +146,22 @@ export default function AdminBottomNav({
 }) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  // iOS Safari detaches position:fixed from the visual viewport while the
+  // on-screen keyboard is up, so the bar drifts mid-page when scrolling a
+  // focused form. Hide it whenever the keyboard eats a chunk of the viewport.
+  const [kbOpen, setKbOpen] = useState(false);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onChange = () => setKbOpen(vv.height < window.innerHeight * 0.75);
+    vv.addEventListener("resize", onChange);
+    vv.addEventListener("scroll", onChange);
+    return () => {
+      vv.removeEventListener("resize", onChange);
+      vv.removeEventListener("scroll", onChange);
+    };
+  }, []);
+
   const primary = primaryIds
     .map((id) => tabs.find((t) => t.id === id))
     .filter((t): t is NavTab => Boolean(t));
@@ -195,7 +211,11 @@ export default function AdminBottomNav({
         </div>
       )}
 
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 flex border-t border-white/10 bg-[#1B2A4A] pb-[env(safe-area-inset-bottom)] sm:hidden">
+      <nav
+        className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#1B2A4A] pb-[env(safe-area-inset-bottom)] sm:hidden ${
+          kbOpen ? "hidden" : "flex"
+        }`}
+      >
         {primary.map((t) => (
           <button
             key={t.id}
