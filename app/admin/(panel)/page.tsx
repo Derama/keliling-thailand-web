@@ -55,15 +55,17 @@ export default function AdminPage() {
   const [active, setActive] = useState<string>(TABS[0].id);
 
   // Restore last-opened tab after mount (avoids hydration mismatch).
+  // sessionStorage, not localStorage: a reload mid-work keeps the tab, but a
+  // fresh visit or login always lands on the Dashboard.
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount localStorage sync, avoids hydration mismatch
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount storage sync, avoids hydration mismatch
     if (saved && TABS.some((t) => t.id === saved)) setActive(saved);
   }, []);
 
   function select(id: string) {
     setActive(id);
-    localStorage.setItem(STORAGE_KEY, id);
+    sessionStorage.setItem(STORAGE_KEY, id);
   }
 
   const ActiveView = TABS.find((t) => t.id === active)?.View ?? TABS[0].View;

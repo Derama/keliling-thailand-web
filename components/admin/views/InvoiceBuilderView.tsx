@@ -174,7 +174,8 @@ export default function InvoiceBuilderView({
   const [custAddress, setCustAddress] = useState("");
 
   // Personal generator — type a rough target, get a multi-row invoice built
-  // from random catalog items whose total drifts 0–10% up. Personal use only.
+  // from random catalog items whose total lands just above the target with the
+  // leading digits intact (920.000 → 92x.xxx). Personal use only.
   const [aiTarget, setAiTarget] = useState(0);
   const [aiErr, setAiErr] = useState("");
 
@@ -631,19 +632,26 @@ export default function InvoiceBuilderView({
     setAiErr("");
 
     const T = aiTarget;
-    const hi = Math.round((T * 1.1) / 100) * 100; // land in [T, +10%], upward
+    // Land just above the target with the leading digits intact: overshoot a
+    // random 0.2–1% (e.g. 920.000 → 92x.xxx), never a flat +10%.
+    const hi = T + Math.max(100, Math.round((T * (0.002 + Math.random() * 0.008)) / 100) * 100);
     // Skip items pricier than the target so one unit can't blow past it.
     const usePool = all.filter((it) => it.sell <= T);
     const pool = usePool.length ? usePool : all;
 
-    // Few distinct rows (fits ≤ 2 pages); quantity does the work, not row count.
-    const rowCount = Math.min(pool.length, 9 + Math.floor(Math.random() * 5)); // 9–13
+    // 15–22 distinct rows (fills ~2 pages); quantity closes the remaining gap.
+    const rowCount = Math.min(pool.length, 15 + Math.floor(Math.random() * 8)); // 15–22
     const items = shuffle(pool).slice(0, rowCount);
+
+    // Quantity ceiling scales with the target so a cheap catalog can still
+    // reach big totals (500k–950k+) instead of stalling around 500k.
+    const avgSell = items.reduce((s, it) => s + it.sell, 0) / items.length;
+    const qtyMax = Math.max(20, Math.ceil(hi / (rowCount * avgSell)) + 5);
 
     // Seed each row with a quantity near the per-row share, then nudge to target.
     const avg = T / rowCount;
     const qty = items.map((it) =>
-      Math.min(20, Math.max(1, Math.round(avg / it.sell)))
+      Math.min(qtyMax, Math.max(1, Math.round(avg / it.sell)))
     );
     let sum = items.reduce((s, it, i) => s + it.sell * qty[i], 0);
 
@@ -658,7 +666,7 @@ export default function InvoiceBuilderView({
     while (sum < T && guard++ < 5000) {
       const fit = items
         .map((_, i) => i)
-        .filter((i) => qty[i] < 20 && items[i].sell <= hi - sum);
+        .filter((i) => qty[i] < qtyMax && items[i].sell <= hi - sum);
       if (fit.length) {
         const i = fit[Math.floor(Math.random() * fit.length)];
         qty[i]++;
@@ -965,9 +973,9 @@ export default function InvoiceBuilderView({
               </div>
               {aiErr && <p className="text-xs text-red-600">{aiErr}</p>}
               <p className="text-xs text-gray-500">
-                Ambil ±9–13 item acak dari katalog (modal & margin asli), lalu atur
-                quantity sampai total naik 0–10% dari target (cth 500.000 →
-                510.000–550.000). Maks 2 halaman. Tekan ulang untuk acak baru.
+                Ambil 15–22 item acak dari katalog (modal & margin asli), lalu
+                atur quantity sampai total mendarat sedikit di atas target (cth
+                920.000 → 92x.xxx). Maks 2 halaman. Tekan ulang untuk acak baru.
               </p>
             </section>
           )}

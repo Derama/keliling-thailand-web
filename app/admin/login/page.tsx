@@ -27,7 +27,7 @@ export default function LoginPage() {
       return;
     }
     // Fresh login always lands on the Dashboard tab, not the last-opened one.
-    localStorage.setItem("admin-tab", "dashboard");
+    sessionStorage.setItem("admin-tab", "dashboard");
     router.push("/admin");
     router.refresh();
   }
