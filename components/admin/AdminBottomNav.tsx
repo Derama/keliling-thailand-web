@@ -183,20 +183,23 @@ export default function AdminBottomNav({
       {/* Overflow sheet */}
       {sheetOpen && (
         <div
-          className="no-print fixed inset-0 z-40 bg-black/40 sm:hidden"
+          className="no-print fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] animate-[planner-overlay-in_0.2s_ease-out_both] sm:hidden"
           onClick={() => setSheetOpen(false)}
         >
           <div
-            className="absolute inset-x-0 bottom-0 rounded-t-2xl bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+            className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-white px-4 pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.2)] animate-[sheetUp_0.28s_var(--ease-out-quart)_both]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-gray-300" />
+            <p className="mb-3 px-1 text-sm font-bold text-[#1B2A4A]">
+              Menu lainnya
+            </p>
             <div className="grid grid-cols-3 gap-2">
               {overflow.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => pick(t.id)}
-                  className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-center text-xs font-medium ${
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-center text-xs font-medium transition-colors active:bg-gray-50 ${
                     active === t.id
                       ? "border-[#F5C518] bg-[#F5C518]/10 text-[#1B2A4A]"
                       : "border-gray-200 text-gray-600"
