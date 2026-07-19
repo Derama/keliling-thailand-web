@@ -22,12 +22,19 @@ export const KELILING_THAILAND = {
   ] as Contact[],
 } as const;
 
-// Personal account — used only for personal-draft invoices.
-export const PERSONAL_PAYMENT = {
-  bank: "Kasikorn Bank",
-  account: "0691789756",
-  holder: "Deva Adithya Rama",
-} as const;
+// Personal accounts — used only for personal-draft invoices.
+export const PERSONAL_PAYMENT = [
+  {
+    bank: "Kasikorn Bank",
+    account: "0691789756",
+    holder: "Deva Adithya Rama",
+  },
+  {
+    bank: "Bangkok Bank",
+    account: "8790537602",
+    holder: "Deva Adithya Rama",
+  },
+] as const;
 
 export const LOVE_BANGKOK = {
   name: "Love Bangkok.Co.Ltd",

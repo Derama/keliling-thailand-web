@@ -417,10 +417,12 @@ function Totals({
               {LOVE_BANGKOK.bank.account} — {LOVE_BANGKOK.bank.holder}
             </p>
           ) : mode === "personal" ? (
-            <p className="text-gray-900">
-              <span className="font-semibold">{PERSONAL_PAYMENT.bank}</span> ·{" "}
-              {PERSONAL_PAYMENT.account} — {PERSONAL_PAYMENT.holder}
-            </p>
+            PERSONAL_PAYMENT.map((acc) => (
+              <p key={acc.account} className="text-gray-900">
+                <span className="font-semibold">{acc.bank}</span> ·{" "}
+                {acc.account} — {acc.holder}
+              </p>
+            ))
           ) : (
             <p className="text-gray-900">
               <span className="font-semibold">Bank Central Asia (BCA)</span> ·
