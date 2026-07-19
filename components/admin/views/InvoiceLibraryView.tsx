@@ -1,6 +1,8 @@
 "use client";
 
-import DocumentLibraryView from "@/components/admin/views/DocumentLibraryView";
+import DocumentLibraryView, {
+  NEW_DOC_ID,
+} from "@/components/admin/views/DocumentLibraryView";
 import InvoiceBuilderView, {
   type InvoiceDraft,
 } from "@/components/admin/views/InvoiceBuilderView";
@@ -14,9 +16,14 @@ export default function InvoiceLibraryView() {
       newLabel="+ Invoice baru"
       emptyLabel="Belum ada invoice tersimpan."
       createDraft={() => ({}) as InvoiceDraft}
-      renderBuilder={(id, onExit) => (
-        <InvoiceBuilderView templateId={id} onExit={onExit} />
-      )}
+      deferCreate
+      renderBuilder={(id, onExit) =>
+        id === NEW_DOC_ID ? (
+          <InvoiceBuilderView newTemplate onExit={onExit} />
+        ) : (
+          <InvoiceBuilderView templateId={id} onExit={onExit} />
+        )
+      }
     />
   );
 }

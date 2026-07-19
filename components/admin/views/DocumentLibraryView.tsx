@@ -15,6 +15,9 @@ import {
   type TemplateRow,
 } from "@/lib/admin/docLibrary";
 
+/** Sentinel openId for a deferred (not-yet-persisted) new document. */
+export const NEW_DOC_ID = "new";
+
 interface DocumentLibraryViewProps<T> {
   kind: TemplateKind;
   heading: string;
@@ -23,6 +26,12 @@ interface DocumentLibraryViewProps<T> {
   emptyLabel: string;
   createDraft: () => T;
   renderBuilder: (id: string, onExit: () => void) => React.ReactNode;
+  /**
+   * Open new documents without creating a DB row — the builder is rendered
+   * with NEW_DOC_ID and persists itself on first save (throwaway drafts never
+   * hit the database).
+   */
+  deferCreate?: boolean;
 }
 
 export default function DocumentLibraryView<T>({
@@ -33,6 +42,7 @@ export default function DocumentLibraryView<T>({
   emptyLabel,
   createDraft,
   renderBuilder,
+  deferCreate,
 }: DocumentLibraryViewProps<T>) {
   const [rows, setRows] = useState<TemplateRow<T>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +87,10 @@ export default function DocumentLibraryView<T>({
   }, [load]);
 
   async function createNew() {
+    if (deferCreate) {
+      setOpenId(NEW_DOC_ID);
+      return;
+    }
     setBusy(true);
     setError(null);
     try {

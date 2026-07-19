@@ -104,6 +104,7 @@ export default function InvoiceBuilderView({
   orderId,
   onInvoiceSaved,
   templateId,
+  newTemplate,
   onExit,
 }: {
   /** When set, the invoice loads from / saves to this order. */
@@ -112,6 +113,8 @@ export default function InvoiceBuilderView({
   onInvoiceSaved?: () => void;
   /** Standalone saved-template row edited outside an order. */
   templateId?: string;
+  /** Fresh standalone invoice — no DB row yet; one is created on first save. */
+  newTemplate?: boolean;
   /** Return to the saved Invoice list. */
   onExit?: () => void;
 } = {}) {
@@ -151,6 +154,13 @@ export default function InvoiceBuilderView({
   // Library mirror: one document_templates row per order, autosaved in sync.
   const [libraryId, setLibraryId] = useState<string | null>(null);
   const [templateTitle, setTemplateTitle] = useState("");
+  // Standalone (library) flow: "+ Invoice baru" opens the builder with no DB
+  // row at all — one is created lazily on the first non-personal save, so a
+  // personal invoice never touches the database no matter how the user leaves.
+  const isLibrary = Boolean(templateId || newTemplate);
+  // Ref (not state — nothing renders it) so an in-flight save never
+  // double-creates the row.
+  const tplIdRef = useRef<string | null>(templateId ?? null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -374,16 +384,34 @@ export default function InvoiceBuilderView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, JSON.stringify(draft)]);
 
-  async function saveTemplateDraft() {
-    if (!templateId) return;
+  // Serialized so an autosave tick and an explicit "Simpan" can never race a
+  // lazy row creation into duplicates.
+  const templateSaveChain = useRef<Promise<void>>(Promise.resolve());
+  function saveTemplateDraft(): Promise<void> {
+    templateSaveChain.current = templateSaveChain.current
+      .catch(() => {})
+      .then(doSaveTemplateDraft);
+    return templateSaveChain.current;
+  }
+
+  async function doSaveTemplateDraft() {
+    if (!isLibrary) return;
+    const d = draftRef.current;
+    // Personal invoices are download-only — never persisted to the library.
+    if (d.mode === "personal") return;
+    // Nothing worth a row yet — don't litter the list with empty invoices.
+    if (!tplIdRef.current && d.lines.length === 0 && !templateTitle.trim())
+      return;
     setSaveState("saving");
     setSaveErr(null);
+    const title = templateTitle.trim() || d.invoiceNumber || "Invoice";
+    const payload = { ...d, libraryId: null, savedInvoiceId: null };
     try {
-      await saveTemplate(
-        templateId,
-        templateTitle.trim() || invoiceNumber || "Invoice",
-        { ...draft, libraryId: null, savedInvoiceId: null }
-      );
+      if (tplIdRef.current) {
+        await saveTemplate(tplIdRef.current, title, payload);
+      } else {
+        tplIdRef.current = await createTemplate("invoice", title, payload, null);
+      }
       setSaveState("saved");
     } catch (cause) {
       setSaveErr(cause instanceof Error ? cause.message : "Gagal menyimpan invoice.");
@@ -392,16 +420,19 @@ export default function InvoiceBuilderView({
   }
 
   useEffect(() => {
-    if (!templateId || !hydrated.current) return;
+    if (!isLibrary || !hydrated.current) return;
     const t = setTimeout(() => {
       void saveTemplateDraft();
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId, templateTitle, JSON.stringify(draft)]);
+  }, [isLibrary, templateTitle, JSON.stringify(draft)]);
 
   async function exitTemplate() {
-    if (templateId) await saveTemplateDraft();
+    // Personal drafts leave nothing behind — no row was ever created for them.
+    if (isLibrary && draftRef.current.mode !== "personal") {
+      await saveTemplateDraft();
+    }
     onExit?.();
   }
 
@@ -744,7 +775,7 @@ export default function InvoiceBuilderView({
               ← Daftar invoice
             </button>
           )}
-          {templateId ? (
+          {isLibrary ? (
             <input
               value={templateTitle}
               onChange={(event) => setTemplateTitle(event.target.value)}
@@ -760,7 +791,7 @@ export default function InvoiceBuilderView({
           </p>
         </div>
         <div className="flex flex-wrap items-start gap-2">
-          {templateId && (
+          {isLibrary && mode !== "personal" && (
             <button
               type="button"
               onClick={() => void saveTemplateDraft()}
@@ -977,6 +1008,12 @@ export default function InvoiceBuilderView({
                 atur quantity sampai total mendarat sedikit di atas target (cth
                 920.000 → 92x.xxx). Maks 2 halaman. Tekan ulang untuk acak baru.
               </p>
+              {isLibrary && (
+                <p className="text-xs font-semibold text-amber-700">
+                  Invoice personal tidak disimpan — hanya untuk di-download /
+                  print, lalu hilang saat keluar.
+                </p>
+              )}
             </section>
           )}
 
