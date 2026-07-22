@@ -250,10 +250,12 @@ export default function ReviewEditor({
       </section>
 
       {/* Preview */}
-      <section className="flex justify-center rounded-xl border border-gray-200 bg-gray-50 p-5">
+      <section className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="flex justify-center">
         <ScaledFrame ref={nodeRef} format={format} maxWidth={360}>
           <Component data={data} format={format} />
         </ScaledFrame>
+        </div>
       </section>
     </div>
   );

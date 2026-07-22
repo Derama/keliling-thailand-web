@@ -310,7 +310,7 @@ export default function JourneyEditor({
             </button>
           ))}
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center overflow-hidden">
           <ScaledFrame format={format} maxWidth={360}>
             <Component data={data} format={format} slideIndex={previewIndex} />
           </ScaledFrame>
