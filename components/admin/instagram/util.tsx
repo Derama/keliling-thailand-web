@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { FORMAT_SIZES, type PostFormat } from "@/lib/admin/instagram";
 
 /** Pull a readable message out of Error | Supabase error | anything. */
@@ -56,15 +56,29 @@ export function PhotoDrop({
 /**
  * Renders children at full 1080px export size inside a scaled wrapper.
  * The forwarded ref points at the FULL-SIZE node so export captures 1080px.
+ * Measures its container so it never overflows on narrow screens.
  */
 export const ScaledFrame = forwardRef<
   HTMLDivElement,
   { format: PostFormat; maxWidth?: number; children: React.ReactNode }
 >(function ScaledFrame({ format, maxWidth = 360, children }, ref) {
   const { w, h } = FORMAT_SIZES[format];
-  const scale = maxWidth / w;
+  const outerRef = useRef<HTMLDivElement>(null);
+  const [renderWidth, setRenderWidth] = useState(maxWidth);
+
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const update = () => setRenderWidth(Math.min(maxWidth, el.clientWidth));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [maxWidth]);
+
+  const scale = renderWidth / w;
   return (
-    <div style={{ width: maxWidth, height: h * scale, overflow: "hidden" }}>
+    <div ref={outerRef} style={{ width: "100%", maxWidth: maxWidth, height: h * scale, overflow: "hidden" }}>
       <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: w, height: h }}>
         <div ref={ref}>{children}</div>
       </div>
