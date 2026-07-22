@@ -193,6 +193,9 @@ export default function InvoiceBuilderView({
   // refreshed once from a free no-key FX API. Always editable by hand.
   const [idrRate, setIdrRate] = useState(450);
   const [rateNote, setRateNote] = useState("Kurs manual");
+  // True once a saved draft has set the rate — prevents the live FX fetch
+  // from overwriting a rate the user already locked in for bookkeeping.
+  const rateFromDraftRef = useRef(false);
 
   useEffect(() => {
     let on = true;
@@ -200,12 +203,15 @@ export default function InvoiceBuilderView({
       .then((r) => r.json())
       .then((d) => {
         const rate = d?.rate;
-        if (on && typeof rate === "number" && rate > 0) {
+        if (!on) return;
+        if (rateFromDraftRef.current) {
+          setRateNote("Kurs tersimpan (terkunci)");
+        } else if (typeof rate === "number" && rate > 0) {
           setIdrRate(Math.round(rate));
           setRateNote("Kurs live");
         }
       })
-      .catch(() => on && setRateNote("Kurs manual (API gagal)"));
+      .catch(() => on && !rateFromDraftRef.current && setRateNote("Kurs manual (API gagal)"));
     return () => {
       on = false;
     };
@@ -230,7 +236,10 @@ export default function InvoiceBuilderView({
     setCustPhone(d.custPhone ?? "");
     setCustEmail(d.custEmail ?? "");
     setCustAddress(d.custAddress ?? "");
-    if (typeof d.idrRate === "number") setIdrRate(d.idrRate);
+    if (typeof d.idrRate === "number") {
+      setIdrRate(d.idrRate);
+      rateFromDraftRef.current = true;
+    }
     setSavedInvoice(d.savedInvoiceId ?? null);
     setLibraryId(d.libraryId ?? null);
   }

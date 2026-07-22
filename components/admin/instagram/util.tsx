@@ -64,7 +64,7 @@ export const ScaledFrame = forwardRef<
   const { w, h } = FORMAT_SIZES[format];
   const scale = maxWidth / w;
   return (
-    <div style={{ width: maxWidth, height: h * scale }}>
+    <div style={{ width: maxWidth, height: h * scale, overflow: "hidden" }}>
       <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: w, height: h }}>
         <div ref={ref}>{children}</div>
       </div>

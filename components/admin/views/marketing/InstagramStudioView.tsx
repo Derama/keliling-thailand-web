@@ -68,9 +68,9 @@ export default function InstagramStudioView() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold text-[#1B2A4A]">Instagram Studio</h1>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           <button className={tab === "make" ? btnCls : btnSecondaryCls} onClick={() => setTab("make")}>Editor</button>
           <button className={tab === "gallery" ? btnCls : btnSecondaryCls} onClick={openGallery}>Galeri</button>
         </div>
