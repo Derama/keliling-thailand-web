@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useLayoutEffect, useRef, useState } from "react";
 import { FORMAT_SIZES, type PostFormat } from "@/lib/admin/instagram";
 
 /** Pull a readable message out of Error | Supabase error | anything. */
@@ -66,7 +66,7 @@ export const ScaledFrame = forwardRef<
   const outerRef = useRef<HTMLDivElement>(null);
   const [renderWidth, setRenderWidth] = useState(maxWidth);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     const update = () => setRenderWidth(Math.min(maxWidth, el.clientWidth));
