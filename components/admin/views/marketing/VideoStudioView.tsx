@@ -164,10 +164,10 @@ export default function VideoStudioView() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold text-[#1B2A4A]">Video Studio</h1>
         {videoUrl && dims && (
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <button className={tab === "edit" ? btnCls : btnSecondaryCls} onClick={() => setTab("edit")}>Editor</button>
             <button className={tab === "thumbnail" ? btnCls : btnSecondaryCls} onClick={() => setTab("thumbnail")}>Thumbnail</button>
           </div>
