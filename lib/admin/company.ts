@@ -34,6 +34,11 @@ export const PERSONAL_PAYMENT = [
     account: "8790537602",
     holder: "Deva Adithya Rama",
   },
+  {
+    bank: "Siam Commercial Bank",
+    account: "2472693148",
+    holder: "Deva Adithya Rama",
+  },
 ] as const;
 
 export const LOVE_BANGKOK = {
