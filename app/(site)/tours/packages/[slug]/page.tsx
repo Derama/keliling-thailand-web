@@ -29,12 +29,12 @@ export async function generateMetadata({
   const cities = pkg.cityIds.map((id) => cityNames[id].toLowerCase());
 
   return {
-    title: `Paket Tur ${title} — Itinerary Lengkap`,
+    title: `Paket Tour ${title} — Itinerary Lengkap`,
     description,
-    keywords: `paket tur ${cities.join(" ")}, tur ${title.toLowerCase()}, paket wisata thailand ${pkg.days} hari, group trip thailand`,
+    keywords: `paket tour ${cities.join(" ")}, tour ${title.toLowerCase()}, paket wisata thailand ${pkg.days} hari, group trip thailand`,
     alternates: { canonical: `/tours/packages/${pkg.id}` },
     openGraph: {
-      title: `Paket Tur ${title}`,
+      title: `Paket Tour ${title}`,
       description,
       url: `/tours/packages/${pkg.id}`,
       type: "website",
@@ -60,7 +60,7 @@ export default async function PackageDetailPage({
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Beranda", item: siteUrl },
-      { "@type": "ListItem", position: 2, name: "Tur", item: `${siteUrl}/tours` },
+      { "@type": "ListItem", position: 2, name: "Tour", item: `${siteUrl}/tours` },
       { "@type": "ListItem", position: 3, name: title, item: pageUrl },
     ],
   };
@@ -68,7 +68,7 @@ export default async function PackageDetailPage({
   const tripLd = {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
-    name: `Paket Tur ${title}`,
+    name: `Paket Tour ${title}`,
     description:
       packagesId.descriptions[pkg.id as keyof typeof packagesId.descriptions],
     url: pageUrl,

@@ -38,13 +38,13 @@ export async function generateMetadata({
     .slice(0, 3)
     .map((a) => attractionNames[a.id])
     .join(", ");
-  const title = `Tur Privat ${name} — Harga & Itinerary`;
-  const description = `Tur privat ${name} sehari penuh (${cityData.durationHours} jam): ${topAttractions}, dan lainnya. Mulai ${minPrice?.toLocaleString()} THB per kendaraan dengan sopir — jemput di hotel Anda.`;
+  const title = `Tour Private ${name} — Harga & Itinerary`;
+  const description = `Tour private ${name} sehari penuh (${cityData.durationHours} jam): ${topAttractions}, dan lainnya. Mulai ${minPrice?.toLocaleString()} THB per kendaraan dengan sopir — jemput di hotel Anda.`;
 
   return {
     title,
     description,
-    keywords: `tur privat ${name.toLowerCase()}, sewa mobil ${name.toLowerCase()}, day trip ${name.toLowerCase()}, tur ${name.toLowerCase()} dari bangkok, harga tur ${name.toLowerCase()}`,
+    keywords: `tour private ${name.toLowerCase()}, sewa mobil ${name.toLowerCase()}, day trip ${name.toLowerCase()}, tour ${name.toLowerCase()} dari bangkok, harga tour ${name.toLowerCase()}`,
     alternates: { canonical: `/tours/${city}` },
     openGraph: {
       title,
@@ -77,7 +77,7 @@ export default async function TourDetailPage({
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Beranda", item: siteUrl },
-      { "@type": "ListItem", position: 2, name: "Tur", item: `${siteUrl}/tours` },
+      { "@type": "ListItem", position: 2, name: "Tour", item: `${siteUrl}/tours` },
       { "@type": "ListItem", position: 3, name, item: pageUrl },
     ],
   };
@@ -98,7 +98,7 @@ export default async function TourDetailPage({
   const tripLd = {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
-    name: `Tur Privat ${name}`,
+    name: `Tour Private ${name}`,
     description: guideId.intros[city as keyof typeof guideId.intros]?.[0],
     url: pageUrl,
     provider: { "@id": `${siteUrl}/#organization` },

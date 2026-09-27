@@ -28,7 +28,7 @@ Estimasi tiket masuk: Grand Palace 500 THB, Wat Pho 300 THB, Wat Arun 200 THB pe
 
 ## Hari 3 — Day Trip Ayutthaya
 
-Kota tua warisan dunia UNESCO ini hanya 1,5 jam dari Bangkok — day trip favorit keluarga yang ingin suasana berbeda. Kunjungi **Wat Mahathat** (kepala Buddha di akar pohon), **Wat Chaiwatthanaram**, dan **Istana Bang Pa-In**. Detail rute dan harga ada di halaman [tur Ayutthaya](/tours/ayutthaya).
+Kota tua warisan dunia UNESCO ini hanya 1,5 jam dari Bangkok — day trip favorit keluarga yang ingin suasana berbeda. Kunjungi **Wat Mahathat** (kepala Buddha di akar pohon), **Wat Chaiwatthanaram**, dan **Istana Bang Pa-In**. Detail rute dan harga ada di halaman [tour Ayutthaya](/tours/ayutthaya).
 
 Alternatif jika rombongan membawa balita: ganti dengan hari santai di Bangkok — **Safari World** atau akuarium **SEA LIFE** di Siam Paragon.
 
@@ -41,15 +41,15 @@ Alternatif jika rombongan membawa balita: ganti dengan hari santai di Bangkok �
 
 | Pengeluaran | Estimasi (THB) |
 |---|---|
-| Kendaraan privat + sopir, 4 hari (van) | 16.800–21.200 |
+| Kendaraan private + sopir, 4 hari (van) | 16.800–21.200 |
 | Hotel keluarga 3 malam (2 kamar) | 9.000–18.000 |
 | Makan 4 hari | 6.000–10.000 |
 | Tiket masuk wisata | 4.000–6.000 |
 
-Catatan: harga kendaraan adalah harga per mobil — untuk 6 orang, van jauh lebih hemat daripada naik taksi atau Grab berkali-kali, apalagi untuk day trip keluar kota. Rincian harga per kendaraan ada di [halaman armada](/fleet) dan [tur privat Bangkok](/tours/bangkok).
+Catatan: harga kendaraan adalah harga per mobil — untuk 6 orang, van jauh lebih hemat daripada naik taksi atau Grab berkali-kali, apalagi untuk day trip keluar kota. Rincian harga per kendaraan ada di [halaman armada](/fleet) dan [tour private Bangkok](/tours/bangkok).
 
-## Kenapa Pakai Kendaraan Privat?
+## Kenapa Pakai Kendaraan Private?
 
-Empat hari di atas melibatkan banyak perpindahan: bandara, kuil, sungai, kota tua, pasar. Dengan transportasi umum, setiap perpindahan berarti tawar-menawar tuk-tuk, antre taksi, atau jalan kaki di cuaca panas — berat untuk anak kecil dan lansia. Dengan kendaraan privat, sopir menunggu di setiap lokasi dan rute bisa diubah kapan saja.
+Empat hari di atas melibatkan banyak perpindahan: bandara, kuil, sungai, kota tua, pasar. Dengan transportasi umum, setiap perpindahan berarti tawar-menawar tuk-tuk, antre taksi, atau jalan kaki di cuaca panas — berat untuk anak kecil dan lansia. Dengan kendaraan private, sopir menunggu di setiap lokasi dan rute bisa diubah kapan saja.
 
 Mau itinerary ini disesuaikan dengan tanggal dan jumlah rombongan Anda? Hubungi kami via WhatsApp — konsultasi gratis.

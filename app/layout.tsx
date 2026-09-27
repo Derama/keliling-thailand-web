@@ -24,13 +24,13 @@ export const metadata: Metadata = {
     title: "KT Admin",
   },
   title: {
-    default: "Tur Privat Keliling Thailand — Sewa Mobil + Sopir untuk Rombongan",
+    default: "Tour Private Keliling Thailand — Sewa Mobil + Sopir untuk Rombongan",
     template: "%s | Keliling Thailand",
   },
   description:
-    "Tur privat di Thailand untuk rombongan Indonesia: sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, itinerary bisa disesuaikan. Bangkok, Pattaya, Ayutthaya, dan lainnya.",
+    "Tour private di Thailand untuk rombongan Indonesia: sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, itinerary bisa disesuaikan. Bangkok, Pattaya, Ayutthaya, dan lainnya.",
   keywords:
-    "tur privat thailand, sewa mobil thailand, sewa van bangkok, private tour thailand, sewa mini bus thailand, airport transfer bangkok",
+    "tour private thailand, sewa mobil thailand, sewa van bangkok, private tour thailand, sewa mini bus thailand, airport transfer bangkok",
   alternates: {
     canonical: "/",
     languages: {
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Tur Privat Keliling Thailand untuk Rombongan Anda",
+    title: "Tour Private Keliling Thailand untuk Rombongan Anda",
     description:
       "Sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, bukan per orang.",
     type: "website",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tur Privat Keliling Thailand untuk Rombongan Anda",
+    title: "Tour Private Keliling Thailand untuk Rombongan Anda",
     description:
       "Sedan, SUV, van, dan mini bus dengan sopir. Harga per kendaraan, bukan per orang.",
   },

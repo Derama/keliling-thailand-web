@@ -38,8 +38,6 @@ export const vehicles: Vehicle[] = [
     id: "suv",
     pax: "1-5",
     image: "/vehicles/suv/corolla-cross-grsport-v3.png",
-    images: ["/vehicles/suv/corolla-cross-grsport-v3.png", "/vehicles/suv/fortuner-v2.png"],
-    imageLabels: ["New Corolla Cross GR Sport 2026", "Toyota Fortuner"],
   },
   { id: "alphard", pax: "1-6", image: "/vehicles/alphard/alphard-v2.png" },
   { id: "van", pax: "5-10", image: "/vehicles/van/van-v3.png" },
@@ -56,7 +54,7 @@ export const cities: City[] = [
     durationHours: 10,
     // Wat Arun from the Chao Phraya river
     image: unsplash("photo-1613672803979-a6edfc5a179b"),
-    prices: { altis: 3400, suv: 3700, alphard: 8500, van: 4200, minibus: 8000 },
+    prices: { altis: 3400, suv: 4300, alphard: 8500, van: 4200, minibus: 8000 },
     attractions: [
       { id: "grand-palace", hours: 2, image: unsplash("photo-1586098311577-520120ba3df3") },
       { id: "wat-pho", hours: 1.5, image: unsplash("photo-1704391445538-cf5e763234be") },
@@ -80,7 +78,7 @@ export const cities: City[] = [
     durationHours: 12,
     // Sanctuary of Truth on the coast
     image: unsplash("photo-1671597728617-32d19c352c4d"),
-    prices: { altis: 3700, suv: 4300, alphard: 10500, van: 5300, minibus: 10000 },
+    prices: { altis: 3700, suv: 5400, alphard: 10500, van: 5300, minibus: 10000 },
     driveFromBangkok: { km: 150, hours: "2" },
     attractions: [
       { id: "sanctuary-of-truth", hours: 1.5, image: unsplash("photo-1644902617098-45abe72a7445") },
@@ -100,7 +98,7 @@ export const cities: City[] = [
     durationHours: 10,
     // Wat Chaiwatthanaram at sunset
     image: unsplash("photo-1584314637755-8f69c5e5078a"),
-    prices: { altis: 3400, suv: 4000, alphard: 10500, van: 4500 },
+    prices: { altis: 3400, suv: 5400, alphard: 10500, van: 4500 },
     driveFromBangkok: { km: 80, hours: "1.5" },
     attractions: [
       { id: "wat-mahathat", hours: 1.5, image: unsplash("photo-1632130879594-b2d00838f09d") },
@@ -120,7 +118,7 @@ export const cities: City[] = [
     durationHours: 10,
     // Death Railway train on the cliffside trestle
     image: unsplash("photo-1702826711635-790dc66f1c41"),
-    prices: { altis: 4200, suv: 4700, alphard: 10500, van: 5300 },
+    prices: { altis: 4200, suv: 5700, alphard: 10500, van: 5300 },
     driveFromBangkok: { km: 130, hours: "2.5" },
     attractions: [
       { id: "bridge-river-kwai", hours: 1.5, image: unsplash("photo-1624806296367-33e24d6162ef") },
@@ -140,7 +138,7 @@ export const cities: City[] = [
     // Hua Hin Railway Station royal pavilion.
     // Photo: Khaosaming, Wikimedia Commons, CC BY-SA 4.0
     image: "/huahin-station.jpg",
-    prices: { altis: 4300, suv: 4800, alphard: 10500, van: 5500 },
+    prices: { altis: 4300, suv: 5700, alphard: 10500, van: 5500 },
     driveFromBangkok: { km: 200, hours: "3" },
     attractions: [
       { id: "cicada-market", hours: 2, image: unsplash("photo-1541738158050-3f1568a657a5") },
@@ -159,7 +157,7 @@ export const cities: City[] = [
     durationHours: 12,
     // Khao Yai mountain panorama
     image: unsplash("photo-1601225612399-46e1fd6b9e90"),
-    prices: { altis: 4200, suv: 4700, alphard: 10500, van: 5500, minibus: 11000 },
+    prices: { altis: 4200, suv: 5700, alphard: 10500, van: 5500, minibus: 11000 },
     driveFromBangkok: { km: 165, hours: "2.5" },
     attractions: [
       { id: "khao-yai-national-park", hours: 4, image: unsplash("photo-1748966006345-ea3c0ca397e9") },

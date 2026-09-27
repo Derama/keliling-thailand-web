@@ -59,7 +59,7 @@ export const PRICE_BOOK: ServiceGroup[] = [
   {
     group: "Airport Pickup",
     services: [
-      { id: "at-bangkok", name: "DMK → Bangkok", prices: row([500, 800], [600, 1000], [900, 1300]) },
+      { id: "at-bangkok", name: "DMK → Bangkok", prices: row([500, 800], [600, 1500], [900, 1300]) },
       { id: "at-pattaya", name: "DMK → Pattaya", prices: row([1500, 2000], [1700, 2200], [2200, 2500]) },
       { id: "at-khaoyai", name: "DMK → Khao Yai", prices: row([2200, 2700], [2500, 3000], [3500, 4000]) },
       { id: "at-huahin", name: "DMK → Hua Hin", prices: row([2200, 2700], [2700, 3200], [3200, 3700]) },
@@ -68,18 +68,19 @@ export const PRICE_BOOK: ServiceGroup[] = [
   {
     group: "Daily Return Tours",
     services: [
-      { id: "ct-bangkok", name: "Bangkok City Tour", prices: row([2400, 3200], [2700, 3700], [3200, 4200]) },
-      { id: "bangkok-pattaya", name: "Bangkok → Pattaya", prices: row([2700, 3700], [3300, 4300], [4300, 5300]) },
-      { id: "bangkok-khaoyai", name: "Bangkok → Khao Yai", prices: row([3200, 4200], [3700, 4700], [4300, 5500]) },
-      { id: "bangkok-huahin", name: "Bangkok → Hua Hin", prices: row([3300, 4300], [3800, 4800], [4800, 5500]) },
-      { id: "bangkok-ayutthaya", name: "Bangkok → Ayutthaya", prices: row([2400, 3400], [3000, 4000], [3500, 4500]) },
-      { id: "bangkok-kanchanaburi", name: "Bangkok → Kanchanaburi", prices: row([3200, 4200], [3700, 4700], [4300, 5300]) },
+      { id: "ct-bangkok", name: "Bangkok City Tour", prices: row([2400, 3200], [2700, 4300], [3200, 4200]) },
+      { id: "bangkok-pattaya", name: "Bangkok → Pattaya", prices: row([2700, 3700], [3300, 5400], [4300, 5300]) },
+      { id: "bangkok-khaoyai", name: "Bangkok → Khao Yai", prices: row([3200, 4200], [3700, 5700], [4300, 5500]) },
+      { id: "bangkok-huahin", name: "Bangkok → Hua Hin", prices: row([3300, 4300], [3800, 5700], [4800, 5500]) },
+      { id: "bangkok-ayutthaya", name: "Bangkok → Ayutthaya", prices: row([2400, 3400], [3000, 5400], [3500, 4500]) },
+      { id: "bangkok-kanchanaburi", name: "Bangkok → Kanchanaburi", prices: row([3200, 4200], [3700, 5700], [4300, 5300]) },
     ],
   },
   {
     group: "Drop-Off and Northern Thailand",
     services: [
       { id: "pattaya-khaoyai", name: "Pattaya → Khao Yai", prices: row([3000, 3500], [3300, 3800], [3800, 4200]) },
+      { id: "bangkok-pattaya-dropoff", name: "Bangkok → Pattaya (Drop-off only)", contact: true },
       { id: "cm-cr", name: "Chiang Mai → Chiang Rai", contact: true },
       { id: "cm-trip", name: "Chiang Mai Trip", contact: true },
       { id: "cr-trip", name: "Chiang Rai Trip", contact: true },

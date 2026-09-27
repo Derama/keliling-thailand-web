@@ -61,10 +61,10 @@ export const DEFAULT_FLEET: FleetItem[] = [
   },
   {
     id: "suv",
-    name: "SUV — Corolla Cross GR Sport 2026 / Fortuner",
+    name: "SUV — Corolla Cross GR Sport 2026",
     capacity: "1–5 penumpang",
     blurb:
-      "Keluarga kecil dengan bagasi besar — kabin tinggi dan lega.",
+      "Tur privat premium — kabin tinggi dan lega untuk keluarga kecil dengan bagasi besar.",
     image: "/vehicles/suv/corolla-cross-grsport-v3.png",
     enabled: true,
   },

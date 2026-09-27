@@ -22,6 +22,7 @@ export type PublicServiceId =
   | "bangkok-ayutthaya"
   | "bangkok-kanchanaburi"
   | "pattaya-khaoyai"
+  | "bangkok-pattaya-dropoff"
   | "cm-cr"
   | "cm-trip"
   | "cr-trip";
@@ -43,7 +44,7 @@ export const PUBLIC_PRICE_GROUPS: PublicPriceGroup[] = [
     services: [
       {
         id: "at-bangkok",
-        prices: { altis: 800, suv: 1000, van: 1300 },
+        prices: { altis: 800, suv: 1500, van: 1300 },
       },
       {
         id: "at-pattaya",
@@ -64,27 +65,27 @@ export const PUBLIC_PRICE_GROUPS: PublicPriceGroup[] = [
     services: [
       {
         id: "ct-bangkok",
-        prices: { altis: 3200, suv: 3700, van: 4200 },
+        prices: { altis: 3200, suv: 4300, van: 4200 },
       },
       {
         id: "bangkok-pattaya",
-        prices: { altis: 3700, suv: 4300, van: 5300 },
+        prices: { altis: 3700, suv: 5400, van: 5300 },
       },
       {
         id: "bangkok-khaoyai",
-        prices: { altis: 4200, suv: 4700, van: 5500 },
+        prices: { altis: 4200, suv: 5700, van: 5500 },
       },
       {
         id: "bangkok-huahin",
-        prices: { altis: 4300, suv: 4800, van: 5500 },
+        prices: { altis: 4300, suv: 5700, van: 5500 },
       },
       {
         id: "bangkok-ayutthaya",
-        prices: { altis: 3400, suv: 4000, van: 4500 },
+        prices: { altis: 3400, suv: 5400, van: 4500 },
       },
       {
         id: "bangkok-kanchanaburi",
-        prices: { altis: 4200, suv: 4700, van: 5300 },
+        prices: { altis: 4200, suv: 5700, van: 5300 },
       },
     ],
   },
@@ -94,6 +95,10 @@ export const PUBLIC_PRICE_GROUPS: PublicPriceGroup[] = [
       {
         id: "pattaya-khaoyai",
         prices: { altis: 3500, suv: 3800, van: 4200 },
+      },
+      {
+        id: "bangkok-pattaya-dropoff",
+        prices: { suv: 3400 },
       },
       {
         id: "cm-cr",
